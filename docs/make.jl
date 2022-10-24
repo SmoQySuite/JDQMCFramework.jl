@@ -22,6 +22,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/SmoQySuite/JDQMCFramework.jl",
+    repo="github.com/SmoQySuite/JDQMCFramework.jl.git",
     devbranch="master",
 )
