@@ -1,5 +1,6 @@
 using JDQMCFramework
 using Documenter
+using LinearAlgebra
 
 DocMeta.setdocmeta!(JDQMCFramework, :DocTestSetup, :(using JDQMCFramework); recursive=true)
 
@@ -16,6 +17,7 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
+        "API" => "api.md"
     ],
 )
 
