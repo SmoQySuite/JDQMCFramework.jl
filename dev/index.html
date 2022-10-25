@@ -75,22 +75,22 @@ Gdn = zeros(N,N)
 logdetGdn, sgndetGdn = calculate_equaltime_greens!(Gdn, fgc_dn)
 
 Gdn</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">16×16 Matrix{Float64}:
-  0.5          -0.187347     -8.37266e-16  …   0.0623473    -5.4683e-16
- -0.187347      0.5          -0.187347         2.58688e-16   0.0623473
- -3.64483e-16  -0.187347      0.5             -0.187347     -2.39582e-16
- -0.187347      5.86106e-17  -0.187347        -7.31e-16     -0.187347
- -0.187347      5.76499e-16   0.0623473        7.50759e-17   0.0623473
- -5.28766e-17  -0.187347     -1.26255e-16  …   0.0623473    -2.33288e-16
-  0.0623473    -2.39392e-16  -0.187347        -3.02226e-17   0.0623473
-  1.49538e-16   0.0623473     2.75014e-16      0.0623473    -1.07201e-16
- -1.78171e-16   0.0623473     3.2063e-16       0.0623473    -4.41848e-16
-  0.0623473    -4.78895e-17   0.0623473       -1.01993e-15   0.0623473
-  1.04462e-15   0.0623473    -8.21298e-16  …  -0.187347     -8.64183e-17
-  0.0623473    -4.8261e-16    0.0623473        4.4019e-16   -0.187347
- -0.187347      1.24532e-16   0.0623473        3.88083e-16  -0.187347
-  1.57113e-17  -0.187347      7.65126e-16     -0.187347     -3.45111e-16
-  0.0623473     1.10447e-16  -0.187347         0.5          -0.187347
- -2.46594e-16   0.0623473     2.29458e-16  …  -0.187347      0.5</code></pre><p>Now we will demonstrate how to synchronously iterate over the imaginary time slices for both the spin up and spin down sectors.</p><pre><code class="language-julia hljs"># Iterate over imaginary time τ=Δτ⋅l.
+  0.5          -0.187347     -6.91121e-16  …   0.0623473    -3.76191e-16
+ -0.187347      0.5          -0.187347        -6.105e-16     0.0623473
+  3.77298e-16  -0.187347      0.5             -0.187347      1.64714e-17
+ -0.187347     -7.37668e-16  -0.187347        -2.43433e-16  -0.187347
+ -0.187347     -8.83141e-16   0.0623473        6.34021e-16   0.0623473
+ -2.20159e-16  -0.187347      2.26124e-17  …   0.0623473     3.62704e-16
+  0.0623473    -6.18057e-16  -0.187347         1.56668e-16   0.0623473
+  6.88684e-16   0.0623473    -7.40513e-16      0.0623473    -2.27255e-16
+  8.85909e-16   0.0623473     8.36216e-16      0.0623473    -1.68804e-16
+  0.0623473    -1.07027e-15   0.0623473       -3.7287e-16    0.0623473
+ -6.43177e-16   0.0623473     3.6236e-17   …  -0.187347      1.89486e-16
+  0.0623473     1.2482e-15    0.0623473       -6.34033e-16  -0.187347
+ -0.187347     -4.63171e-16   0.0623473        6.76001e-16  -0.187347
+  3.93943e-16  -0.187347     -6.35525e-16     -0.187347     -5.01478e-17
+  0.0623473    -5.25257e-16  -0.187347         0.5          -0.187347
+ -5.85272e-16   0.0623473     6.97574e-16  …  -0.187347      0.5</code></pre><p>Now we will demonstrate how to synchronously iterate over the imaginary time slices for both the spin up and spin down sectors.</p><pre><code class="language-julia hljs"># Iterate over imaginary time τ=Δτ⋅l.
 for l in fgc_up
 
     # Propagate equal-time Green&#39;s function matrix to current imaginary time G(τ±Δτ,τ±Δτ) ==&gt; G(τ,τ)
@@ -115,4 +115,4 @@ calculate_unequaltime_greens!(G0τ_up, Gττ_up, fgc_up, Bup)
 
 G0τ_dn = zeros(N, N, Lτ+1)
 Gττ_dn = zeros(N, N, Lτ+1)
-calculate_unequaltime_greens!(G0τ_dn, Gττ_dn, fgc_dn, Bdn)</code></pre><p>Calling the <a href="api/#JDQMCFramework.calculate_unequaltime_greens!"><code>calculate_unequaltime_greens!</code></a> method also reverses the direction of iteration the next time imaginary time is iterated over.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Tuesday 25 October 2022 00:59">Tuesday 25 October 2022</span>. Using Julia version 1.8.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+calculate_unequaltime_greens!(G0τ_dn, Gττ_dn, fgc_dn, Bdn)</code></pre><p>Calling the <a href="api/#JDQMCFramework.calculate_unequaltime_greens!"><code>calculate_unequaltime_greens!</code></a> method also reverses the direction of iteration the next time imaginary time is iterated over.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Tuesday 25 October 2022 01:13">Tuesday 25 October 2022</span>. Using Julia version 1.8.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
