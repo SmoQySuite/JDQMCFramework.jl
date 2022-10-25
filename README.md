@@ -7,3 +7,15 @@
 
 This package exports a suite of types and routines that significantly simplify the process of writing a determinant quantum
 Monte Carlo (DQMC) code.
+
+## Installation
+To install [`JDQMCFramework.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl.git) run following in the Julia REPL:
+
+```julia
+] add JDQMCFramework
+```
+
+## Documentation
+
+- [STABLE](https://SmoQySuite.github.io/JDQMCFramework.jl/stable/): Documentation for the latest version of the code published to the Julia package registry.
+- [DEV](https://SmoQySuite.github.io/JDQMCFramework.jl/dev/): Documentation for the latest commit to the `master` branch.
