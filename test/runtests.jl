@@ -61,7 +61,7 @@ end
     Bup = AsymExactPropagator{eltype(expmΔτK),eltype(expmΔτV)}[]; # spin up propagators
     Bdn = AsymExactPropagator{eltype(expmΔτK),eltype(expmΔτV)}[]; # spin down propagators
     for l in 1:Lτ
-        B_l = AsymExactPropagator(expmΔτV, expmΔτK, exppΔτK, false)
+        B_l = AsymExactPropagator(expmΔτV, expmΔτK, exppΔτK)
         push!(Bup, B_l)
         push!(Bdn, B_l)
     end
@@ -99,8 +99,8 @@ end
         # Periodically re-calculate the Green's function matrix for numerical stability.
         # If not performing updates, but just evaluating the derivative of the action, then
         # set update_B̄=false to avoid wasting cpu time re-computing B̄ₙ matrices.
-        logdetGup, sgndetGup = stabilize_equaltime_greens!(Gup, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=true)
-        logdetGdn, sgndetGdn = stabilize_equaltime_greens!(Gdn, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=true)
+        logdetGup, sgndetGup, δGup, δθup = stabilize_equaltime_greens!(Gup, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=true)
+        logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_equaltime_greens!(Gdn, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=true)
 
         # test that spin up equal-time Green's function is correct
         @test G ≈ Gup
@@ -128,8 +128,8 @@ end
         # Periodically re-calculate the Green's function matrix for numerical stability.
         # If not performing updates, but just evaluating the derivative of the action, then
         # set update_B̄=false to avoid wasting cpu time re-computing B̄ₙ matrices.
-        logdetGup, sgndetGup = stabilize_equaltime_greens!(Gup, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=true)
-        logdetGdn, sgndetGdn = stabilize_equaltime_greens!(Gdn, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=true)
+        logdetGup, sgndetGup, δGup, δθup = stabilize_equaltime_greens!(Gup, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=true)
+        logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_equaltime_greens!(Gdn, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=true)
 
         # test that spin up equal-time Green's function is correct
         @test G ≈ Gup
@@ -153,15 +153,15 @@ end
 
     # calculate uneqaul time Green's function, and equal time Green's function
     # for all imaginary time slices
-    G0τ_up = zeros(N, N, Lτ+1)
-    G0τ_dn = zeros(N, N, Lτ+1)
+    Gτ0_up = zeros(N, N, Lτ+1)
+    Gτ0_dn = zeros(N, N, Lτ+1)
     Gττ_up = zeros(N, N, Lτ+1)
     Gττ_dn = zeros(N, N, Lτ+1)
-    calculate_unequaltime_greens!(G0τ_up, Gττ_up, fgc_up, Bup)
-    calculate_unequaltime_greens!(G0τ_dn, Gττ_dn, fgc_dn, Bdn)
+    calculate_unequaltime_greens!(Gτ0_up, Gττ_up, fgc_up, Bup)
+    calculate_unequaltime_greens!(Gτ0_dn, Gττ_dn, fgc_dn, Bdn)
 
     # test that spin up unequal time Greens function is correct
-    @test G_l ≈ G0τ_up
+    @test G_l ≈ Gτ0_up
 
     # test that spin up equal time Greens functions is correct
     @testset for l in 0:Lτ
@@ -170,7 +170,7 @@ end
     end
 
     # test that spin down unequal time Greens function is correct
-    @test G_l ≈ G0τ_dn
+    @test G_l ≈ Gτ0_dn
 
     # test that spin down equal time Greens functions is correct
     @testset for l in 0:Lτ

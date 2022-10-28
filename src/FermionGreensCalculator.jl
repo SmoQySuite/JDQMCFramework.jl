@@ -15,6 +15,7 @@ A type to facilitate calculating the single-particle fermion Green's function ma
 - `Nₛ::Int`: Number of numerical stabilization intervals, ``N_s = \left\lceil L_\tau / n_s \right\rceil.``
 - `B̄::Array{T,3}`: A multidimensional array where the matrix `B̄[:,:,n]` represents ``\bar{B}_n.``
 - `F::Vector{LDR{T,E}}`: A vector of ``N_s`` LDR factorizations to represent the matrices ``B(0,\tau)`` and ``B(\tau,\beta)``.
+- `G′::Matrix{T}`: Matrix used for calculating the error corrected by numerical stabilization of the equal time Green's function.
 - `ldr_ws::LDRWorkspace{T}`: Workspace for performing LDR factorization while avoiding dynamic memory allocations.
 """
 mutable struct FermionGreensCalculator{T<:Continuous, E<:AbstractFloat}
@@ -29,6 +30,7 @@ mutable struct FermionGreensCalculator{T<:Continuous, E<:AbstractFloat}
     const Nₛ::Int
     const B̄::Array{T, 3}
     const F::Vector{LDR{T,E}}
+    const G′::Matrix{T}
     const ldr_ws::LDRWorkspace{T}
 end
 
@@ -62,6 +64,9 @@ function fermion_greens_calculator(B::AbstractVector{P}, N::Int, β::E, Δτ::E,
         copyto!(B̄ₙ, I)
     end
 
+    # calculate scratch matrix
+    G′ = zeros(T, N, N)
+
     # construct vector of LDR factorization to represent B(τ,0) and B(β,τ) matrices
     B_template = zeros(T, N, N)
     copyto!(B_template, I)
@@ -75,7 +80,7 @@ function fermion_greens_calculator(B::AbstractVector{P}, N::Int, β::E, Δτ::E,
     forward = false
 
     # allocate FermionGreensCalculator struct
-    fgc = FermionGreensCalculator(forward, l, N, β, Δτ, Lτ, nₛ, Nₛ, B̄, F, ldr_ws)
+    fgc = FermionGreensCalculator(forward, l, N, β, Δτ, Lτ, nₛ, Nₛ, B̄, F, G′, ldr_ws)
 
     # initialize FermionGreensCalculator struct
     for l in fgc
@@ -173,7 +178,7 @@ end
     update_factorizations!(fgc::FermionGreensCalculator{T,E}) where {T, E}
 
 If current imaginary time slice `fgc.l` corresponds to the boundary of a stabilization interval,
-calculate a LDR factorization to represent ``B(0, \tau)`` or ``B(\tau-\Delta\tau, \beta)``
+calculate a LDR factorization to represent ``B(\tau, 0)`` or ``B(\beta, \tau-\Delta\tau)``
 if iterating over imaginary time in the forward (`fgc.forward = true`)
 or reverse (`fgc.forward = false`) directions respectively.
 This method should be called *after* all changes to the current time slice propagator matrix
@@ -194,33 +199,33 @@ function update_factorizations!(fgc::FermionGreensCalculator{T,E}) where {T, E}
     if forward
         # if at boundary of first stabilization interval (l=nₛ)
         if l′==nₛ && n==1
-            # calculate B(0,τ=nₛ⋅Δτ) = B̄[1]
+            # calculate B(τ=nₛ⋅Δτ,0) = B̄[1]
             B̄₁ = @view B̄[:,:,1]
-            B_0τ = F[1]::LDR{T,E}
-            ldr!(B_0τ, B̄₁, ldr_ws)
+            B_τ0 = F[1]::LDR{T,E}
+            ldr!(B_τ0, B̄₁, ldr_ws)
         # if at the end of a stabilization interval
-        elseif l′==nₛ || l==Lτ
-            # calculate B(0,τ=n⋅nₛ⋅Δτ) = B(0,τ=(n-1)⋅nₛ⋅Δτ) × B̄[n]
+        elseif l′==nₛ || l==Lτ && Nₛ > 1
+            # calculate B(τ=n⋅nₛ⋅Δτ,0) = B̄[n]⋅B(τ=(n-1)⋅nₛ⋅Δτ,0)
             B̄ₙ = @view B̄[:,:,n]
-            B_0τ_new = F[n]::LDR{T,E}
-            B_0τ_prev = F[n-1]::LDR{T,E}
-            mul!(B_0τ_new, B_0τ_prev, B̄ₙ, ldr_ws)
+            B_τ0_new = F[n]::LDR{T,E}
+            B_τ0_prev = F[n-1]::LDR{T,E}
+            mul!(B_τ0_new, B̄ₙ, B_τ0_prev, ldr_ws)
         end
     # if iterating from l=Lτ => l=1
     else
         # if at boundary of last stabilization interval (l=Lτ-nₛ+1)
         if l′==1 && n==Nₛ
-            # calculate B(τ=β-(nₛ+1)Δτ,β) = B̄[Nₛ]
+            # calculate B(β,τ=β-(nₛ+1)Δτ) = B̄[Nₛ]
             B̄_Nₛ = @view B̄[:,:,n]
-            B_τβ = F[n]::LDR{T,E}
-            ldr!(B_τβ, B̄_Nₛ, ldr_ws)
+            B_βτ = F[n]::LDR{T,E}
+            ldr!(B_βτ, B̄_Nₛ, ldr_ws)
         # if at boundary of stabilization interval
-        elseif l′==1
-            # calculate B(τ=β-n⋅nₛ⋅Δτ-Δτ,β) = B̄[n] × B(τ=β-n⋅nₛ⋅Δτ,β)
+        elseif l′==1 && Nₛ > 1
+            # calculate B(β,τ=β-n⋅nₛ⋅Δτ-Δτ) = B(β,τ=β-n⋅nₛ⋅Δτ)⋅B̄[n]
             B̄ₙ = @view B̄[:,:,n]
-            B_τβ_new = F[n]::LDR{T,E}
-            B_τβ_prev = F[n+1]::LDR{T,E}
-            mul!(B_τβ_new, B̄ₙ, B_τβ_prev, ldr_ws)
+            B_βτ_new = F[n]::LDR{T,E}
+            B_βτ_prev = F[n+1]::LDR{T,E}
+            mul!(B_βτ_new, B_βτ_prev, B̄ₙ, ldr_ws)
         end
     end
 
@@ -278,7 +283,7 @@ function calculate_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P},
     B̄ₙ = @view B̄[:,:,n]
     copyto!(B̄ₙ, I) # B̄ₙ := I
     # iterate over imaginary time slices associated with stabilization interval
-    for l in (n-1)*nₛ+1:min(n*nₛ,Lτ)
+    for l in min(n*nₛ,Lτ):-1:(n-1)*nₛ+1
         B_l = B[l]::P
         rmul!(B̄ₙ, B_l, M = ldr_ws.M) # B̄ₙ := B̄ₙ⋅B[l]
     end

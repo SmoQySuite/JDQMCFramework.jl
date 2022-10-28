@@ -58,7 +58,7 @@ end
 
 Represents imaginary time propagator matrix as using the symmetric form
 ```math
-B_l = e^{-\Delta\tau K_l} e^{-\Delta\tau V_l},
+B_l = e^{-\Delta\tau V_l} e^{-\Delta\tau K_l},
 ```
 where ``K_l`` is the strictly off-diagonal hopping matrix and ``V_l``
 is the diagonal total on-site energy matrix.
@@ -68,7 +68,6 @@ is the diagonal total on-site energy matrix.
 - `expmΔτV::Vector{E}`: A vector representing the diagonal exponeniated on-site energy matrix ``e^{-\Delta\tau V_l}.``
 - `expmΔτK::Matrix{T}`: The exponentiated hopping matrix ``e^{-\Delta\tau K_l}.``
 - `exppΔτK::Matrix{T}`: Inverse of the exponentiated hopping matrix ``e^{+\Delta\tau K_l}.``
-- `adjointed::Bool`: If `true` then propagator is representing ``B_l^\dagger = e^{-\Delta\tau V_l} e^{-\Delta\tau K_l}.``
 """
 struct AsymExactPropagator{T,E} <: AbstractExactPropagator{T,E}
     
@@ -80,9 +79,6 @@ struct AsymExactPropagator{T,E} <: AbstractExactPropagator{T,E}
 
     "Inverse of the exponentiated hopping matrix `exp(-Δτ⋅Kₗ)`"
     exppΔτK::Matrix{T}
-
-    "If representing adjoint of propagator matrix."
-    adjointed::Bool
 end
 
 
@@ -117,7 +113,7 @@ end
 
 Represents imaginary time propagator matrix as using the symmetric form
 ```math
-B_l = e^{-\Delta\tau K_l} e^{-\Delta\tau V_l},
+B_l = e^{-\Delta\tau V_l} e^{-\Delta\tau K_l},
 ```
 where ``K_l`` is the strictly off-diagonal hopping matrix and ``V_l``
 is the diagonal total on-site energy matrix. The exponentiated hopping
@@ -127,7 +123,6 @@ matrix ``e^{-\Delta\tau K}`` is represented by the checkerboard approximation.
 
 - `expmΔτV::Vector{E}`: The vector representing the diagonal exponeniated on-site energy matrix ``e^{-\Delta\tau V_l}.``
 - `expmΔτK::CheckerboardMatrix{T}`: The exponentiated hopping matrix ``e^{-\Delta\tau K_l}`` represented by the checkerboard approximation.
-- `adjointed::Bool`: If `true` then propagator is representing ``B_l^\dagger = e^{-\Delta\tau V_l} [e^{-\Delta\tau K_l}]^\dagger.``
 """
 struct AsymChkbrdPropagator{T,E} <: AbstractChkbrdPropagator{T,E}
     
@@ -136,9 +131,6 @@ struct AsymChkbrdPropagator{T,E} <: AbstractChkbrdPropagator{T,E}
 
     "The exponentiated hopping matrix `exp(-Δτ⋅Kₗ/2)` represented by the checkerboard approximation."
     expmΔτK::CheckerboardMatrix{T}
-
-    "If representing adjoint of propagator matrix."
-    adjointed::Bool
 end
 
 
@@ -209,14 +201,6 @@ end
 
 
 @doc raw"""
-    adjoint(B::AbstractPropagator)
-
-Return a propagator representing the adjoint of the passed propagator `B`.
-"""
-adjoint(B::AbstractPropagator) = propagator(B, allocate_expmΔτV=false, allocate_expmΔτK=false, adjointed=!B.adjointed)
-
-
-@doc raw"""
     mul!(A::AbstractMatrix{T}, B::SymExactPropagator{T}, C::AbstractMatrix{T};
          M::AbstractMatrix{T}=similar(A)) where {T}
 
@@ -243,13 +227,8 @@ end
 function mul!(A::AbstractMatrix{T}, B::AsymExactPropagator{T}, C::AbstractMatrix{T};
               M::AbstractMatrix{T}=similar(A)) where {T}
 
-    if !B.adjointed
-        mul_D!(M, B.expmΔτV, C) # exp(-Δτ⋅V)⋅C
-        mul!(A, B.expmΔτK, M) # A = B⋅C = exp(-Δτ⋅K)⋅[exp(-Δτ⋅V)⋅C]
-    else
-        mul!(A, B.exppΔτK, C) # exp(-Δτ⋅K)⋅C
-        lmul_D!(B.expmΔτV, A) # A = Bᵀ⋅C = exp(-Δτ⋅V)⋅[exp(-Δτ⋅K)⋅C]
-    end
+    mul!(A, B.expmΔτK, C) # exp(-Δτ⋅K)⋅C
+    lmul_D!(B.expmΔτV, A) # A = B⋅C = exp(-Δτ⋅V)⋅[exp(-Δτ⋅K)⋅C]
 
     return nothing
 end
@@ -291,13 +270,8 @@ end
 function mul!(A::AbstractMatrix{T}, C::AbstractMatrix{T}, B::AsymExactPropagator{T};
               M::AbstractMatrix{T} = similar(A)) where {T}
 
-    if !B.adjointed
-        mul!(A, C, B.expmΔτK) # C⋅exp(-Δτ⋅K)
-        rmul_D!(A, B.expmΔτV) # A = C⋅B = [C⋅exp(-Δτ⋅K)]⋅exp(-Δτ⋅V)
-    else
-        rmul_D!(M, C, B.expmΔτV) # C⋅exp(-Δτ⋅V)
-        mul!(A, M, B.expmΔτK) # A := C⋅Bᵀ = [C⋅exp(-Δτ⋅V)]⋅exp(-Δτ⋅K)
-    end
+    mul_D!(M, C, B.expmΔτV) # C⋅exp(-Δτ⋅V)
+    mul!(A, M, B.expmΔτK) # A := C⋅B = [C⋅exp(-Δτ⋅V)]⋅exp(-Δτ⋅K)
 
     return nothing
 end
@@ -342,13 +316,8 @@ end
 function lmul!(B::AsymExactPropagator{T}, A::AbstractMatrix{T};
                M::AbstractMatrix{T} = similar(A)) where {T}
 
-    if !B.adjointed
-        mul_D!(M, B.expmΔτV, A) # exp(-Δτ⋅V)⋅A
-        mul!(A, B.expmΔτK, M) # A := B⋅A = exp(-Δτ⋅K)⋅[exp(-Δτ⋅V)⋅A]
-    else
-        mul!(M, B.expmΔτK, A) # exp(-Δτ⋅K)⋅A
-        mul_D!(A, B.expmΔτV, M) # A := Bᵀ⋅A = exp(-Δτ⋅V)⋅[exp(-Δτ⋅K)⋅A]
-    end
+    mul!(M, B.expmΔτK, A) # exp(-Δτ⋅K)⋅A
+    mul_D!(A, B.expmΔτV, M) # A := B⋅A = exp(-Δτ⋅V)⋅[exp(-Δτ⋅K)⋅A]
 
     return nothing
 end
@@ -367,14 +336,8 @@ end
 function lmul!(B::AsymChkbrdPropagator{T}, A::AbstractMatrix{T};
                M = nothing) where {T}
 
-    if B.adjointed
-        expmΔτKᵀ = adjoint(B.expmΔτK)
-        lmul!(expmΔτKᵀ, A) # exp(-Δτ⋅K)ᵀ⋅A
-        lmul_D!(B.expmΔτV, A) # A := Bᵀ⋅A = exp(-Δτ⋅V)⋅[exp(-Δτ⋅K)ᵀ⋅A]
-    else
-        lmul_D!(B.expmΔτV, A) # exp(-Δτ⋅V)⋅A
-        lmul!(B.expmΔτK, A) # A := B⋅A = exp(-Δτ⋅K)⋅[exp(-Δτ⋅V)⋅A]
-    end
+    lmul!(B.expmΔτK, A) # exp(-Δτ⋅K)⋅A
+    lmul_D!(B.expmΔτV, A) # A := B⋅A = exp(-Δτ⋅V)⋅[exp(-Δτ⋅K)⋅A]
 
     return nothing
 end
@@ -410,13 +373,8 @@ end
 function rmul!(A::AbstractMatrix{T}, B::AsymExactPropagator{T};
                M::AbstractMatrix{T} = similar(A)) where {T}
 
-    if !B.adjointed
-        mul!(M, A, B.expmΔτK) # A⋅exp(-Δτ⋅K)
-        mul_D!(A, M, B.expmΔτV) # A := A⋅B = [A⋅exp(-Δτ⋅K)]⋅exp(-Δτ⋅V)
-    else
-        mul_D!(M, A, B.expmΔτV) # A⋅exp(-Δτ⋅V)
-        mul!(A, M, B.expmΔτK) # A := A⋅Bᵀ = [A⋅exp(-Δτ⋅V)]⋅exp(-Δτ⋅K)
-    end
+    mul_D!(M, A, B.expmΔτV) # A⋅exp(-Δτ⋅V)
+    mul!(A, M, B.expmΔτK) # A := A⋅B = [A⋅exp(-Δτ⋅V)]⋅exp(-Δτ⋅K)
 
     return nothing
 end
@@ -435,14 +393,8 @@ end
 function rmul!(A::AbstractMatrix{T}, B::AsymChkbrdPropagator{T};
                M = nothing) where {T}
 
-    if B.adjointed
-        expmΔτKᵀ = adjoint(B.expmΔτK)
-        rmul_D!(A, B.expmΔτV) # A⋅exp(-Δτ⋅V)
-        rmul!(A, expmΔτKᵀ) # A := A⋅Bᵀ = [A⋅exp(-Δτ⋅V)]⋅exp(-Δτ⋅K)ᵀ
-    else
-        rmul!(A, B.expmΔτK) # A⋅exp(-Δτ⋅K)
-        rmul_D!(A, B.expmΔτV) # A := A⋅B = [A⋅exp(-Δτ⋅K)]⋅exp(-Δτ⋅V)
-    end
+    rmul_D!(A, B.expmΔτV) # A⋅exp(-Δτ⋅V)
+    rmul!(A, B.expmΔτK) # A := A⋅B = [A⋅exp(-Δτ⋅V)]⋅exp(-Δτ⋅K)
 
     return nothing
 end
@@ -508,13 +460,8 @@ end
 function ldiv!(B::AsymExactPropagator{T}, A::AbstractMatrix{T};
                M::AbstractMatrix{T} = similar(A)) where {T}
     
-    if !B.adjointed
-        mul!(M, B.exppΔτK, A) # exp(+Δτ⋅K)⋅A
-        div_D!(A, B.expmΔτV, M) # A := B⁻¹⋅A = exp(+Δτ⋅V)⋅[exp(+Δτ⋅K)⋅A]
-    else
-        ldiv_D!(M, B.expmΔτV, A) # exp(+Δτ⋅V)⋅A
-        mul!(A, B.exppΔτK, M) # A := B⁻ᵀ⋅A = exp(+Δτ⋅K)⋅[exp(+Δτ⋅V)⋅A]
-    end
+    div_D!(M, B.expmΔτV, A) # exp(+Δτ⋅V)⋅A
+    mul!(A, B.exppΔτK, M) # A := B⁻¹⋅A = exp(+Δτ⋅K)⋅[exp(+Δτ⋅V)⋅A]
     
     return nothing
 end
@@ -533,14 +480,8 @@ end
 function ldiv!(B::AsymChkbrdPropagator{T}, A::AbstractMatrix{T};
                M = nothing) where {T}
 
-    if B.adjointed
-        expmΔτKᵀ = adjoint(B.expmΔτK)
-        ldiv_D!(B.expmΔτV, A) # exp(+Δτ⋅V)⋅A
-        ldiv!(expmΔτKᵀ, A) # A := B⁻ᵀ⋅A = exp(+Δτ⋅K)ᵀ⋅[exp(+Δτ⋅V)⋅A]
-    else
-        ldiv!(B.expmΔτK, A) # exp(+Δτ⋅K)⋅A
-        ldiv_D!(B.expmΔτV, A) # A := B⁻¹⋅A = exp(+Δτ⋅V)⋅[exp(+Δτ⋅K)⋅A]
-    end
+    ldiv_D!(B.expmΔτV, A) # exp(+Δτ⋅V)⋅A
+    ldiv!(B.expmΔτK, A) # A := B⁻¹⋅A = exp(+Δτ⋅K)⋅[exp(+Δτ⋅V)⋅A]
     
     return nothing
 end
@@ -606,13 +547,8 @@ end
 function rdiv!(A::AbstractMatrix{T}, B::AsymExactPropagator{T};
                M::AbstractMatrix{T} = similar(A)) where {T}
 
-    if !B.adjointed
-        div_D!(M, A, B.expmΔτV) # A⋅exp(+Δτ⋅V)
-        mul!(A, M, B.exppΔτK) # A := A⋅B⁻¹ = [A⋅exp(+Δτ⋅V)]⋅exp(+Δτ⋅K)
-    else
-        mul!(M, A, B.exppΔτK) # A⋅exp(+Δτ⋅K)
-        div_D!(A, B.expmΔτV, M) # A := A⋅B⁻ᵀ = [A⋅exp(+Δτ⋅K)]⋅exp(+Δτ⋅V)
-    end
+    mul!(M, A, B.exppΔτK) # A⋅exp(+Δτ⋅K)
+    div_D!(A, M, B.expmΔτV) # A := A⋅B⁻¹ = [A⋅exp(+Δτ⋅K)]⋅exp(+Δτ⋅V)
 
     return nothing
 end
@@ -631,14 +567,8 @@ end
 function rdiv!(A::AbstractMatrix{T}, B::AsymChkbrdPropagator{T};
                M = nothing) where {T}
 
-    if B.adjointed
-        expmΔτKᵀ = adjoint(B.expmΔτK)
-        rdiv!(A, expmΔτKᵀ) # A⋅exp(+ΔτK)ᵀ
-        rdiv_D!(A, B.expmΔτV) # A := A⋅B⁻ᵀ = [A⋅exp(+ΔτK)ᵀ]⋅exp(+Δτ⋅V)
-    else
-        rdiv_D!(A, B.expmΔτV) # A⋅exp(+Δτ⋅V)
-        rdiv!(A, B.expmΔτK) # A := A⋅B⁻¹ = [A⋅exp(+Δτ⋅V)]⋅exp(+Δτ⋅K)
-    end
+    rdiv!(A, B.expmΔτK) # A⋅exp(+ΔτK)
+    rdiv_D!(A, B.expmΔτV) # A := A⋅B⁻¹ = [A⋅exp(+ΔτK)]⋅exp(+Δτ⋅V)
 
     return nothing
 end

@@ -6,7 +6,7 @@ using Checkerboard
 using StableLinearAlgebra
 
 # importing function to be overloaded
-import Base: size, copyto!, adjoint, iterate
+import Base: size, copyto!, iterate
 import LinearAlgebra: mul!, lmul!, rmul!, ldiv!, rdiv!
 
 # import functions for multiplying/dividing by diagonal matrix represented by a vector

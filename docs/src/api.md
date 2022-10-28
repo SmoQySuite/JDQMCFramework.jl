@@ -26,7 +26,6 @@ SymPropagators
 
 - [`size`](@ref)
 - [`copyto!`](@ref)
-- [`adjoint`](@ref)
 - [`mul!`](@ref)
 - [`lmul!`](@ref)
 - [`rmul!`](@ref)
@@ -36,7 +35,6 @@ SymPropagators
 ```@docs
 Base.size
 Base.copyto!
-Base.adjoint
 LinearAlgebra.mul!
 LinearAlgebra.lmul!
 LinearAlgebra.rmul!
