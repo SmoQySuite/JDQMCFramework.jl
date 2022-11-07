@@ -413,7 +413,7 @@ function stabilize_equaltime_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::
         # calculate the error corrected by stabilization
         ΔG = G′
         @. ΔG = abs(G′-G)
-        δG = maximum(ΔG)
+        δG = maximum(real, ΔG)
         δθ = angle(sgndetG′/sgndetG)
     # if iterating from l=Lτ => l=1
     else
@@ -437,7 +437,7 @@ function stabilize_equaltime_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::
         # calculate the error corrected by stabilization
         ΔG = G′
         @. ΔG = abs(G′-G)
-        δG = maximum(ΔG)
+        δG = maximum(real, ΔG)
         δθ = angle(sgndetG′/sgndetG)
     end
     
@@ -535,7 +535,7 @@ function local_update_greens!(G′::AbstractMatrix{T}, G::AbstractMatrix{T}, log
 
     @fastmath @inbounds for k in axes(G,2)
         for j in axes(G,1)
-            G′[j,k] = G[j,k] - inv(R) * G[j,i] * Δ * (I[i,k]-G[i,k]) # Note: I[k,j] = δₖⱼ
+            G′[j,k] = G[j,k] - inv(R) * G[j,i] * Δ * (I[i,k]-G[i,k]) # Note: I[i,k] = δᵢₖ
         end
     end
 

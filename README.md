@@ -1,4 +1,4 @@
-# JDQMCFramework
+# JDQMCFramework.jl
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://SmoQySuite.github.io/JDQMCFramework.jl/stable/)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://SmoQySuite.github.io/JDQMCFramework.jl/dev/)

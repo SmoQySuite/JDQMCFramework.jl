@@ -17,12 +17,12 @@ end
 @testset "JDQMCFramework.jl" begin
     
     # model parameters
-    t = 1.0; # hopping amplitude
-    μ = 0.0; # chemical potential
-    L = 4; # lattice size
-    β = 3.7; # inverse temperature
-    Δτ = 0.1; # discretization in imaginary time
-    nₛ = 10; # frequency of numerical stabilization
+    t = 1.0 # hopping amplitude
+    μ = 0.0 # chemical potential
+    L = 4 # lattice size
+    β = 3.7 # inverse temperature
+    Δτ = 0.1 # discretization in imaginary time
+    nₛ = 10 # frequency of numerical stabilization
 
     # calculate length of imagninary time axis
     Lτ = eval_length_imaginary_axis(β,Δτ)
@@ -41,7 +41,7 @@ end
     Nbonds = size(neighbor_table, 2)
 
     # build hopping matrix
-    K = zeros(N,N)
+    K = zeros(typeof(t), N, N)
     build_hopping_matrix!(K, neighbor_table, fill(t, Nbonds))
 
     # build diagonal on-site energy matrix
@@ -50,6 +50,12 @@ end
     # construct Hamiltonian matrix
     H = K + Diagonal(V)
     ϵ, U = eigen(H)
+
+    # calculate exact unequal time Green's function
+    G_l = zeros(typeof(t), N, N, Lτ+1)
+    for l in 1:Lτ+1
+        G_l[:,:,l] = greens(Δτ*(l-1), β, ϵ, U)[1]
+    end
 
     # calculate equal-time Green's function matrix
     G, logdetG, sgndetG = greens(0, β, ϵ, U)
@@ -71,8 +77,8 @@ end
     fgc_dn = fermion_greens_calculator(Bdn, N, β, Δτ, nₛ)
 
     # calculate equal-time Green's function
-    Gup = zeros(N,N)
-    Gdn = zeros(N,N)
+    Gup = zeros(typeof(t), N, N)
+    Gdn = zeros(typeof(t), N, N)
     logdetGup, sgndetGup = calculate_equaltime_greens!(Gup, fgc_up)
     logdetGdn, sgndetGdn = calculate_equaltime_greens!(Gdn, fgc_dn)
 
@@ -145,18 +151,12 @@ end
         iterate(fgc_dn, fgc_up.forward)
     end
 
-    # calculate exact unequal time Green's function
-    G_l = zeros(N, N, Lτ+1)
-    for l in 1:Lτ+1
-        G_l[:,:,l] = greens(Δτ*(l-1), β, ϵ, U)[1]
-    end
-
     # calculate uneqaul time Green's function, and equal time Green's function
     # for all imaginary time slices
-    Gτ0_up = zeros(N, N, Lτ+1)
-    Gτ0_dn = zeros(N, N, Lτ+1)
-    Gττ_up = zeros(N, N, Lτ+1)
-    Gττ_dn = zeros(N, N, Lτ+1)
+    Gτ0_up = zeros(typeof(t), N, N, Lτ+1)
+    Gτ0_dn = zeros(typeof(t), N, N, Lτ+1)
+    Gττ_up = zeros(typeof(t), N, N, Lτ+1)
+    Gττ_dn = zeros(typeof(t), N, N, Lτ+1)
     calculate_unequaltime_greens!(Gτ0_up, Gττ_up, fgc_up, Bup)
     calculate_unequaltime_greens!(Gτ0_dn, Gττ_dn, fgc_dn, Bdn)
 

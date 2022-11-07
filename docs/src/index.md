@@ -2,7 +2,7 @@
 CurrentModule = JDQMCFramework
 ```
 
-# JDQMCFramework
+# JDQMCFramework.jl
 
 Documentation for [JDQMCFramework](https://github.com/cohensbw/JDQMCFramework.jl).
 This is a utility package that exports a suite of types and routines to simplify the
