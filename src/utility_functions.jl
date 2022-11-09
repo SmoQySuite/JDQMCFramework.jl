@@ -7,7 +7,7 @@ return the length of the imaginary time axis `Lτ`.
 function eval_length_imaginary_axis(β::T, Δτ::T)::Int where {T<:AbstractFloat}
 
     Lτ = round(Int, β/Δτ)
-    @assert (Lτ*Δτ)%β ≈ 0.0
+    @assert (Lτ*Δτ)≈β
     return Lτ
 end
 
