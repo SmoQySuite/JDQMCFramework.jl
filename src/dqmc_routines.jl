@@ -503,20 +503,21 @@ end
 
 
 @doc raw"""
-    local_update_greens!(G′::AbstractMatrix{T}, G::AbstractMatrix{T}, logdetG::E, sgndetG::T,
-                         R::T, Δ::T, i::Int)::Tuple{E,T} where {T, E<:AbstractFloat}
+    local_update_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::T, R::T, Δ::T, i::Int,
+                         u::AbstractVector{T}, v::AbstractVector{T})::Tuple{E,T} where {T, E<:AbstractFloat}
 
-Update the equal-time Green's function matrix resulting from a local update.
+Update the equal-time Green's function matrix `G` resulting from a local update in-place.
 
 # Arguments
 
-- `G′::AbstractMatrix{T}`: Updated equal-time Green's function matrix ``G^\prime(\tau,\tau)``, which is modified in-place.
-- `G::AbstractMatrix{T}`: Initial equal-time Green's function matrix ``G(\tau,\tau).``
+- `G::AbstractMatrix{T}`: Equal-time Green's function matrix ``G(\tau,\tau)`` that will be updated in-place.
 - `logdetG::E`: The log of the absolute value of the initial Green's function matrix, ``\log( \vert \det G(\tau,\tau) \vert ).``
 - `sgndetG::T`: The sign/phase of the determinant of the initial Green's function matrix, ``\textrm{sign}( \det G(\tau,\tau) ).``
 - `R::T`: The determinant ratio ``R_{l,i} = \frac{\det G(\tau,\tau)}{\det G^\prime(\tau,\tau)}.``
 - `Δ::T`: Change in the exponentiated on-site energy matrix, ``\Delta_{l,i} = e^{-\Delta\tau (V^\prime_{l,(i,i)} - V_{l,(i,i)})} - 1.``
 - `i::Int`: Matrix element of diagonal on-site energy matrix ``V_l`` that is being updated.
+- `u::AbstractVector{T}`: Vector of length `size(G,1)` that is used to avoid dynamic memory allocations.
+- `v::AbstractVector{T}`: Vector of length `size(G,2)` that is used to avoid dynamic memory allocations.
 
 # Algorithm
 
@@ -530,14 +531,21 @@ An important note is that if the propagator matrices are represented in a symmet
 to the transformed eqaul-time Green's function matrices ``\tilde{G}^\prime(\tau,\tau)`` and ``\tilde{G}(\tau,\tau).``
 Refer to the [`local_update_det_ratio`](@ref) docstring for more information.
 """
-function local_update_greens!(G′::AbstractMatrix{T}, G::AbstractMatrix{T}, logdetG::E, sgndetG::T,
-                              R::T, Δ::T, i::Int)::Tuple{E,T} where {T, E<:AbstractFloat}
+function local_update_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::T, R::T, Δ::T, i::Int,
+                              u::AbstractVector{T}, v::AbstractVector{T})::Tuple{E,T} where {T, E<:AbstractFloat}
 
-    @fastmath @inbounds for k in axes(G,2)
-        for j in axes(G,1)
-            G′[j,k] = G[j,k] - inv(R) * G[j,i] * Δ * (I[i,k]-G[i,k]) # Note: I[i,k] = δᵢₖ
-        end
-    end
+    # u = G[:,i] <== column vector
+    G0i = @view G[:,i]
+    copyto!(u, G0i)
+
+    # v = G[i,:] - I[i,:] <== row vector
+    Gi0 = @view G[i,:]
+    copyto!(v, Gi0) # v = G[i,:]
+    v[i] = v[i] - 1 # v = G[i,:] - I[i,:]
+
+    # G′ = G + (Δ/R)⋅[u⨂v] = G + (Δ/R)⋅G[:,i]⨂(G[i,:] - I[i,:])
+    # where ⨂ denotes an outer product
+    BLAS.ger!(Δ/R, u, v, G)
 
     # R = det(M′)/det(M) = det(G)/det(G′)
     # ==> log(|R|) = log(|det(M′)|) - log(|det(M)|) = log(|det(G)|) - log(|det(G′)|)
