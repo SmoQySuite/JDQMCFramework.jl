@@ -503,7 +503,7 @@ end
 
 
 @doc raw"""
-    local_update_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::T, R::T, Δ::T, i::Int,
+    local_update_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::T, B::AbstractPropagator{T,E}, R::T, Δ::T, i::Int,
                          u::AbstractVector{T}, v::AbstractVector{T})::Tuple{E,T} where {T, E<:AbstractFloat}
 
 Update the equal-time Green's function matrix `G` resulting from a local update in-place.
@@ -513,6 +513,7 @@ Update the equal-time Green's function matrix `G` resulting from a local update 
 - `G::AbstractMatrix{T}`: Equal-time Green's function matrix ``G(\tau,\tau)`` that will be updated in-place.
 - `logdetG::E`: The log of the absolute value of the initial Green's function matrix, ``\log( \vert \det G(\tau,\tau) \vert ).``
 - `sgndetG::T`: The sign/phase of the determinant of the initial Green's function matrix, ``\textrm{sign}( \det G(\tau,\tau) ).``
+- `B::AbstractPropagator{T,E}`: Propagator that needs to be updated to reflect accepted local update.
 - `R::T`: The determinant ratio ``R_{l,i} = \frac{\det G(\tau,\tau)}{\det G^\prime(\tau,\tau)}.``
 - `Δ::T`: Change in the exponentiated on-site energy matrix, ``\Delta_{l,i} = e^{-\Delta\tau (V^\prime_{l,(i,i)} - V_{l,(i,i)})} - 1.``
 - `i::Int`: Matrix element of diagonal on-site energy matrix ``V_l`` that is being updated.
@@ -525,14 +526,17 @@ The equal-time Green's function matrix is updated using the relationship
 ```math
 G_{j,k}^{\prime}\left(\tau,\tau\right)=G_{j,k}\left(\tau,\tau\right)-\frac{1}{R_{l,i}}G_{j,i}\left(\tau,\tau\right)\Delta_{l,i}\left(\delta_{i,k}-G_{i,k}\left(\tau,\tau\right)\right).
 ```
-This method also returns ``\log( \vert \det G^\prime(\tau,\tau) \vert )`` and ``\textrm{sign}( \det G^\prime(\tau,\tau) ).``
+The  ``B_l`` progpagator `B` is also udpated.
+Additionally, this method returns ``\log( \vert \det G^\prime(\tau,\tau) \vert )`` and ``\textrm{sign}( \det G^\prime(\tau,\tau) ).``
 
 An important note is that if the propagator matrices are represented in a symmetric form, then `G′` and `G` need to correspond
 to the transformed eqaul-time Green's function matrices ``\tilde{G}^\prime(\tau,\tau)`` and ``\tilde{G}(\tau,\tau).``
 Refer to the [`local_update_det_ratio`](@ref) docstring for more information.
 """
-function local_update_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::T, R::T, Δ::T, i::Int,
+function local_update_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::T, B::AbstractPropagator{T,E}, R::T, Δ::T, i::Int,
                               u::AbstractVector{T}, v::AbstractVector{T})::Tuple{E,T} where {T, E<:AbstractFloat}
+
+    (; expmΔτV) = B
 
     # u = G[:,i] <== column vector
     G0i = @view G[:,i]
@@ -552,6 +556,12 @@ function local_update_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::T, R::T
     # ==> log(|det(G′)|) = log(|det(G)|) - log(|R|)
     logdetG′ = logdetG - log(abs(R))
     sgndetG′ = sign(R) * sgndetG
+
+    # update the diagonal exponentiated on-site energy matrix appearing in propagator
+    # (1 + Δ[i,l]) × exp(-Δτ⋅V[i,l]) = (1 + [exp(-Δτ⋅V′[i,l])/exp(-Δτ⋅V[i,l])-1]) × exp(-Δτ⋅V[i,l])
+    #                                = exp(-Δτ⋅V′[i,l])/exp(-Δτ⋅V[i,l]) × exp(-Δτ⋅V[i,l])
+    #                                = exp(-Δτ⋅V′[i,l])
+    expmΔτV[i] = (1+Δ) * expmΔτV[i]
 
     return (logdetG′, sgndetG′)
 end
