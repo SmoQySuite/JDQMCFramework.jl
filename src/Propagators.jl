@@ -318,7 +318,7 @@ function lmul!(B::SymExactPropagator{T}, A::AbstractMatrix{T};
                M::AbstractMatrix{T} = similar(A)) where {T}
 
     mul!(M, B.expmΔτKo2, A) # exp(-Δτ⋅K/2)⋅A
-    ldiv_D!(B.expmΔτV, M) # exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)⋅A
+    lmul_D!(B.expmΔτV, M) # exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)⋅A
     mul!(A, B.expmΔτKo2, M) # A := B⋅A = exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)⋅A
     
     return nothing
