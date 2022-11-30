@@ -379,6 +379,9 @@ function stabilize_equaltime_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::
     δG = zero(E)
     δθ = zero(E)
 
+    # boolean specifying whether or not stabilization was performed
+    stabilized = false
+
     # record initial sign of determinant
     sgndetG′ = sgndetG
 
@@ -395,46 +398,54 @@ function stabilize_equaltime_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::
     if forward
         # if at last time slice calculate G(β,β)
         if l == Lτ
+            # record initial G′(β,β) = G(β,β) before stabilization
+            copyto!(G′, G)
             # G(β,β) = [I + B(β,0)]⁻¹
             B_β0 = F[Nₛ]::LDR{T,E}
             logdetG, sgndetG = inv_IpA!(G, B_β0, ldr_ws)
-
+            # record that stabilization was performed
+            stabilized = true
         # if at boundary of stablization interval calculate G(τ,τ)
         elseif l′ == nₛ && Nₛ > 1
+            # record initial G′(τ,τ) = G(τ,τ) before stabilization
+            copyto!(G′, G)
             # calculate G(τ,τ) = [I + B(τ,0)⋅B(β,τ)]⁻¹
             B_βτ = F[n+1]::LDR{T,E}
             B_τ0 = F[n]::LDR{T,E}
             logdetG, sgndetG = inv_IpUV!(G, B_τ0, B_βτ, ldr_ws)
+            # record that stabilization was performed
+            stabilized = true
         end
-        # perform naive propagation G′(τ,τ) = B[l]⋅G(τ-Δτ,τ-Δτ)⋅B⁻¹[l]
-        B_l = B[l]::P
-        mul!(G′, B_l, G, M = ldr_ws.M) # B[l]⋅G(τ-Δτ,τ-Δτ)
-        rdiv!(G′, B_l, M = ldr_ws.M) # B[l]⋅G(τ-Δτ,τ-Δτ)⋅B⁻¹[l]
-        # calculate the error corrected by stabilization
-        ΔG = G′
-        @. ΔG = abs(G′-G)
-        δG = maximum(real, ΔG)
-        δθ = angle(sgndetG′/sgndetG)
     # if iterating from l=Lτ => l=1
     else
         # if at first time slice calculate G(0,0) = G(β,β)
         if l == 1
-            # G(β,β) = [I + B(β,0)]⁻¹
+            # perform naive propagation G′(τ-Δτ,τ-Δτ) = B⁻¹[l]⋅G(τ,τ)⋅B[l]
+            B_l = B[l]::P
+            mul!(G′, G, B_l, M = ldr_ws.M) # G(τ,τ)⋅B[l]
+            ldiv!(B_l, G′, M = ldr_ws.M) # B⁻¹[l]⋅G(τ,τ)⋅B[l]
+            # G(0,0) = [I + B(β,0)]⁻¹
             B_β0 = F[1]::LDR{T,E}
             logdetG, sgndetG = inv_IpA!(G, B_β0, ldr_ws)
-
+            # record that stabilization was performed
+            stabilized = true
         # if at boundary of stabilization interval calculate G(τ-Δτ,τ-Δτ)
         elseif l′ == 1 && Nₛ > 1
+            # perform naive propagation G′(τ-Δτ,τ-Δτ) = B⁻¹[l]⋅G(τ,τ)⋅B[l]
+            B_l = B[l]::P
+            mul!(G′, G, B_l, M = ldr_ws.M) # G(τ,τ)⋅B[l]
+            ldiv!(B_l, G′, M = ldr_ws.M) # B⁻¹[l]⋅G(τ,τ)⋅B[l]
             # calucate G(τ-Δτ,τ-Δτ) = [I + B(τ-Δτ,0)⋅B(β,τ-Δτ)]⁻¹
             B_β_τmΔτ = F[n]::LDR{T,E}
             B_τmΔτ_0 = F[n-1]::LDR{T,E}
             logdetG, sgndetG = inv_IpUV!(G, B_τmΔτ_0, B_β_τmΔτ, ldr_ws)
+            # record that stabilization was performed
+            stabilized = true
         end
-        # perform naive propagation G′(τ-Δτ,τ-Δτ) = B⁻¹[l]⋅G(τ,τ)⋅B[l]
-        B_l = B[l]::P
-        mul!(G′, G, B_l, M = ldr_ws.M) # G(τ,τ)⋅B[l]
-        ldiv!(B_l, G′, M = ldr_ws.M) # B⁻¹[l]⋅G(τ,τ)⋅B[l]
-        # calculate the error corrected by stabilization
+    end
+
+    # calculate error corrected by stabilization
+    if stabilized
         ΔG = G′
         @. ΔG = abs(G′-G)
         δG = maximum(real, ΔG)
