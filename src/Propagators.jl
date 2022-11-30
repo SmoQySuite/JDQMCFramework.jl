@@ -201,6 +201,17 @@ end
 
 
 @doc raw"""
+    eltype(B::AbstractPropagator{T,E}) where {T,E}
+
+Return the matrix element type of the propagator `T`.
+"""
+function eltype(B::AbstractPropagator{T,E}) where {T,E}
+
+    return T
+end
+
+
+@doc raw"""
     mul!(A::AbstractMatrix{T}, B::SymExactPropagator{T}, C::AbstractMatrix{T};
          M::AbstractMatrix{T}=similar(A)) where {T}
 

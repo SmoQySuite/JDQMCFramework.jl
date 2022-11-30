@@ -72,6 +72,8 @@ end
         push!(Bdn, B_l)
     end
 
+    @test eltype(Bup[1]) == eltype(expmΔτK)
+
     # initiate FermionGreensCalculator struct
     fgc_up = fermion_greens_calculator(Bup, N, β, Δτ, nₛ)
     fgc_dn = fermion_greens_calculator(Bdn, N, β, Δτ, nₛ)

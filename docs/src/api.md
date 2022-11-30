@@ -24,6 +24,7 @@ SymPropagators
 
 ### Propagator Functions
 
+- [`eltype`](@ref)
 - [`size`](@ref)
 - [`copyto!`](@ref)
 - [`mul!`](@ref)
@@ -33,6 +34,7 @@ SymPropagators
 - [`rdiv!`](@ref)
 
 ```@docs
+Base.eltype
 Base.size
 Base.copyto!
 LinearAlgebra.mul!
