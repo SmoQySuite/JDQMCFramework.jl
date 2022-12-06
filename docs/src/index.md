@@ -216,7 +216,7 @@ bond_y = Bond(orbitals = (1,1), displacement = [0,1])
 neighbor_table = build_neighbor_table([bond_x, bond_y], unit_cell, lattice)
 
 # calculate number of sites in lattice
-N = get_num_sites(unit_cell, lattice)
+N = nsites(unit_cell, lattice)
 
 # calculate number of bonds in lattice
 Nbonds = size(neighbor_table, 2)

@@ -22,28 +22,6 @@ AsymChkbrdPropagator
 SymPropagators
 ```
 
-### Propagator Functions
-
-- [`eltype`](@ref)
-- [`size`](@ref)
-- [`copyto!`](@ref)
-- [`mul!`](@ref)
-- [`lmul!`](@ref)
-- [`rmul!`](@ref)
-- [`ldiv!`](@ref)
-- [`rdiv!`](@ref)
-
-```@docs
-Base.eltype
-Base.size
-Base.copyto!
-LinearAlgebra.mul!
-LinearAlgebra.lmul!
-LinearAlgebra.rmul!
-LinearAlgebra.ldiv!
-LinearAlgebra.rdiv!
-```
-
 ## FermionGreensCalculator Type
 
 - [`FermionGreensCalculator`](@ref)
@@ -56,7 +34,6 @@ fermion_greens_calculator
 
 ## DQMC Building Block Routines
 
-- [`iterate`](@ref)
 - [`calculate_equaltime_greens!`](@ref)
 - [`propagate_equaltime_greens!`](@ref)
 - [`stabilize_equaltime_greens!`](@ref)
@@ -65,13 +42,36 @@ fermion_greens_calculator
 - [`local_update_greens!`](@ref)
 
 ```@docs
-Base.iterate
 calculate_equaltime_greens!
 propagate_equaltime_greens!
 stabilize_equaltime_greens!
 calculate_unequaltime_greens!
 local_update_det_ratio
 local_update_greens!
+```
+
+## Overloaded Functions
+
+- [`iterate`](@ref)
+- [`eltype`](@ref)
+- [`size`](@ref)
+- [`copyto!`](@ref)
+- [`mul!`](@ref)
+- [`lmul!`](@ref)
+- [`rmul!`](@ref)
+- [`ldiv!`](@ref)
+- [`rdiv!`](@ref)
+
+```@docs
+Base.iterate
+Base.eltype
+Base.size
+Base.copyto!
+LinearAlgebra.mul!
+LinearAlgebra.lmul!
+LinearAlgebra.rmul!
+LinearAlgebra.ldiv!
+LinearAlgebra.rdiv!
 ```
 
 ## Utility Functions

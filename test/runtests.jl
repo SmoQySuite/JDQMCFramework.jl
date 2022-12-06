@@ -35,7 +35,7 @@ end
     neighbor_table = build_neighbor_table([bond_x, bond_y], unit_cell, lattice)
 
     # calculate number of sites in lattice
-    N = get_num_sites(unit_cell, lattice)
+    N = nsites(unit_cell, lattice)
 
     # calculate number of bonds in lattice
     Nbonds = size(neighbor_table, 2)
@@ -78,6 +78,14 @@ end
     fgc_up = fermion_greens_calculator(Bup, N, β, Δτ, nₛ)
     fgc_dn = fermion_greens_calculator(Bdn, N, β, Δτ, nₛ)
 
+    # initialize copy FermionGreensCalculator
+    fgc = fermion_greens_calculator(fgc_up)
+    @test typeof(fgc) <: FermionGreensCalculator
+
+    # copy FermionGreensCalculator
+    copyto!(fgc, fgc_dn)
+    @test typeof(fgc) <: FermionGreensCalculator
+
     # calculate equal-time Green's function
     Gup = zeros(typeof(t), N, N)
     Gdn = zeros(typeof(t), N, N)
@@ -93,7 +101,6 @@ end
     @test G ≈ Gdn
     @test logdetG ≈ logdetGdn
     @test sgndetG ≈ sgndetGdn
-
 
     # Iterate over imaginary time τ=Δτ⋅l.
     @testset for l in fgc_up

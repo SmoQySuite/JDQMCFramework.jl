@@ -68,10 +68,9 @@ function fermion_greens_calculator(B::AbstractVector{P}, N::Int, β::E, Δτ::E,
     G′ = zeros(T, N, N)
 
     # construct vector of LDR factorization to represent B(τ,0) and B(β,τ) matrices
-    B_template = zeros(T, N, N)
-    copyto!(B_template, I)
-    ldr_ws = ldr_workspace(B_template)
-    F = ldrs(B_template, Nₛ)
+    copyto!(G′, I)
+    ldr_ws = ldr_workspace(G′)
+    F = ldrs(G′, Nₛ)
 
     # current imaginary time slice
     l = Lτ
@@ -91,9 +90,57 @@ function fermion_greens_calculator(B::AbstractVector{P}, N::Int, β::E, Δτ::E,
 end
 
 
+@doc raw"""
+    fermion_greens_calculator(fgc::FermionGreensCalculator{T,E}) where {T,E}
+
+Return a new [`FermionGreensCalculator`](@ref) that is a copy of `fgc`.
+"""
+function fermion_greens_calculator(fgc::FermionGreensCalculator{T,E}) where {T,E}
+
+    (; forward, l, N, β, Δτ, Lτ, nₛ, Nₛ, B̄, F, G′, ldr_ws) = fgc
+
+    B̄_new = copy(B̄)
+    F_new = deepcopy(F)
+    G′_new = copy(G′)
+    copyto!(G′_new,I)
+    ldr_ws_new = ldr_workspace(G′_new)
+
+    return FermionGreensCalculator(forward, l, N, β, Δτ, Lτ, nₛ, Nₛ, B̄_new, F_new, G′_new, ldr_ws_new)
+end
+
+
 ########################
 ## OVERLOADED METHODS ##
 ########################
+
+
+@doc raw"""
+    eltype(fgc::FermionGreensCalculator{T,E}) where {T,E}
+
+Return matrix element type `T` associated with an instance of [`FermionGreensCalculator`](ref).
+"""
+function eltype(fgc::FermionGreensCalculator{T,E}) where {T,E}
+
+    return T
+end
+
+
+@doc raw"""
+    copyto!(fgc_out::FermionGreensCalculator{T,E}, fgc_in::FermionGreensCalculator{T,E}) where {T,E}
+
+Copy the contents of `fgc_in` to `fgc_out`.
+"""
+function copyto!(fgc_out::FermionGreensCalculator{T,E}, fgc_in::FermionGreensCalculator{T,E}) where {T,E}
+
+    fgc_out.forward = fgc_in.forward
+    fgc_out.l = fgc_in.l
+    copyto!(fgc_out.B̄::Array{T, 3}, fgc_in.B̄::Array{T, 3})
+    for i in eachindex(fgc_in.F)
+        copyto!(fgc_out.F[i]::LDR{T,E}, fgc_in.F[i]::LDR{T,E})
+    end
+
+    return nothing
+end
 
 
 @doc raw"""
