@@ -505,7 +505,7 @@ then the matrix `G` needs to instead represent the transformed equal-time Green'
 function local_update_det_ratio(G::AbstractMatrix{T}, B::AbstractPropagator{T,E},
                                 V′::T, i::Int, Δτ::E)::Tuple{T,T} where {T,E}
 
-    Λ = B.expmΔτV
+    Λ = B.expmΔτV::Vector{E}
     Δ = exp(-Δτ*V′)/Λ[i] - 1
     R = 1 + Δ*(1 - G[i,i])
 
@@ -547,7 +547,7 @@ Refer to the [`local_update_det_ratio`](@ref) docstring for more information.
 function local_update_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::T, B::AbstractPropagator{T,E}, R::T, Δ::T, i::Int,
                               u::AbstractVector{T}, v::AbstractVector{T})::Tuple{E,T} where {T, E<:AbstractFloat}
 
-    (; expmΔτV) = B
+    expmΔτV = B.expmΔτV::Vector{E}
 
     # u = G[:,i] <== column vector
     G0i = @view G[:,i]

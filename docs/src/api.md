@@ -56,6 +56,7 @@ local_update_greens!
 - [`eltype`](@ref)
 - [`size`](@ref)
 - [`copyto!`](@ref)
+- [`ishermitian`](@ref)
 - [`mul!`](@ref)
 - [`lmul!`](@ref)
 - [`rmul!`](@ref)
@@ -67,6 +68,7 @@ Base.iterate
 Base.eltype
 Base.size
 Base.copyto!
+LinearAlgebra.ishermitian
 LinearAlgebra.mul!
 LinearAlgebra.lmul!
 LinearAlgebra.rmul!

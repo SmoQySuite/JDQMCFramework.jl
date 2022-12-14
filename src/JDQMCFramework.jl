@@ -7,7 +7,7 @@ using StableLinearAlgebra
 
 # importing function to be overloaded
 import Base: size, copyto!, iterate, eltype
-import LinearAlgebra: mul!, lmul!, rmul!, ldiv!, rdiv!
+import LinearAlgebra: mul!, lmul!, rmul!, ldiv!, rdiv!, ishermitian
 
 # import functions for multiplying/dividing by diagonal matrix represented by a vector
 import StableLinearAlgebra: mul_D!, div_D!, lmul_D!, rmul_D!, ldiv_D!, rdiv_D!

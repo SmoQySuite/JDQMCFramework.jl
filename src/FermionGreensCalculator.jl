@@ -117,7 +117,7 @@ end
 @doc raw"""
     eltype(fgc::FermionGreensCalculator{T,E}) where {T,E}
 
-Return matrix element type `T` associated with an instance of [`FermionGreensCalculator`](ref).
+Return matrix element type `T` associated with an instance of [`FermionGreensCalculator`](@ref).
 """
 function eltype(fgc::FermionGreensCalculator{T,E}) where {T,E}
 

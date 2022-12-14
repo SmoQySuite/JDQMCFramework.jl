@@ -146,12 +146,25 @@ SymPropagators = Union{SymExactPropagator, SymChkbrdPropagator}
 
 @doc raw"""
     size(B::AbstractPropagator)
+
     size(B::AbstractPropagator, dim)
 
 Return the size of a propagator.
 """
 size(B::AbstractPropagator) = (size(B.expmΔτV), size(B.expmΔτV))
 size(B::AbstractPropagator, dim) = size(B.expmΔτV)
+
+
+@doc raw"""
+    ishermitian(B::AbstractPropagator)
+
+Return whether a propagator is hermitian or not.
+"""
+ishermitian(B::AbstractPropagator)    = return _ishermitian(B)
+_ishermitian(B::SymExactPropagator)   = return true
+_ishermitian(B::SymChkbrdPropagator)  = return true
+_ishermitian(B::AsymExactPropagator)  = return false
+_ishermitian(B::AsymChkbrdPropagator) = return false
 
 
 @doc raw"""
