@@ -152,7 +152,7 @@ SymPropagators = Union{SymExactPropagator, SymChkbrdPropagator}
 Return the size of a propagator.
 """
 size(B::AbstractPropagator) = (size(B.expmΔτV), size(B.expmΔτV))
-size(B::AbstractPropagator, dim) = size(B.expmΔτV)
+size(B::AbstractPropagator, dim::Int) = length(B.expmΔτV)
 
 
 @doc raw"""

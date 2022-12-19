@@ -36,16 +36,19 @@ end
 
 
 @doc raw"""
-    fermion_greens_calculator(B::AbstractVector{P}, N::Int, β::E, Δτ::E,
+    fermion_greens_calculator(B::AbstractVector{P}, β::E, Δτ::E,
                               nₛ::Int) where {T<:Continuous, E<:AbstractFloat, P<:AbstractPropagator{T}}
 
 Initialize and return [`FermionGreensCalculator`](@ref) struct based on the vector of propagators `B` passed to the function.
 """
-function fermion_greens_calculator(B::AbstractVector{P}, N::Int, β::E, Δτ::E,
+function fermion_greens_calculator(B::AbstractVector{P}, β::E, Δτ::E,
                                    nₛ::Int) where {T<:Continuous, E<:AbstractFloat, P<:AbstractPropagator{T,E}}
 
     # get length of imaginary time axis
     Lτ = eval_length_imaginary_axis(β, Δτ)
+
+    # get the number of orbitals
+    N = size(B[1],1)
 
     # check that there is a propagator for each time slice
     @assert length(B) == Lτ
