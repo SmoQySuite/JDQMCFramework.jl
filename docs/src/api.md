@@ -25,11 +25,11 @@ SymPropagators
 ## FermionGreensCalculator Type
 
 - [`FermionGreensCalculator`](@ref)
-- [`fermion_greens_calculator`](@ref)
 
 ```@docs
 FermionGreensCalculator
-fermion_greens_calculator
+FermionGreensCalculator(::AbstractVector{P}, ::E, ::E, ::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T,E}}
+FermionGreensCalculator(::FermionGreensCalculator{T,E}) where {T,E}
 ```
 
 ## DQMC Building Block Routines

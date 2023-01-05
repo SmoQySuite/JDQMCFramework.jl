@@ -75,11 +75,11 @@ end
     @test eltype(Bup[1]) == eltype(expmΔτK)
 
     # initiate FermionGreensCalculator struct
-    fgc_up = fermion_greens_calculator(Bup, β, Δτ, nₛ)
-    fgc_dn = fermion_greens_calculator(Bdn, β, Δτ, nₛ)
+    fgc_up = FermionGreensCalculator(Bup, β, Δτ, nₛ)
+    fgc_dn = FermionGreensCalculator(Bdn, β, Δτ, nₛ)
 
     # initialize copy FermionGreensCalculator
-    fgc = fermion_greens_calculator(fgc_up)
+    fgc = FermionGreensCalculator(fgc_up)
     @test typeof(fgc) <: FermionGreensCalculator
 
     # copy FermionGreensCalculator

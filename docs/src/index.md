@@ -271,8 +271,8 @@ Next we instantiate two instances of the [`FermionGreensCalculator`](@ref) type,
 electron spin species, spin up and spin down.
 
 ```julia
-fgc_up = fermion_greens_calculator(Bup, β, Δτ, nₛ)
-fgc_dn = fermion_greens_calculator(Bdn, β, Δτ, nₛ)
+fgc_up = FermionGreensCalculator(Bup, β, Δτ, nₛ)
+fgc_dn = FermionGreensCalculator(Bdn, β, Δτ, nₛ)
 ```
 
 Now we initialize the spin up and spin down equal time Green's function matrices ``G_\uparrow(0,0)``

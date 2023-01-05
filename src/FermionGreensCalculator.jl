@@ -36,13 +36,13 @@ end
 
 
 @doc raw"""
-    fermion_greens_calculator(B::AbstractVector{P}, β::E, Δτ::E,
-                              nₛ::Int) where {T<:Continuous, E<:AbstractFloat, P<:AbstractPropagator{T}}
+    FermionGreensCalculator(B::AbstractVector{P}, β::E, Δτ::E,
+                            nₛ::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
 
 Initialize and return [`FermionGreensCalculator`](@ref) struct based on the vector of propagators `B` passed to the function.
 """
-function fermion_greens_calculator(B::AbstractVector{P}, β::E, Δτ::E,
-                                   nₛ::Int) where {T<:Continuous, E<:AbstractFloat, P<:AbstractPropagator{T,E}}
+function FermionGreensCalculator(B::AbstractVector{P}, β::E, Δτ::E,
+                                 nₛ::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T,E}}
 
     # get length of imaginary time axis
     Lτ = eval_length_imaginary_axis(β, Δτ)
@@ -94,11 +94,11 @@ end
 
 
 @doc raw"""
-    fermion_greens_calculator(fgc::FermionGreensCalculator{T,E}) where {T,E}
+    FermionGreensCalculator(fgc::FermionGreensCalculator{T,E}) where {T,E}
 
 Return a new [`FermionGreensCalculator`](@ref) that is a copy of `fgc`.
 """
-function fermion_greens_calculator(fgc::FermionGreensCalculator{T,E}) where {T,E}
+function FermionGreensCalculator(fgc::FermionGreensCalculator{T,E}) where {T,E}
 
     (; forward, l, N, β, Δτ, Lτ, nₛ, Nₛ, B̄, F, G′, ldr_ws) = fgc
 
