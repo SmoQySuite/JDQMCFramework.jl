@@ -126,16 +126,17 @@ end
 
 
 @doc raw"""
-    resize!(fgc::FermionGreensCalculator{T,E}, G::Matrix{T}, B::Vector{P},
-            n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T,E}}
+    resize!(fgc::FermionGreensCalculator{T,E}, G::Matrix{T}, logdetG::E, sgndetG::T,
+            B::Vector{P}, n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T,E}}
 
     resize!(fgc::FermionGreensCalculator{T,E}, n_stab::Int) where {T,E}
 
 Update `fgc` to reflect a new stabilizaiton frequency `n_stab`.
-If `G` and `B` are also passed, then the equal-time Green's function `G` is re-calculated at the same time.
+If `G`, `logdetG`, `sgndetG` and `B` are also passed then the equal-time Green's function `G` is re-calculated
+and the corresponding updated values for `(logdetG, sgndetG)` are returned.
 """
-function resize!(fgc::FermionGreensCalculator{T,E}, G::Matrix{T}, B::Vector{P},
-                 n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T,E}}
+function resize!(fgc::FermionGreensCalculator{T,E}, G::Matrix{T}, logdetG::E, sgndetG::T,
+                 B::Vector{P}, n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T,E}}
 
     # check if stablization frequency is being updated
     if fgc.n_stab != n_stab
@@ -144,10 +145,10 @@ function resize!(fgc::FermionGreensCalculator{T,E}, G::Matrix{T}, B::Vector{P},
         resize!(fgc, n_stab)
 
         # calculate the equal-time Green's function
-        calculate_equaltime_greens!(G, fgc, B)
+        logdetG, sgndetG = calculate_equaltime_greens!(G, fgc, B)
     end
 
-    return nothing
+    return (logdetG, sgndetG)
 end
 
 function resize!(fgc::FermionGreensCalculator{T,E}, n_stab::Int) where {T,E}
