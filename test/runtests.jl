@@ -22,7 +22,7 @@ end
     L = 4 # lattice size
     β = 3.7 # inverse temperature
     Δτ = 0.1 # discretization in imaginary time
-    nₛ = 10 # frequency of numerical stabilization
+    n_stab = 10 # frequency of numerical stabilization
 
     # calculate length of imagninary time axis
     Lτ = eval_length_imaginary_axis(β,Δτ)
@@ -75,16 +75,8 @@ end
     @test eltype(Bup[1]) == eltype(expmΔτK)
 
     # initiate FermionGreensCalculator struct
-    fgc_up = FermionGreensCalculator(Bup, β, Δτ, nₛ)
-    fgc_dn = FermionGreensCalculator(Bdn, β, Δτ, nₛ)
-
-    # initialize copy FermionGreensCalculator
-    fgc = FermionGreensCalculator(fgc_up)
-    @test typeof(fgc) <: FermionGreensCalculator
-
-    # copy FermionGreensCalculator
-    copyto!(fgc, fgc_dn)
-    @test typeof(fgc) <: FermionGreensCalculator
+    fgc_up = FermionGreensCalculator(Bup, β, Δτ, n_stab+1)
+    fgc_dn = FermionGreensCalculator(Bdn, β, Δτ, n_stab+1)
 
     # calculate equal-time Green's function
     Gup = zeros(typeof(t), N, N)
@@ -102,6 +94,24 @@ end
     @test logdetG ≈ logdetGdn
     @test sgndetG ≈ sgndetGdn
 
+    # initialize copy FermionGreensCalculator
+    fgc = FermionGreensCalculator(fgc_up)
+    @test typeof(fgc) <: FermionGreensCalculator
+
+    # copy FermionGreensCalculator
+    copyto!(fgc, fgc_dn)
+    @test typeof(fgc) <: FermionGreensCalculator
+
+    # resize FermionGreensCalculator struct
+    resize!(fgc_up, Gup, Bup, n_stab)
+    resize!(fgc_dn, Gdn, Bdn, n_stab)
+    @test fgc_up.n_stab == n_stab
+    @test fgc_dn.n_stab == n_stab
+
+    # copy FermionGreensCalculator with resizing
+    copyto!(fgc, fgc_up)
+    @test fgc.n_stab == n_stab
+
     # Iterate over imaginary time τ=Δτ⋅l.
     @testset for l in fgc_up
 
@@ -113,7 +123,7 @@ end
 
         # Periodically re-calculate the Green's function matrix for numerical stability.
         # If not performing updates, but just evaluating the derivative of the action, then
-        # set update_B̄=false to avoid wasting cpu time re-computing B̄ₙ matrices.
+        # set update_B̄=false to avoid wasting cpu time re-computing B_barₙ matrices.
         logdetGup, sgndetGup, δGup, δθup = stabilize_equaltime_greens!(Gup, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=true)
         logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_equaltime_greens!(Gdn, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=true)
 
@@ -142,7 +152,7 @@ end
 
         # Periodically re-calculate the Green's function matrix for numerical stability.
         # If not performing updates, but just evaluating the derivative of the action, then
-        # set update_B̄=false to avoid wasting cpu time re-computing B̄ₙ matrices.
+        # set update_B̄=false to avoid wasting cpu time re-computing B_barₙ matrices.
         logdetGup, sgndetGup, δGup, δθup = stabilize_equaltime_greens!(Gup, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=true)
         logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_equaltime_greens!(Gdn, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=true)
 

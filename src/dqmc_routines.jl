@@ -7,14 +7,14 @@ Note that this routine requires `fgc.l == 1` or `fgc.l == fgc.Lτ`.
 """
 function calculate_equaltime_greens!(G::AbstractMatrix{T}, fgc::FermionGreensCalculator{T,E})::Tuple{E,T} where {T,E}
 
-    (; forward, l, Lτ, Nₛ, ldr_ws) = fgc
+    (; forward, l, Lτ, N_stab, ldr_ws) = fgc
     @assert l == 1 || l == Lτ
 
     # get B(0,β)
     if forward
         B_β0 = fgc.F[1]::LDR{T,E}
     else
-        B_β0 = fgc.F[Nₛ]::LDR{T,E}
+        B_β0 = fgc.F[N_stab]::LDR{T,E}
     end
 
     # calculate G(0,0) = [I + B(β,0)]⁻¹
@@ -39,7 +39,7 @@ function calculate_equaltime_greens!(G::AbstractMatrix{T}, fgc::FermionGreensCal
 
     # iterate over imaginary time
     for l in fgc
-        # re-calculate B̄ matrices and matrix factorizations B(τ,0) or B(β,τ) as needed
+        # re-calculate B_bar matrices and matrix factorizations B(τ,0) or B(β,τ) as needed
         update_factorizations!(fgc, B)
     end
     
@@ -77,7 +77,7 @@ function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3},
     @assert size(Gτ0,1) == size(Gτ0,2) == fgc.N
     @assert size(Gτ0,3) == fgc.Lτ+1
 
-    (; Lτ, Nₛ, nₛ, forward) = fgc
+    (; Lτ, N_stab, n_stab, forward) = fgc
     F = fgc.F::Vector{LDR{T,E}}
     ldr_ws = fgc.ldr_ws::LDRWorkspace{T,E}
 
@@ -95,9 +95,9 @@ function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3},
     # if iterating from l=1 => l=Lτ
     if forward
         # iterate over stabilization intervals
-        for n in 1:Nₛ
+        for n in 1:N_stab
             # iterate over imaginary time slices in stabilization interval
-            for l in (n-1)*nₛ+1:min(n*nₛ,Lτ)-1
+            for l in (n-1)*n_stab+1:min(n*n_stab,Lτ)-1
                 # get B[l]
                 B_l = B[l]::P
                 # propagate to later imaginary time G(τ,0) = B[l]⋅G(τ-Δτ0)
@@ -106,10 +106,10 @@ function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3},
                 mul!(Gτ0_τ, B_l, Gτ0_τmΔτ, M = ldr_ws.M)
             end
             # update LDR factorization for B(τ=Δτ⋅n⋅nₛ,0)
-            fgc.l = min(n*nₛ,Lτ)
+            fgc.l = min(n*n_stab,Lτ)
             update_factorizations!(fgc)
             # calculate G(τ=Δτ⋅n⋅nₛ,0) and G(τ=Δτ⋅n⋅nₛ,τ=Δτ⋅n⋅nₛ)
-            if n < Nₛ
+            if n < N_stab
                 B_τ0 = F[n]::LDR{T,E} # B(τ,0)
                 B_βτ = F[n+1]::LDR{T,E} # B(β,τ)
                 # calculate G(τ=Δτ⋅n⋅nₛ,0) using numerically stable procedure
@@ -122,9 +122,9 @@ function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3},
     # if iterating from l=Lτ => l=1
     else
         # iterate over stabilization intervals
-        for n in Nₛ:-1:1
+        for n in N_stab:-1:1
             # calculate LDR factorization for B(β, τ=Δτ⋅n⋅nₛ-Δτ,)
-            fgc.l = (n-1)*nₛ+1
+            fgc.l = (n-1)*n_stab+1
             update_factorizations!(fgc)
             # calculate G(τ=Δτ⋅(n-1)⋅nₛ, 0) and G(τ=Δτ⋅(n-1)⋅nₛ,τ=Δτ⋅(n-1)⋅nₛ) using numerically stable procedure
             if n > 1
@@ -135,7 +135,7 @@ function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3},
                 inv_invUpV!(Gτ0_τ, B_τ0, B_βτ, ldr_ws) # G(0,τ) = [B⁻¹(τ,0) + B(β,τ)]⁻¹
             end
             # iterate over imaginary time slice in stabilization interval
-            for l in (n-1)*nₛ+1:min(n*nₛ,Lτ)-1
+            for l in (n-1)*n_stab+1:min(n*n_stab,Lτ)-1
                 # get B[l]
                 B_l = B[l]::P
                 # propagate to later imaginary time G(τ,0) = B[l]⋅G(τ-Δτ,0)
@@ -186,7 +186,7 @@ function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3}, Gττ::Abstract
     @assert size(Gττ,1) == size(Gττ,2) == fgc.N
     @assert size(Gττ,3) == fgc.Lτ+1
 
-    (; Lτ, Nₛ, nₛ, forward) = fgc
+    (; Lτ, N_stab, n_stab, forward) = fgc
     F = fgc.F::Vector{LDR{T,E}}
     ldr_ws = fgc.ldr_ws::LDRWorkspace{T,E}
 
@@ -208,9 +208,9 @@ function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3}, Gττ::Abstract
     # if iterating from l=1 => l=Lτ
     if forward
         # iterate over stabilization intervals
-        for n in 1:Nₛ
+        for n in 1:N_stab
             # iterate over imaginary time slices in stabilization interval
-            for l in (n-1)*nₛ+1:min(n*nₛ,Lτ)-1
+            for l in (n-1)*n_stab+1:min(n*n_stab,Lτ)-1
                 # get B[l]
                 B_l = B[l]::P
                 # propagate to later imaginary time G(τ,0) = B[l]⋅G(τ-Δτ0)
@@ -224,10 +224,10 @@ function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3}, Gττ::Abstract
                 rdiv!(Gττ_τ, B_l, M = ldr_ws.M) # B[l]⋅G(τ-Δτ,τ-Δτ)⋅B⁻¹[l]
             end
             # update LDR factorization for B(τ=Δτ⋅n⋅nₛ,0)
-            fgc.l = min(n*nₛ,Lτ)
+            fgc.l = min(n*n_stab,Lτ)
             update_factorizations!(fgc)
             # calculate G(τ=Δτ⋅n⋅nₛ,0) and G(τ=Δτ⋅n⋅nₛ,τ=Δτ⋅n⋅nₛ)
-            if n < Nₛ
+            if n < N_stab
                 B_τ0 = F[n]::LDR{T,E} # B(τ,0)
                 B_βτ = F[n+1]::LDR{T,E} # B(β,τ)
                 # calculate G(τ=Δτ⋅n⋅nₛ,0) using numerically stable procedure
@@ -243,9 +243,9 @@ function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3}, Gττ::Abstract
     # if iterating from l=Lτ => l=1
     else
         # iterate over stabilization intervals
-        for n in Nₛ:-1:1
+        for n in N_stab:-1:1
             # calculate LDR factorization for B(β, τ=Δτ⋅n⋅nₛ-Δτ,)
-            fgc.l = (n-1)*nₛ+1
+            fgc.l = (n-1)*n_stab+1
             update_factorizations!(fgc)
             # calculate G(τ=Δτ⋅(n-1)⋅nₛ, 0) and G(τ=Δτ⋅(n-1)⋅nₛ,τ=Δτ⋅(n-1)⋅nₛ) using numerically stable procedure
             if n > 1
@@ -259,7 +259,7 @@ function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3}, Gττ::Abstract
                 inv_IpUV!(Gττ_τ, B_τ0, B_βτ, ldr_ws) # G(τ,τ) = [I + B(τ,0)⋅B(β,τ)]⁻¹
             end
             # iterate over imaginary time slice in stabilization interval
-            for l in (n-1)*nₛ+1:min(n*nₛ,Lτ)-1
+            for l in (n-1)*n_stab+1:min(n*n_stab,Lτ)-1
                 # get B[l]
                 B_l = B[l]::P
                 # propagate to later imaginary time G(τ,0) = B[l]⋅G(τ-Δτ,0)
@@ -301,7 +301,7 @@ is used instead, where the ``B_l`` propagator is given by `B[l]`.
 function propagate_equaltime_greens!(G::AbstractMatrix{T}, fgc::FermionGreensCalculator{T,E},
                                      B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T,E}}
 
-    (; nₛ, l, Lτ, forward) = fgc
+    (; n_stab, l, Lτ, forward) = fgc
     ldr_ws = fgc.ldr_ws::LDRWorkspace{T,E}
     M = ldr_ws.M::Matrix{T}
 
@@ -315,10 +315,10 @@ function propagate_equaltime_greens!(G::AbstractMatrix{T}, fgc::FermionGreensCal
         lmul!(B_l, G, M = M)
         rdiv!(G, B_l, M = M)
     # if iterating from l=Lτ => l=1.
-    # Note: if `fgc.l` corresponds to the "end" of a stabilization interval (l′=nₛ or l=Lτ), then
+    # Note: if `fgc.l` corresponds to the "end" of a stabilization interval (l′=n_stab or l=Lτ), then
     # when the equal-time Green's function was previously re-computed at `fgc.l+1` in the stabilize_equatime_greens!()
     # routine, it already calculated G(l,l), so we don't need to propagate to G(l,l) here.
-    elseif !(l′ == nₛ || l==Lτ)
+    elseif !(l′ == n_stab || l==Lτ)
         # G(l,l) = B⁻¹[l+1]⋅G(l+1,l+1)⋅B[l+1]
         B_lp1 = B[l+1]::P
         ldiv!(B_lp1, G, M = M)
@@ -342,7 +342,7 @@ re-computes
 ```math
 G(\tau,\tau) = [I + B(\tau,0)B(\beta,\tau)]^{-1}
 ```
-when at imaginary time slice `fgc.l` every `fgc.nₛ` imaginary time slice.
+when at imaginary time slice `fgc.l` every `fgc.n_stab` imaginary time slice.
 When iterating through imaginary time in the reverse direction (`fgc.forward = false`), this function
 instead re-computes
 ```math
@@ -367,7 +367,7 @@ function stabilize_equaltime_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::
                                      fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P};
                                      update_B̄::Bool=true)::Tuple{E,T,E,E} where {T, E, P<:AbstractPropagator{T,E}}
 
-    (; l, Lτ, forward, nₛ, Nₛ, G′) = fgc
+    (; l, Lτ, forward, n_stab, N_stab, G′) = fgc
     F = fgc.F::Vector{LDR{T,E}}
     ldr_ws = fgc.ldr_ws::LDRWorkspace{T,E}
 
@@ -387,10 +387,10 @@ function stabilize_equaltime_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::
 
     # update B(τ,0) if iterating forward or B(β,τ-Δτ) if iterating backwards
     if update_B̄
-        # also re-calculate B̄ matrices
+        # also re-calculate B_bar matrices
         update_factorizations!(fgc, B)
     else
-        # do not update B̄ matrices
+        # do not update B_bar matrices
         update_factorizations!(fgc)
     end
 
@@ -401,12 +401,12 @@ function stabilize_equaltime_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::
             # record initial G′(β,β) = G(β,β) before stabilization
             copyto!(G′, G)
             # G(β,β) = [I + B(β,0)]⁻¹
-            B_β0 = F[Nₛ]::LDR{T,E}
+            B_β0 = F[N_stab]::LDR{T,E}
             logdetG, sgndetG = inv_IpA!(G, B_β0, ldr_ws)
             # record that stabilization was performed
             stabilized = true
         # if at boundary of stablization interval calculate G(τ,τ)
-        elseif l′ == nₛ && Nₛ > 1
+        elseif l′ == n_stab && N_stab > 1
             # record initial G′(τ,τ) = G(τ,τ) before stabilization
             copyto!(G′, G)
             # calculate G(τ,τ) = [I + B(τ,0)⋅B(β,τ)]⁻¹
@@ -430,7 +430,7 @@ function stabilize_equaltime_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::
             # record that stabilization was performed
             stabilized = true
         # if at boundary of stabilization interval calculate G(τ-Δτ,τ-Δτ)
-        elseif l′ == 1 && Nₛ > 1
+        elseif l′ == 1 && N_stab > 1
             # perform naive propagation G′(τ-Δτ,τ-Δτ) = B⁻¹[l]⋅G(τ,τ)⋅B[l]
             B_l = B[l]::P
             mul!(G′, G, B_l, M = ldr_ws.M) # G(τ,τ)⋅B[l]

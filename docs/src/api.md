@@ -54,6 +54,7 @@ local_update_greens!
 
 - [`iterate`](@ref)
 - [`eltype`](@ref)
+- [`resize!`](@ref)
 - [`size`](@ref)
 - [`copyto!`](@ref)
 - [`ishermitian`](@ref)
@@ -66,6 +67,7 @@ local_update_greens!
 ```@docs
 Base.iterate
 Base.eltype
+Base.resize!
 Base.size
 Base.copyto!
 LinearAlgebra.ishermitian

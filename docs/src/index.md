@@ -187,7 +187,7 @@ L = 4
 Δτ = 0.1
 
 # frequency of numerical stabilization
-nₛ = 10
+n_stab = 10
 nothing; # hide
 ```
 
@@ -271,8 +271,8 @@ Next we instantiate two instances of the [`FermionGreensCalculator`](@ref) type,
 electron spin species, spin up and spin down.
 
 ```julia
-fgc_up = FermionGreensCalculator(Bup, β, Δτ, nₛ)
-fgc_dn = FermionGreensCalculator(Bdn, β, Δτ, nₛ)
+fgc_up = FermionGreensCalculator(Bup, β, Δτ, n_stab)
+fgc_dn = FermionGreensCalculator(Bdn, β, Δτ, n_stab)
 ```
 
 Now we initialize the spin up and spin down equal time Green's function matrices ``G_\uparrow(0,0)``
@@ -303,7 +303,7 @@ for l in fgc_up
 
     # Periodically re-calculate the Green's function matrix for numerical stability.
     # Comment: if not performing updates, but just evaluating the derivative of the action, then
-    # set update_B̄=false to avoid wasting cpu time re-computing B̄ₙ matrices.
+    # set update_B̄=false to avoid wasting cpu time re-computing B_barₙ matrices.
     logdetGup, sgndetGup, δGup, δθup = stabilize_equaltime_greens!(Gup, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=true)
     logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_equaltime_greens!(Gdn, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=true)
 

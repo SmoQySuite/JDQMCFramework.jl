@@ -6,7 +6,7 @@ using Checkerboard
 using StableLinearAlgebra
 
 # importing function to be overloaded
-import Base: size, copyto!, iterate, eltype
+import Base: size, copyto!, iterate, eltype, resize!
 import LinearAlgebra: mul!, lmul!, rmul!, ldiv!, rdiv!, ishermitian
 
 # import functions for multiplying/dividing by diagonal matrix represented by a vector
@@ -37,7 +37,8 @@ export SymPropagators
 # defines FermionGreensCalculator type to simplify the process of calculating
 # single-particle fermion green's funciton matrices
 include("FermionGreensCalculator.jl")
-export FermionGreensCalculator, fermion_greens_calculator
+export FermionGreensCalculator
+export resize!
 
 # implements core routines that are useful in writing a DQMC code
 include("dqmc_routines.jl")
