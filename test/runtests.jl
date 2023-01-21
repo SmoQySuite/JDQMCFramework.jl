@@ -103,8 +103,8 @@ end
     @test typeof(fgc) <: FermionGreensCalculator
 
     # resize FermionGreensCalculator struct
-    logdetGup, sgndetGup = resize!(fgc_up, Gup, Bup, n_stab)
-    logdetGdn, sgnderGdn = resize!(fgc_dn, Gdn, Bdn, n_stab)
+    logdetGup, sgndetGup = resize!(fgc_up, Gup, logdetGup, sgndetGup, Bup, n_stab)
+    logdetGdn, sgnderGdn = resize!(fgc_dn, Gdn, logdetGdn, sgndetGdn, Bdn, n_stab)
     @test fgc_up.n_stab == n_stab
     @test fgc_dn.n_stab == n_stab
     @test logdetG ≈ logdetGup
