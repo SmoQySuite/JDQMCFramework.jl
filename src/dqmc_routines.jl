@@ -52,6 +52,7 @@ end
 
 @doc raw"""
     calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3},
+                                  G::AbstractMatrix{T},
                                   fgc::FermionGreensCalculator{T,E},
                                   B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T}}
 
@@ -68,8 +69,10 @@ and
 size(Gτ0, 3) == == fgc.Lτ+1
 ```
 return true.
+Note that the current equal-time Green's function matrix `G`, equalling ``G(0,0) = G(\beta,\beta)``, is passed to avoid one additional matrix inversion.
 """
 function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3},
+                                       G::AbstractMatrix{T},
                                        fgc::FermionGreensCalculator{T,E},
                                        B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T,E}}
 
@@ -83,14 +86,12 @@ function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3},
 
     # calculate equal-time Green's function G(0,0) = G(β,β)
     Gτ0_0 = @view Gτ0[:,:,1]
-    calculate_equaltime_greens!(Gτ0_0, fgc)
+    copyto!(G, Gτ0_0)
 
     # apply anti-periodic boundary conditions in imaginary time: G(β,0) = I - G(0,0)
     Gτ0_β = @view Gτ0[:,:,Lτ+1]
-    @. Gτ0_β = -Gτ0_0
-    @fastmath @inbounds for i in axes(Gτ0_β, 1)
-        Gτ0_β[i,i] += 1
-    end
+    copyto!(Gτ0_β, I)
+    @. Gτ0_β = Gτ0_β - G
 
     # if iterating from l=1 => l=Lτ
     if forward
@@ -153,7 +154,8 @@ end
 
 
 @doc raw"""
-    calculate_unequaltime_greens!(G::AbstractMatrix{T}, Gτ0::AbstractArray{T,3}, Gττ::AbstractArray{T,3},
+    calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3}, Gττ::AbstractArray{T,3},
+                                  G::AbstractMatrix{T},
                                   fgc::FermionGreensCalculator{T,E},
                                   B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T}}
 
@@ -175,10 +177,10 @@ must be true. Note that ``G(0,0) = G(\beta,\beta)``, which means that
 Gττ[1, 1] ≈ Gττ[fgc.Lτ+1, fgc.Lτ+1]
 ```
 is true.
-Also, update the equal-time green's function `G` to reflect the new current imaginary
-time slice `fgc.l`.
+Note that the current equal-time Green's function matrix `G`, equalling ``G(0,0) = G(\beta,\beta)``, is passed to avoid one additional matrix inversion.
 """
-function calculate_unequaltime_greens!(G::AbstractMatrix{T}, Gτ0::AbstractArray{T,3}, Gττ::AbstractArray{T,3},
+function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3}, Gττ::AbstractArray{T,3},
+                                       G::AbstractMatrix{T},
                                        fgc::FermionGreensCalculator{T,E},
                                        B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T,E}}
 
@@ -196,16 +198,14 @@ function calculate_unequaltime_greens!(G::AbstractMatrix{T}, Gτ0::AbstractArray
     Gτ0_0 = @view Gτ0[:,:,1]
     Gττ_0 = @view Gττ[:,:,1]
     Gττ_β = @view Gττ[:,:,Lτ+1]
-    calculate_equaltime_greens!(Gτ0_0, fgc)
-    copyto!(Gττ_0, Gτ0_0)
-    copyto!(Gττ_β, Gτ0_0) # G(β,β) = G(0,0)
+    copyto!(Gτ0_0, G)
+    copyto!(Gττ_0, G)
+    copyto!(Gττ_β, G) # G(β,β) = G(0,0)
 
     # apply anti-periodic boundary conditions in imaginary time: G(β,0) = I - G(0,0)
     Gτ0_β = @view Gτ0[:,:,Lτ+1]
-    @. Gτ0_β = -Gτ0_0
-    @fastmath @inbounds for i in axes(Gτ0_β, 1)
-        Gτ0_β[i,i] += 1
-    end
+    copyto!(Gτ0_β, I)
+    @. Gτ0_β = Gτ0_β - G
 
     # if iterating from l=1 => l=Lτ
     if forward
@@ -278,10 +278,6 @@ function calculate_unequaltime_greens!(G::AbstractMatrix{T}, Gτ0::AbstractArray
         # reset forward to true (next iteration over imaginary time will be in the forward direction)
         fgc.forward = true
     end
-
-    # record equal-time green's function for current imaginary time slice
-    G0 = @view Gττ[:,:,fgc.l]
-    copyto!(G, G0)
 
     return nothing
 end

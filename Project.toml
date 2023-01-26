@@ -1,7 +1,7 @@
 name = "JDQMCFramework"
 uuid = "72315111-4c7c-4639-8a62-af4b2dda42e0"
 authors = ["Benjamin Cohen-Stead <benwcs@gmail.com>"]
-version = "0.7.0"
+version = "0.8.0"
 
 [deps]
 Checkerboard = "b297549e-c8cb-44e5-9c33-b7e2667db6fc"
