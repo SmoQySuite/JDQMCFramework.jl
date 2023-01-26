@@ -180,8 +180,8 @@ end
     Gτ0_dn = zeros(typeof(t), N, N, Lτ+1)
     Gττ_up = zeros(typeof(t), N, N, Lτ+1)
     Gττ_dn = zeros(typeof(t), N, N, Lτ+1)
-    calculate_unequaltime_greens!(Gτ0_up, Gττ_up, fgc_up, Bup)
-    calculate_unequaltime_greens!(Gτ0_dn, Gττ_dn, fgc_dn, Bdn)
+    calculate_unequaltime_greens!(Gup, Gτ0_up, Gττ_up, fgc_up, Bup)
+    calculate_unequaltime_greens!(Gdn, Gτ0_dn, Gττ_dn, fgc_dn, Bdn)
 
     # test that spin up unequal time Greens function is correct
     @test G_l ≈ Gτ0_up

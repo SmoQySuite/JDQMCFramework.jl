@@ -325,11 +325,11 @@ equal-time Green's function ``G_{\sigma}(\tau,\tau)`` for all imaginary time sli
 ```julia
 Gτ0_up = zeros(N, N, Lτ+1)
 Gττ_up = zeros(N, N, Lτ+1)
-calculate_unequaltime_greens!(Gτ0_up, Gττ_up, fgc_up, Bup)
+calculate_unequaltime_greens!(Gup, Gτ0_up, Gττ_up, fgc_up, Bup)
 
 Gτ0_dn = zeros(N, N, Lτ+1)
 Gττ_dn = zeros(N, N, Lτ+1)
-calculate_unequaltime_greens!(Gτ0_dn, Gττ_dn, fgc_dn, Bdn)
+calculate_unequaltime_greens!(Gdn, Gτ0_dn, Gττ_dn, fgc_dn, Bdn)
 ```
 
 Calling the [`calculate_unequaltime_greens!`](@ref) method also reverses the direction of iteration the next time

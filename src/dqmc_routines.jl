@@ -153,7 +153,7 @@ end
 
 
 @doc raw"""
-    calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3}, Gττ::AbstractArray{T,3},
+    calculate_unequaltime_greens!(G::AbstractMatrix{T}, Gτ0::AbstractArray{T,3}, Gττ::AbstractArray{T,3},
                                   fgc::FermionGreensCalculator{T,E},
                                   B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T}}
 
@@ -170,13 +170,15 @@ and
 ```julia
 size(Gτ0, 3) == size(Gττ, 3) == fgc.Lτ+1
 ```
-return true. Note that ``G(0,0) = G(\beta,\beta)``, which means that
+must be true. Note that ``G(0,0) = G(\beta,\beta)``, which means that
 ```julia
 Gττ[1, 1] ≈ Gττ[fgc.Lτ+1, fgc.Lτ+1]
 ```
 is true.
+Also, update the equal-time green's function `G` to reflect the new current imaginary
+time slice `fgc.l`.
 """
-function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3}, Gττ::AbstractArray{T,3},
+function calculate_unequaltime_greens!(G::AbstractMatrix{T}, Gτ0::AbstractArray{T,3}, Gττ::AbstractArray{T,3},
                                        fgc::FermionGreensCalculator{T,E},
                                        B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T,E}}
 
@@ -276,6 +278,10 @@ function calculate_unequaltime_greens!(Gτ0::AbstractArray{T,3}, Gττ::Abstract
         # reset forward to true (next iteration over imaginary time will be in the forward direction)
         fgc.forward = true
     end
+
+    # record equal-time green's function for current imaginary time slice
+    G0 = @view Gττ[:,:,fgc.l]
+    copyto!(G, G0)
 
     return nothing
 end
