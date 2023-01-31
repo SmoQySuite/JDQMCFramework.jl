@@ -321,13 +321,13 @@ function update_factorizations!(fgc::FermionGreensCalculator{T,E}) where {T, E}
     if forward
         # if at boundary of first stabilization interval (l=n_stab)
         if l′==n_stab && n==1
-            # calculate B(τ=nₛ⋅Δτ,0) = B_bar[1]
+            # calculate LDR factorization of B(τ=nₛ⋅Δτ,0) = B̄[1]
             B̄₁ = B_bar[1]
             B_τ0 = F[1]::LDR{T,E}
             ldr!(B_τ0, B̄₁, ldr_ws)
         # if at the end of a stabilization interval
         elseif l′==n_stab || l==Lτ && N_stab > 1
-            # calculate B(τ=n⋅nₛ⋅Δτ,0) = B_bar[n]⋅B(τ=(n-1)⋅nₛ⋅Δτ,0)
+            # calculate LDR factorization of B(τ=n⋅nₛ⋅Δτ,0) = B̄[n]⋅B(τ=(n-1)⋅nₛ⋅Δτ,0)
             B̄ₙ = B_bar[n]
             B_τ0_new = F[n]::LDR{T,E}
             B_τ0_prev = F[n-1]::LDR{T,E}
@@ -337,13 +337,13 @@ function update_factorizations!(fgc::FermionGreensCalculator{T,E}) where {T, E}
     else
         # if at boundary of last stabilization interval (l=Lτ-n_stab+1)
         if l′==1 && n==N_stab
-            # calculate B(β,τ=β-(n_stab+1)Δτ) = B_bar[N_stab]
+            # calculate LDR factorization of B(β,τ=β-(n_stab+1)⋅Δτ) = B̄[N_stab]
             B̄_Nₛ = B_bar[n]
             B_βτ = F[n]::LDR{T,E}
             ldr!(B_βτ, B̄_Nₛ, ldr_ws)
         # if at boundary of stabilization interval
         elseif l′==1 && N_stab > 1
-            # calculate B(β,τ=β-n⋅nₛ⋅Δτ-Δτ) = B(β,τ=β-n⋅nₛ⋅Δτ)⋅B̄[n]
+            # calculate LDR factorization of B(β,τ=β-n⋅nₛ⋅Δτ-Δτ) = B(β,τ=β-n⋅nₛ⋅Δτ)⋅B̄[n]
             B̄ₙ = B_bar[n]
             B_βτ_new = F[n]::LDR{T,E}
             B_βτ_prev = F[n+1]::LDR{T,E}

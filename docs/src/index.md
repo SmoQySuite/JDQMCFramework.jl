@@ -111,24 +111,38 @@ and
 ```math
 G_{\sigma}(\tau-\Delta\tau,\tau-\Delta\tau)=B_{\sigma,l}^{-1}G_{\sigma}(\tau,\tau)B_{\sigma,l}.
 ```
-The unequal-time Green's function is accessible using the relation
+The unequal-time Green's function is accessible using the relations
 ```math
 \begin{align*}
-G_{\sigma}(\tau,0)= & B_{\sigma}(\tau,0)G_{\sigma}(0,0)\\
-= & [B_{\sigma}^{-1}(\tau,0)+B_{\sigma}(\beta,\tau)]^{-1},
+G_{\sigma}(\tau,0) = & B_{\sigma}(\tau,0)G_{\sigma}(0,0)\\
+                   = & [B_{\sigma}^{-1}(\tau,0) + B_{\sigma}(\beta,\tau)]^{-1},
 \end{align*}
 ```
-which also implies
+and
 ```math
 \begin{align*}
-G_{\sigma}(\tau,0)= & B_{\sigma}^{-1}(\tau',\tau)G_{\sigma}(\tau',0),
+G_{\sigma}(0,\tau) = & -[I-G_{\sigma}(0,0)] B_{\sigma}^{-1}(\tau,0) \\
+                   = & -[B_{\sigma}^{-1}(\beta,\tau) + B_{\sigma}^{-1}(\tau,0)]^{-1},
 \end{align*}
 ```
-for ``\tau\in[0,\beta-\Delta\tau]`` and ``\tau<\tau'<\beta``. By applying
-the anti-periodic boundary conditions of the single-particle Green's
+where the second relationship may be shown by applying the Woodbury matrix identity.
+These relationships also imply
+```math
+G_{\sigma}(\tau,0) = B_{\sigma}^{-1}(\tau',\tau)G_{\sigma}(\tau',0)
+```
+and
+```math
+G_{\sigma}(0,\tau) = G_{\sigma}(0,\tau') B_{\sigma}(\tau',\tau),
+```
+for ``\tau\in[0,\beta-\Delta\tau]`` and ``\tau<\tau'<\beta``.
+By applying the anti-periodic boundary conditions of the single-particle Green's
 function in imaginary time it immediately follows that
 ```math
-G_{\sigma}(\beta,0)=I-G_{\sigma}(0,0),
+G_{\sigma}(\beta,0) = I-G_{\sigma}(0,0)
+```
+and
+```math
+G_\sigma(0,\beta) = -G_{\sigma}(0,0),
 ```
 where
 ```math
@@ -319,18 +333,37 @@ While not immediately obvious, this allows for a reduction in the number of requ
 This package also exports two routines, [`local_update_det_ratio`](@ref) and [`local_update_greens!`](@ref),
 that are useful for implementing local updates in a DQMC simulation.
 
-Lastly, we will will calculate the unequal-time Green's functions ``G_{\sigma}(\tau,0)`` and the
-equal-time Green's function ``G_{\sigma}(\tau,\tau)`` for all imaginary time slices.
+Lastly, we will will calculate the unequal-time Green's functions ``G_{\sigma}(\tau,0)`` and
+``G_{\sigma}(0,\tau)``, and the equal-time Green's function ``G_{\sigma}(\tau,\tau)`` for all imaginary time slices.
+This functionality is important 
 
 ```julia
-Gτ0_up = zeros(N, N, Lτ+1)
-Gττ_up = zeros(N, N, Lτ+1)
-calculate_unequaltime_greens!(Gup, Gτ0_up, Gττ_up, fgc_up, Bup)
+# initialize unequal-time Green's functions
+Gup_τ0 = similar(Gdn) # G₊(τ,0)
+Gup_0τ = similar(Gdn) # G₊(0,τ)
+Gup_ττ = similar(Gdn) # G₊(τ,τ)
+Gdn_τ0 = similar(Gdn) # G₋(τ,0)
+Gdn_0τ = similar(Gdn) # G₋(0,τ)
+Gdn_ττ = similar(Gdn) # G₋(τ,τ)
+initialize_unequaltime_greens!(Gup_τ0, Gup_0τ, Gup_ττ, Gup)
+initialize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, Gdn)
 
-Gτ0_dn = zeros(N, N, Lτ+1)
-Gττ_dn = zeros(N, N, Lτ+1)
-calculate_unequaltime_greens!(Gdn, Gτ0_dn, Gττ_dn, fgc_dn, Bdn)
+# EQUAL-TIME CORRELATION MEASUREMENTS WOULD GO HERE
+
+# Iterate over imaginary time τ=Δτ⋅l.
+for l in fgc_up
+
+    # Propagate Green's function matrices to current imaginary time slice
+    propagate_unequaltime_greens!(Gup_τ0, Gup_0τ, Gup_ττ, fgc_up, Bup)
+    propagate_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, fgc_dn, Bdn)
+
+    # UNEQUAL-TIME CORRELATION FUNCTION MEASUREMENTS WOULD GO HERE
+
+    # Periodically re-calculate the Green's function matrix for numerical stability.
+    logdetGup, sgndetGup, δGup, δθup = stabilize_unequaltime_greens!(Gup_τ0, Gup_0τ, Gup_ττ, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=false)
+    logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=false)
+
+    # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
+    iterate(fgc_dn, fgc_up.forward)
+end
 ```
-
-Calling the [`calculate_unequaltime_greens!`](@ref) method also reverses the direction of iteration the next time
-imaginary time is iterated over.

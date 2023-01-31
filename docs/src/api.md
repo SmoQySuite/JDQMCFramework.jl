@@ -37,7 +37,9 @@ FermionGreensCalculator(::FermionGreensCalculator{T,E}) where {T,E}
 - [`calculate_equaltime_greens!`](@ref)
 - [`propagate_equaltime_greens!`](@ref)
 - [`stabilize_equaltime_greens!`](@ref)
-- [`calculate_unequaltime_greens!`](@ref)
+- [`initialize_unequaltime_greens!`](@ref)
+- [`propagate_unequaltime_greens!`](@ref)
+- [`stabilize_unequaltime_greens!`](@ref)
 - [`local_update_det_ratio`](@ref)
 - [`local_update_greens!`](@ref)
 
@@ -45,7 +47,9 @@ FermionGreensCalculator(::FermionGreensCalculator{T,E}) where {T,E}
 calculate_equaltime_greens!
 propagate_equaltime_greens!
 stabilize_equaltime_greens!
-calculate_unequaltime_greens!
+initialize_unequaltime_greens!
+propagate_unequaltime_greens!
+stabilize_unequaltime_greens!
 local_update_det_ratio
 local_update_greens!
 ```

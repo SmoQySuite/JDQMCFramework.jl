@@ -42,7 +42,8 @@ export resize!
 
 # implements core routines that are useful in writing a DQMC code
 include("dqmc_routines.jl")
-export calculate_equaltime_greens!, calculate_unequaltime_greens!, propagate_equaltime_greens!, stabilize_equaltime_greens!
+export propagate_equaltime_greens!, stabilize_equaltime_greens!, calculate_equaltime_greens!
+export initialize_unequaltime_greens!, propagate_unequaltime_greens!, stabilize_unequaltime_greens!
 export local_update_det_ratio, local_update_greens!
 
 end
