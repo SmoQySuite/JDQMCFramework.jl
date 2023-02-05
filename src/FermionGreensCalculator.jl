@@ -213,6 +213,7 @@ function copyto!(fgc_out::FermionGreensCalculator{T,E}, fgc_in::FermionGreensCal
         copyto!(fgc_out.B_bar[i]::Matrix{T}, fgc_in.B_bar[i]::Matrix{T})
         copyto!(fgc_out.F[i]::LDR{T,E}, fgc_in.F[i]::LDR{T,E})
     end
+    copyto!(fgc_out.ldr_ws, fgc_in.ldr_ws)
 
     return nothing
 end
