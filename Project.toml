@@ -1,7 +1,7 @@
 name = "JDQMCFramework"
 uuid = "72315111-4c7c-4639-8a62-af4b2dda42e0"
 authors = ["Benjamin Cohen-Stead <benwcs@gmail.com>"]
-version = "1.0.1"
+version = "1.0.2"
 
 [deps]
 Checkerboard = "b297549e-c8cb-44e5-9c33-b7e2667db6fc"
@@ -12,7 +12,7 @@ StableLinearAlgebra = "7d06c537-f8ff-4c22-91e1-ce4088e3cfd7"
 [compat]
 StableLinearAlgebra = "1.4"
 FastLapackInterface = "1.2"
-Checkerboard = "1"
+Checkerboard = "1.2"
 julia = "1.7"
 
 [extras]
