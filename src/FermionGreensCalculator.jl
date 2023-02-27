@@ -100,8 +100,8 @@ function FermionGreensCalculator(fgc::FermionGreensCalculator{T,E}) where {T,E}
 
     (; forward, l, N, β, Δτ, Lτ, n_stab, N_stab, B_bar, F, G′, ldr_ws) = fgc
 
-    B_bar_new = deepcopy(B_bar)
-    F_new = deepcopy(F)
+    B_bar_new = [copy(B_bar[i]) for i in eachindex(B_bar)]
+    F_new = [ldr(F[i]) for i in eachindex(F)]
     G′_new = copy(G′)
     copyto!(G′_new,I)
     ldr_ws_new = ldr_workspace(G′_new)
