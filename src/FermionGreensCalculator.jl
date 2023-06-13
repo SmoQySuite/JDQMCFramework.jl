@@ -42,7 +42,7 @@ end
 Initialize and return [`FermionGreensCalculator`](@ref) struct based on the vector of propagators `B` passed to the function.
 """
 function FermionGreensCalculator(B::AbstractVector{P}, β::E, Δτ::E,
-                                 n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T,E}}
+                                 n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
 
     # get length of imaginary time axis
     Lτ = eval_length_imaginary_axis(β, Δτ)
@@ -127,7 +127,7 @@ end
 
 @doc raw"""
     resize!(fgc::FermionGreensCalculator{T,E}, G::Matrix{T}, logdetG::E, sgndetG::T,
-            B::Vector{P}, n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T,E}}
+            B::Vector{P}, n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
 
     resize!(fgc::FermionGreensCalculator{T,E}, n_stab::Int) where {T,E}
 
@@ -136,7 +136,7 @@ If `G`, `logdetG`, `sgndetG` and `B` are also passed then the equal-time Green's
 and the corresponding updated values for `(logdetG, sgndetG)` are returned.
 """
 function resize!(fgc::FermionGreensCalculator{T,E}, G::Matrix{T}, logdetG::E, sgndetG::T,
-                 B::Vector{P}, n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T,E}}
+                 B::Vector{P}, n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
 
     # check if stablization frequency is being updated
     if fgc.n_stab != n_stab
@@ -276,7 +276,7 @@ end
 
 
 @doc raw"""
-    update_factorizations!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T,E}}
+    update_factorizations!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T}}
 
 If current imaginary time slice `fgc.l` corresponds to the boundary of a stabilization interval,
 calculate a LDR factorization to represent ``B(0, \tau)`` or ``B(\tau-\Delta\tau, \beta)``
@@ -286,7 +286,7 @@ This method should be called *after* all changes to the current time slice propa
 ``B_l`` have been made
 This method will also recompute ``\bar{B}_n`` as needed.
 """
-function update_factorizations!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T,E}}
+function update_factorizations!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T}}
 
     # update B_bar matrix when necessary
     update_B̄!(fgc, B)
@@ -357,13 +357,13 @@ end
 
 
 @doc raw"""
-    update_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T,E,P<:AbstractPropagator{T,E}}
+    update_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T,E,P<:AbstractPropagator{T}}
 
 Recalculate ``\bar{B}_n`` if the current timeslice `fgc.l` corresponds to the boundary of a stabilization interval,
 accounting for whether imaginary time is being iterated over in the forward (`fgc.forward = true`) or
 reverse (`fgc.forward = false`) direction.
 """
-function update_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T,E,P<:AbstractPropagator{T,E}}
+function update_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T,E,P<:AbstractPropagator{T}}
 
     (; forward, n_stab, l, Lτ) = fgc
 
@@ -391,7 +391,7 @@ end
 
 
 @doc raw"""
-    calculate_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}, n::Int) where {T,E,P<:AbstractPropagator{T,E}}
+    calculate_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}, n::Int) where {T,E,P<:AbstractPropagator{T}}
 
 Given `B`, a vector of all the propagator matrices ``B_l``, calculate the matrix product
 ```math
@@ -399,7 +399,7 @@ Given `B`, a vector of all the propagator matrices ``B_l``, calculate the matrix
 ```
 with the result getting written to `fgc.B_bar[n]`.
 """
-function calculate_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}, n::Int) where {T,E,P<:AbstractPropagator{T,E}}
+function calculate_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}, n::Int) where {T,E,P<:AbstractPropagator{T}}
 
     (; B_bar, n_stab, Lτ, N_stab, ldr_ws) = fgc
     @assert 1 <= n <= N_stab
