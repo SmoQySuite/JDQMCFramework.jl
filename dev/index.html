@@ -16,35 +16,7 @@ G_{\sigma}(0,\tau) = &amp; -[I-G_{\sigma}(0,0)] B_{\sigma}^{-1}(\tau,0) \\
 \end{align*}\]</p><p>where the second relationship may be shown by applying the Woodbury matrix identity. These relationships also imply</p><p class="math-container">\[G_{\sigma}(\tau,0) = B_{\sigma}^{-1}(\tau&#39;,\tau)G_{\sigma}(\tau&#39;,0)\]</p><p>and</p><p class="math-container">\[G_{\sigma}(0,\tau) = G_{\sigma}(0,\tau&#39;) B_{\sigma}(\tau&#39;,\tau),\]</p><p>for <span>$\tau\in[0,\beta-\Delta\tau]$</span> and <span>$\tau&lt;\tau&#39;&lt;\beta$</span>. By applying the anti-periodic boundary conditions of the single-particle Green&#39;s function in imaginary time it immediately follows that</p><p class="math-container">\[G_{\sigma}(\beta,0) = I-G_{\sigma}(0,0)\]</p><p>and</p><p class="math-container">\[G_\sigma(0,\beta) = -G_{\sigma}(0,0),\]</p><p>where</p><p class="math-container">\[G_{\sigma}(0,0)=[I+B_{\sigma}(\beta,0)]^{-1}=[I+B_{\sigma,L_{\tau}}\dots B_{\sigma,1}]^{-1},\]</p><p>subject to the boundary condition <span>$G_{\sigma}(0,0)=G_{\sigma}(\beta,\beta)$</span>.</p><p>The DQMC method also requires periodic re-calculation of the fermion Green&#39;s function matrix as <span>$G_{\sigma}(\tau,\tau)$</span> is propagated to later or ealier imaginary times to maintain numerical stability. Therefore, we introduce a parameter <span>$n_{s},$</span> which describes the frequency with which numerical stabilization needs to occur. The number of &quot;stabilization intervals&quot; in imaginary time is then given by <span>$N_{s}=\left\lceil L_{\tau}/n_{s}\right \rceil$</span>, and we introduce the notation</p><p class="math-container">\[\bar{B}_{\sigma,n}=\prod_{l=(n-1)\cdot n_{s}+1}^{\min(n\cdot n_{s},N_{s})}B_{\sigma,l},\]</p><p>where <span>$n\in[1,N_{s}]$</span>, to represent the product of propagator matrices over a single stabilization interval. Using this definition we may express <span>$G_{\sigma}(0,0)$</span> as</p><p class="math-container">\[G_{\sigma}(0,0) = (I + B_{\sigma,L_\tau} B_{\sigma,L_\tau-1} \dots B_{\sigma, 2} B_{\sigma,1})^{-1}
                 = (I + \bar{B}_{\sigma,N_s} \bar{B}_{\sigma,N_s-1} \dots \bar{B}_{\sigma, 2} \bar{B}_{\sigma,1})^{-1}.\]</p><h2 id="Basic-Usage"><a class="docs-heading-anchor" href="#Basic-Usage">Basic Usage</a><a id="Basic-Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-Usage" title="Permalink"></a></h2><p>In this section we introduce some of the basics of using this package by setting up the framework for a DQMC simulations in the case of a simple non-interacting square lattice tight binding model, assuming two electron spin species, spin up and spin down. While this is a &quot;tivial&quot; example, it is instructive.</p><pre><code class="language-julia hljs">using LinearAlgebra
 using LatticeUtilities
-using JDQMCFramework</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">WARNING: Method definition loc_to_pos!() in module LatticeUtilities at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/UnitCell.jl:109 overwritten at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/UnitCell.jl:125.
-  ** incremental compilation may be fatally broken for this module **
-
-WARNING: Method definition kwcall(Any, typeof(LatticeUtilities.loc_to_pos!)) in module LatticeUtilities at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/UnitCell.jl:109 overwritten at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/UnitCell.jl:125.
-  ** incremental compilation may be fatally broken for this module **
-
-WARNING: Method definition loc_to_pos() in module LatticeUtilities at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/UnitCell.jl:141 overwritten at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/UnitCell.jl:157.
-  ** incremental compilation may be fatally broken for this module **
-
-WARNING: Method definition kwcall(Any, typeof(LatticeUtilities.loc_to_pos)) in module LatticeUtilities at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/UnitCell.jl:141 overwritten at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/UnitCell.jl:157.
-  ** incremental compilation may be fatally broken for this module **
-
-WARNING: Method definition loc_to_site() in module LatticeUtilities at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/utilities.jl:112 overwritten at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/utilities.jl:132.
-  ** incremental compilation may be fatally broken for this module **
-
-WARNING: Method definition kwcall(Any, typeof(LatticeUtilities.loc_to_site)) in module LatticeUtilities at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/utilities.jl:112 overwritten at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/utilities.jl:132.
-  ** incremental compilation may be fatally broken for this module **
-
-WARNING: Method definition simplify!() in module LatticeUtilities at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/utilities.jl:189 overwritten at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/utilities.jl:204.
-  ** incremental compilation may be fatally broken for this module **
-
-WARNING: Method definition kwcall(Any, typeof(LatticeUtilities.simplify!)) in module LatticeUtilities at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/utilities.jl:189 overwritten at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/utilities.jl:204.
-  ** incremental compilation may be fatally broken for this module **
-
-WARNING: Method definition build_neighbor_table() in module LatticeUtilities at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/utilities.jl:442 overwritten at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/utilities.jl:460.
-  ** incremental compilation may be fatally broken for this module **
-
-WARNING: Method definition kwcall(Any, typeof(LatticeUtilities.build_neighbor_table)) in module LatticeUtilities at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/utilities.jl:442 overwritten at /home/runner/.julia/packages/LatticeUtilities/1qn4U/src/utilities.jl:460.
-  ** incremental compilation may be fatally broken for this module **</code></pre><p>First let us define the relevant model parameters.</p><pre><code class="language-julia hljs"># hopping amplitude
+using JDQMCFramework</code></pre><p>First let us define the relevant model parameters.</p><pre><code class="language-julia hljs"># hopping amplitude
 t = 1.0
 
 # chemical potential
@@ -60,7 +32,7 @@ L = 4
 Δτ = 0.1
 
 # frequency of numerical stabilization
-n_stab = 10</code></pre><p>Next we calculate the length of the imaginary time axis <span>$L_\tau$</span> using the <a href="api/#JDQMCFramework.eval_length_imaginary_axis"><code>eval_length_imaginary_axis</code></a> method.</p><pre><code class="language-julia hljs">Lτ = eval_length_imaginary_axis(β, Δτ)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">37</code></pre><p>Using functionality imported from the <a href="https://github.com/cohensbw/LatticeUtilities.jl.git"><code>LatticeUtilities.jl</code></a> package, we construct the neighbor table for a square lattice.</p><pre><code class="language- hljs"># define unit cell
+n_stab = 10</code></pre><p>Next we calculate the length of the imaginary time axis <span>$L_\tau$</span> using the <a href="api/#JDQMCFramework.eval_length_imaginary_axis"><code>eval_length_imaginary_axis</code></a> method.</p><pre><code class="language-julia hljs">Lτ = eval_length_imaginary_axis(β, Δτ)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">37</code></pre><p>Using functionality imported from the <a href="https://github.com/cohensbw/LatticeUtilities.jl.git"><code>LatticeUtilities.jl</code></a> package, we construct the neighbor table for a square lattice.</p><pre><code class="language-julia hljs"># define unit cell
 unit_cell = UnitCell(lattice_vecs = [[1.,0.],[0.,1.]], basis_vecs = [[0.,0.]])
 
 # define size of lattice
@@ -79,7 +51,7 @@ N = nsites(unit_cell, lattice)
 # calculate number of bonds in lattice
 Nbonds = size(neighbor_table, 2)
 
-(N, Nbonds)</code></pre><p>Next we construct the strictly off-diagonal hopping matrix <span>$K,$</span> and a vector to represent the diagonal on-site energy matrix <span>$V.$</span></p><pre><code class="language-julia hljs"># build hopping matrix
+(N, Nbonds)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(16, 32)</code></pre><p>Next we construct the strictly off-diagonal hopping matrix <span>$K,$</span> and a vector to represent the diagonal on-site energy matrix <span>$V.$</span></p><pre><code class="language-julia hljs"># build hopping matrix
 K = zeros(typeof(t), N, N)
 build_hopping_matrix!(K, neighbor_table, fill(t, Nbonds))
 
@@ -150,4 +122,4 @@ for l in fgc_up
 
     # Keep up and down spin Green&#39;s functions synchronized as iterating over imaginary time.
     iterate(fgc_dn, fgc_up.forward)
-end</code></pre></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Tuesday 13 June 2023 17:33">Tuesday 13 June 2023</span>. Using Julia version 1.9.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+end</code></pre></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Wednesday 14 June 2023 01:02">Wednesday 14 June 2023</span>. Using Julia version 1.9.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
