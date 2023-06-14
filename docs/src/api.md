@@ -28,7 +28,7 @@ SymPropagators
 
 ```@docs
 FermionGreensCalculator
-FermionGreensCalculator(::AbstractVector{P}, ::E, ::E, ::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T,E}}
+FermionGreensCalculator(::AbstractVector{P}, ::E, ::E, ::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
 FermionGreensCalculator(::FermionGreensCalculator{T,E}) where {T,E}
 ```
 
