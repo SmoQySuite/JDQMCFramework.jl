@@ -46,4 +46,8 @@ export propagate_equaltime_greens!, stabilize_equaltime_greens!, calculate_equal
 export initialize_unequaltime_greens!, propagate_unequaltime_greens!, stabilize_unequaltime_greens!
 export local_update_det_ratio, local_update_greens!
 
+# Implement method for partially wrapping the Greens function matrix.
+include("partially_wrap_greens.jl")
+export partially_wrap_greens_forward!, partially_wrap_greens_reverse!
+
 end

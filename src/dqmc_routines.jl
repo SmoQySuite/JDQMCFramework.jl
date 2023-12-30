@@ -337,7 +337,7 @@ end
                                   fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P};
                                   update_B̄::Bool=true)::Tuple{E,T,E,E} where {T, E, P<:AbstractPropagator{T}}
 
-Stabilize the Green's function matrice ``G(\tau,0``, ``G(0,\tau)`` and ``G(\tau,\tau)``
+Stabilize the Green's function matrice ``G(\tau,0)``, ``G(0,\tau)`` and ``G(\tau,\tau)``
 as iterating through imaginary time ``\tau = \Delta\tau \cdot l.``
 For a given imaginary time slice `fgc.l`, this routine should be called *after* all changes to the ``B_l``
 propagator have been made.
@@ -354,11 +354,11 @@ when at imaginary time slice `fgc.l` every `fgc.n_stab` imaginary time slice.
 When iterating through imaginary time in the reverse direction (`fgc.forward = false`), this function
 instead re-computes
 ```math
-\begin{align}
+\begin{align*}
 G(\tau-\Delta\tau,0)               = & [B^{-1}(\tau-\Delta\tau,0) + B(\beta,\tau-\Delta\tau)]^{-1} \\
 G(0,\tau-\Delta\tau)               = & [B^{-1}(\beta,\tau-\Delta\tau) + B(\tau-\Delta\tau,0)]^{-1} \\
 G(\tau-\Delta\tau,\tau-\Delta\tau) = & [I + B(\tau-\Delta\tau,0)B(\beta,\tau-\Delta\tau)]^{-1}
-\begin{align}
+\begin{align*}
 ```
 for `fgc.l`.
 
