@@ -21,9 +21,10 @@
 #
 # The repulsive Hubbard model Hamiltonian on a square lattice considered in this tutorial is given by
 # ```math
-# \hat{H} = -t \sum_{\sigma,\langle i,j\rangle} (\hat{c}^{\dagger}_{\sigma,i} \hat{c}^{\phantom \dagger}_{\sigma,j} + {\rm h.c.})
-# + U \sum_i (\hat{n}_{\uparrow,i}-\tfrac{1}{2})(\hat{n}_{\downarrow,i}-\tfrac{1}{2})
-# - \mu \sum_{\sigma,i} \hat{n}_{\sigma,i},
+# \hat{H} =
+#   -t \sum_{\sigma,\langle i,j\rangle} (\hat{c}^{\dagger}_{\sigma,i} \hat{c}^{\phantom \dagger}_{\sigma,j} + {\rm h.c.})
+#   + U \sum_i (\hat{n}_{\uparrow,i}-\tfrac{1}{2})(\hat{n}_{\downarrow,i}-\tfrac{1}{2})
+#   - \mu \sum_{\sigma,i} \hat{n}_{\sigma,i},
 # ```
 # where ``\hat{c}^\dagger_{\sigma,i} \ (\hat{c}^{\phantom \dagger}_{\sigma,i})`` creates (annihilates) a spin ``\sigma``
 # electron on site ``i`` in the lattice, and ``\hat{n}_{\sigma,i} = \hat{c}^\dagger_{\sigma,i} \hat{c}^{\phantom \dagger}_{\sigma,i}``
@@ -33,14 +34,14 @@
 # and there is no sign problem. In the the case of ``\mu \ne 0`` there will be a sign problem.
 #
 # A script version of this tutorial is found at
-# [`tutorial_scripts/square_hubbard.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/main/tutorial_scripts/square_hubbard.jl)
+# [`tutorial_scripts/square_hubbard.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/master/tutorial_scripts/square_hubbard.jl)
 # in the respository, and can be run with the command
 # ```
 # julia square_hubbard.jl
 # ```
 # at the command line in a terminal.
 # This tutorial is also available as a notebook, which can be found at
-# [`tutorial_notebooks/square_hubbard.ipynb`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/main/tutorial_notebooks/square_hubbard.ipynb).
+# [`tutorial_notebooks/square_hubbard.ipynb`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/master/tutorial_notebooks/square_hubbard.ipynb).
 #
 # We begin by importing the relevant packages we will need to use in this script.
 # Note that to run this tutorial you will need to install all the required Julia pacakges.

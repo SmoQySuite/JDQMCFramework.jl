@@ -25,9 +25,10 @@ correlation function measurements for arbitary lattice geometries.
 
 The repulsive Hubbard model Hamiltonian on a square lattice considered in this tutorial is given by
 ```math
-\hat{H} = -t \sum_{\sigma,\langle i,j\rangle} (\hat{c}^{\dagger}_{\sigma,i} \hat{c}^{\phantom \dagger}_{\sigma,j} + {\rm h.c.})
-+ U \sum_i (\hat{n}_{\uparrow,i}-\tfrac{1}{2})(\hat{n}_{\downarrow,i}-\tfrac{1}{2})
-- \mu \sum_{\sigma,i} \hat{n}_{\sigma,i},
+\hat{H} =
+  -t \sum_{\sigma,\langle i,j\rangle} (\hat{c}^{\dagger}_{\sigma,i} \hat{c}^{\phantom \dagger}_{\sigma,j} + {\rm h.c.})
+  + U \sum_i (\hat{n}_{\uparrow,i}-\tfrac{1}{2})(\hat{n}_{\downarrow,i}-\tfrac{1}{2})
+  - \mu \sum_{\sigma,i} \hat{n}_{\sigma,i},
 ```
 where ``\hat{c}^\dagger_{\sigma,i} \ (\hat{c}^{\phantom \dagger}_{\sigma,i})`` creates (annihilates) a spin ``\sigma``
 electron on site ``i`` in the lattice, and ``\hat{n}_{\sigma,i} = \hat{c}^\dagger_{\sigma,i} \hat{c}^{\phantom \dagger}_{\sigma,i}``
@@ -37,14 +38,14 @@ Lastly, if ``\mu = 0.0`` the Hamiltonian is rendered particle-hole symmetric and
 and there is no sign problem. In the the case of ``\mu \ne 0`` there will be a sign problem.
 
 A script version of this tutorial is found at
-[`tutorial_scripts/square_hubbard.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/main/tutorial_scripts/square_hubbard.jl)
+[`tutorial_scripts/square_hubbard.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/master/tutorial_scripts/square_hubbard.jl)
 in the respository, and can be run with the command
 ```
 julia square_hubbard.jl
 ```
 at the command line in a terminal.
 This tutorial is also available as a notebook, which can be found at
-[`tutorial_notebooks/square_hubbard.ipynb`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/main/tutorial_notebooks/square_hubbard.ipynb).
+[`tutorial_notebooks/square_hubbard.ipynb`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/master/tutorial_notebooks/square_hubbard.ipynb).
 
 We begin by importing the relevant packages we will need to use in this script.
 Note that to run this tutorial you will need to install all the required Julia pacakges.
@@ -206,7 +207,7 @@ println("Random seed used to initialize RNG, seed = ", seed)
 ````
 
 ````
-Random seed used to initialize RNG, seed = 9182099641899459314
+Random seed used to initialize RNG, seed = 1754835493629536841
 
 ````
 
@@ -373,22 +374,22 @@ show(stdout, "text/plain", s)
 ````
 Random initial Ising HS configuration, s =
 16×80 Matrix{Int64}:
-  1  -1  -1   1   1  -1  -1   1   1  -1   1  -1  -1  -1   1  -1   1  -1  -1   1  -1  -1   1   1  -1   1  -1   1   1   1   1   1   1  -1  -1   1  -1   1  -1  -1  -1   1  -1  -1  -1   1   1  -1  -1  -1   1  -1   1  -1  -1   1  -1   1  -1   1  -1  -1  -1   1   1   1  -1  -1   1   1  -1   1  -1  -1  -1   1   1  -1   1  -1
-  1   1   1   1   1   1   1   1   1  -1   1   1  -1   1  -1   1  -1  -1  -1   1  -1   1   1  -1   1   1  -1  -1  -1   1  -1   1  -1  -1   1  -1  -1   1  -1   1  -1  -1   1   1  -1  -1   1  -1   1   1  -1   1  -1   1  -1   1   1  -1  -1  -1  -1   1   1   1   1  -1   1   1  -1  -1   1  -1  -1  -1   1   1   1  -1  -1   1
- -1   1   1  -1  -1   1   1   1   1   1   1   1  -1  -1   1  -1   1   1  -1   1  -1   1   1   1  -1   1   1  -1  -1  -1  -1   1   1  -1   1  -1  -1  -1  -1   1  -1  -1  -1  -1   1  -1  -1  -1  -1   1  -1   1   1  -1  -1  -1   1  -1  -1   1   1  -1   1  -1   1  -1   1   1   1  -1  -1  -1  -1  -1   1  -1   1   1   1   1
- -1   1  -1   1  -1   1  -1  -1  -1  -1   1   1   1  -1  -1  -1   1   1   1   1   1  -1   1   1  -1   1  -1  -1  -1  -1  -1  -1  -1  -1   1  -1  -1   1  -1  -1   1   1   1   1   1   1   1  -1  -1   1  -1  -1   1   1  -1  -1   1  -1   1   1   1   1   1   1  -1  -1  -1  -1   1   1   1  -1   1  -1   1  -1  -1   1   1  -1
- -1   1  -1  -1   1  -1   1  -1  -1  -1  -1   1   1   1   1   1  -1   1   1   1  -1  -1  -1   1   1   1   1  -1   1  -1   1   1   1   1  -1   1   1   1  -1  -1   1  -1  -1  -1  -1  -1   1   1   1   1   1   1  -1   1   1  -1  -1   1  -1  -1  -1   1   1  -1  -1   1   1  -1   1  -1   1   1  -1  -1   1   1   1   1   1  -1
- -1  -1  -1   1   1  -1  -1   1  -1  -1  -1  -1  -1  -1  -1   1  -1   1   1  -1   1   1   1   1   1  -1  -1   1   1  -1   1  -1  -1  -1  -1  -1   1   1   1   1   1   1  -1   1  -1   1  -1  -1  -1   1  -1  -1   1   1  -1  -1   1  -1   1  -1   1   1   1  -1   1  -1  -1   1  -1   1   1  -1   1  -1  -1  -1   1   1   1  -1
-  1   1  -1   1  -1   1   1  -1   1  -1   1  -1  -1   1   1   1  -1   1   1  -1  -1  -1  -1  -1  -1  -1   1   1  -1   1   1   1   1   1   1   1  -1  -1   1  -1  -1   1  -1  -1  -1  -1   1  -1  -1   1   1   1   1   1  -1  -1   1  -1  -1  -1   1  -1  -1   1   1   1   1   1   1   1  -1  -1   1  -1  -1   1  -1  -1   1  -1
- -1  -1  -1  -1   1   1  -1  -1  -1  -1   1  -1   1   1   1  -1  -1  -1   1  -1   1   1   1  -1  -1  -1  -1  -1  -1   1  -1   1   1   1   1   1  -1   1   1   1  -1   1   1   1   1   1   1  -1  -1   1   1  -1   1  -1   1  -1  -1   1  -1   1   1  -1  -1  -1   1  -1  -1   1   1   1   1   1   1  -1   1   1  -1  -1   1   1
-  1   1  -1   1   1  -1  -1  -1   1   1   1  -1  -1  -1  -1   1   1   1  -1   1  -1   1  -1  -1   1  -1   1  -1   1   1  -1   1  -1   1  -1   1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1   1  -1   1  -1  -1  -1  -1  -1  -1   1   1  -1   1  -1  -1  -1   1  -1   1  -1  -1  -1   1  -1  -1   1  -1   1   1  -1  -1   1   1
- -1   1   1   1   1   1  -1  -1  -1  -1  -1   1  -1  -1   1  -1   1  -1  -1   1   1   1  -1  -1  -1  -1  -1  -1  -1   1  -1   1   1  -1   1  -1  -1   1  -1  -1  -1   1  -1   1   1  -1   1  -1   1   1   1  -1  -1  -1   1  -1  -1  -1  -1   1  -1  -1   1   1   1  -1   1   1  -1  -1   1  -1   1  -1  -1   1   1   1  -1   1
-  1   1  -1   1  -1   1   1   1  -1  -1  -1   1   1  -1   1  -1   1   1   1   1   1  -1   1  -1   1  -1   1   1  -1   1  -1  -1   1   1  -1  -1  -1  -1  -1  -1   1  -1   1   1   1   1  -1   1  -1  -1   1   1  -1   1   1   1  -1   1   1   1  -1   1   1   1   1   1  -1   1  -1   1   1  -1  -1  -1  -1  -1   1   1   1   1
- -1  -1  -1  -1  -1   1   1  -1  -1   1  -1  -1   1  -1   1  -1   1   1  -1   1  -1   1  -1   1  -1  -1  -1   1  -1   1   1  -1  -1   1  -1   1  -1   1   1  -1   1   1   1   1   1   1   1   1   1  -1   1  -1   1  -1   1  -1  -1  -1   1   1   1   1  -1  -1   1  -1  -1   1  -1  -1   1   1   1  -1   1   1   1   1  -1  -1
-  1  -1   1  -1   1  -1  -1  -1   1   1   1  -1  -1  -1  -1  -1   1  -1   1   1   1   1  -1   1  -1  -1  -1   1  -1   1  -1   1  -1   1   1  -1   1   1   1   1   1  -1  -1   1   1  -1   1  -1   1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1   1   1  -1   1   1   1   1   1   1  -1  -1  -1  -1   1   1  -1  -1   1  -1   1
- -1  -1  -1   1   1   1   1  -1  -1  -1   1  -1   1  -1   1   1  -1   1   1  -1  -1   1   1   1   1  -1   1   1  -1   1   1  -1  -1   1   1  -1  -1   1   1  -1  -1   1   1  -1   1  -1   1   1  -1   1  -1  -1  -1  -1  -1  -1  -1   1   1  -1  -1  -1   1   1  -1  -1  -1  -1  -1   1   1  -1  -1  -1  -1   1   1   1  -1  -1
-  1   1  -1  -1   1  -1   1   1  -1  -1   1  -1  -1  -1   1   1   1  -1   1   1   1  -1   1  -1   1   1  -1  -1   1  -1  -1  -1  -1  -1  -1  -1   1   1   1  -1  -1  -1   1  -1  -1   1   1  -1  -1  -1  -1  -1  -1   1  -1  -1  -1   1   1  -1   1  -1  -1   1  -1  -1  -1  -1  -1  -1   1  -1  -1  -1   1  -1   1  -1   1   1
-  1  -1  -1  -1   1  -1   1  -1   1   1  -1   1  -1   1  -1  -1  -1   1   1  -1  -1  -1   1   1  -1   1  -1   1  -1   1  -1   1   1  -1  -1   1   1   1  -1   1   1  -1  -1   1  -1  -1  -1   1   1   1   1   1   1   1   1   1  -1   1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1   1  -1   1   1  -1   1   1  -1  -1   1   1  -1
+  1   1   1   1  -1   1  -1   1   1  -1  -1  -1   1   1   1   1  -1  -1   1   1   1   1   1   1   1  -1   1  -1  -1   1   1   1   1  -1  -1  -1  -1   1  -1  -1   1  -1  -1   1   1  -1  -1   1   1  -1   1   1  -1  -1   1  -1   1   1  -1  -1  -1  -1   1  -1   1  -1   1  -1  -1  -1  -1   1   1  -1  -1  -1   1   1  -1  -1
+  1   1  -1  -1  -1  -1  -1   1   1   1  -1   1  -1  -1   1   1   1  -1  -1  -1  -1  -1  -1   1  -1  -1  -1  -1   1  -1   1  -1   1   1   1  -1  -1   1  -1   1   1  -1   1   1   1   1  -1  -1   1  -1  -1  -1   1   1   1   1  -1   1   1   1  -1  -1  -1  -1  -1   1   1  -1   1  -1   1   1   1   1   1   1  -1   1  -1  -1
+ -1   1   1   1   1   1   1  -1  -1  -1  -1  -1   1   1  -1  -1   1   1   1  -1  -1   1   1  -1  -1   1   1  -1  -1  -1  -1  -1   1  -1  -1  -1  -1  -1   1  -1   1  -1  -1   1   1   1  -1  -1   1  -1  -1   1   1   1   1  -1   1  -1   1   1   1   1   1  -1   1  -1  -1  -1   1   1  -1  -1   1   1   1  -1  -1  -1  -1  -1
+ -1   1   1   1  -1  -1  -1   1   1  -1  -1   1   1  -1   1  -1   1  -1  -1  -1   1   1  -1  -1   1  -1  -1   1   1   1  -1  -1  -1  -1   1  -1  -1   1   1  -1  -1   1   1  -1  -1  -1  -1  -1  -1   1   1   1  -1   1  -1   1  -1  -1  -1  -1  -1   1   1   1   1   1  -1  -1   1  -1   1  -1   1   1   1   1   1   1   1   1
+ -1  -1  -1   1   1   1   1  -1   1  -1  -1  -1  -1   1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1   1   1  -1  -1   1  -1  -1   1   1  -1   1   1   1  -1  -1   1   1  -1   1   1  -1  -1   1   1   1  -1  -1   1  -1   1   1  -1   1   1   1   1  -1   1  -1   1   1  -1   1  -1   1  -1  -1  -1  -1   1   1   1   1  -1  -1   1
+  1  -1   1  -1   1  -1  -1   1  -1   1   1  -1  -1  -1   1  -1  -1   1  -1  -1  -1   1   1  -1   1   1  -1   1  -1  -1  -1  -1  -1   1  -1  -1   1   1  -1   1   1  -1   1  -1   1  -1  -1   1   1   1   1   1   1   1  -1  -1  -1   1   1   1   1   1  -1   1   1  -1  -1  -1   1   1  -1  -1  -1  -1   1   1  -1  -1   1  -1
+  1  -1  -1  -1   1  -1  -1  -1   1  -1   1   1   1  -1  -1   1   1  -1   1  -1  -1   1  -1  -1  -1  -1   1  -1  -1  -1   1   1   1  -1  -1  -1   1   1   1  -1  -1  -1   1  -1   1  -1  -1  -1   1  -1  -1   1  -1   1  -1  -1   1  -1   1  -1  -1   1  -1   1  -1  -1  -1   1  -1   1   1  -1  -1   1   1  -1  -1   1   1   1
+  1  -1   1  -1   1  -1  -1   1  -1   1   1  -1  -1  -1  -1   1  -1   1  -1   1  -1  -1   1  -1  -1   1  -1  -1   1   1   1  -1  -1  -1   1  -1  -1  -1  -1  -1  -1   1  -1  -1  -1  -1  -1  -1  -1  -1   1   1  -1   1  -1   1  -1   1  -1  -1  -1  -1   1   1   1   1  -1  -1   1   1   1   1   1   1   1   1  -1   1   1  -1
+  1  -1   1  -1  -1   1   1   1   1  -1   1   1   1  -1  -1  -1  -1  -1  -1  -1   1  -1   1  -1  -1   1   1   1  -1  -1   1   1   1   1  -1   1  -1  -1   1   1  -1   1   1  -1   1   1  -1   1  -1   1  -1  -1  -1  -1  -1   1   1  -1   1   1  -1   1   1   1   1   1   1  -1   1   1  -1  -1   1  -1  -1  -1   1  -1   1   1
+  1  -1   1   1  -1   1  -1   1   1   1   1  -1   1  -1  -1   1  -1  -1  -1  -1   1   1  -1   1  -1   1   1  -1   1   1   1   1  -1  -1  -1  -1  -1   1  -1  -1   1  -1   1  -1   1  -1   1  -1   1   1  -1  -1   1  -1  -1   1   1  -1   1  -1   1  -1   1   1  -1   1  -1   1  -1  -1   1   1   1  -1   1  -1   1   1   1   1
+  1  -1   1   1  -1  -1   1  -1   1   1  -1   1  -1  -1   1   1   1   1   1   1  -1   1  -1   1   1   1   1   1   1   1  -1  -1  -1   1   1   1   1   1   1   1  -1   1   1   1  -1  -1  -1  -1   1   1   1   1   1   1  -1   1   1   1  -1   1   1   1   1  -1   1  -1  -1  -1  -1  -1   1   1  -1   1   1   1   1  -1  -1   1
+  1   1   1  -1  -1  -1  -1  -1  -1   1  -1   1  -1  -1   1   1  -1   1   1  -1  -1  -1  -1   1   1   1  -1   1  -1   1   1  -1   1  -1   1  -1  -1   1  -1   1  -1  -1  -1  -1   1   1  -1   1  -1   1  -1   1   1   1  -1   1  -1   1  -1  -1  -1  -1  -1  -1  -1  -1  -1   1  -1  -1  -1  -1  -1   1  -1   1   1  -1   1  -1
+  1  -1   1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1   1   1  -1  -1   1   1  -1   1  -1   1   1   1   1  -1  -1   1   1   1   1   1  -1  -1  -1   1  -1  -1   1  -1  -1   1   1  -1   1  -1  -1   1   1  -1  -1  -1  -1   1  -1  -1  -1  -1  -1   1   1  -1   1  -1  -1  -1   1   1   1  -1   1   1   1  -1  -1
+  1   1  -1  -1  -1  -1   1   1  -1  -1  -1  -1   1   1   1  -1   1  -1   1  -1  -1   1   1   1   1  -1   1  -1   1   1   1  -1  -1  -1   1   1   1  -1   1   1  -1  -1  -1   1   1   1  -1   1  -1  -1  -1  -1   1  -1  -1  -1   1   1   1   1   1  -1  -1  -1   1   1   1   1   1   1  -1  -1  -1  -1   1  -1  -1  -1  -1  -1
+  1   1   1  -1   1   1  -1  -1  -1   1  -1   1  -1  -1   1  -1  -1   1   1  -1  -1  -1   1  -1  -1  -1   1  -1  -1  -1   1  -1   1  -1  -1   1  -1  -1  -1   1  -1   1  -1   1  -1  -1  -1   1   1   1  -1  -1  -1  -1  -1  -1  -1   1   1  -1   1  -1   1  -1  -1   1  -1   1   1   1   1   1   1  -1   1  -1  -1  -1   1   1
+  1  -1   1   1  -1   1  -1   1  -1   1  -1   1   1  -1   1   1  -1  -1   1   1   1  -1  -1  -1  -1  -1   1   1   1   1   1  -1  -1   1   1   1   1  -1  -1  -1  -1  -1  -1   1   1   1  -1   1   1  -1   1   1   1  -1   1   1   1   1   1  -1  -1   1  -1   1   1   1   1  -1  -1   1  -1   1  -1   1   1   1   1   1   1  -1
 ````
 
 Next we to initialize propagator matrices ``B_{\sigma,l}`` for each imaginary time slice ``l \in [1,L_\tau]``.
@@ -522,7 +523,7 @@ Gdn_ττ = zeros(eltype(Gdn), size(Gdn)); # Gdn(τ,τ)
 
 Now we will allocate arrays to contain the various measurements we will make during the simulation,
 including various correlation functions. Note that the definition for each measurement will be
-given below when we begin processing the data to calculate the final statistics
+supplied later in the tutorial when we begin processing the data to calculate the final statistics
 for each measured observable.
 
 ````julia
@@ -952,14 +953,14 @@ println("Largest Numerical Error = ", δG)
 ````
 
 ````
-Acceptance Rate = 0.686510499999999
-Largest Numerical Error = 2.888117478505592e-8
+Acceptance Rate = 0.6863001875000025
+Largest Numerical Error = 9.726790040076594e-8
 
 ````
 
 Having completed the DQMC simulation, the next step is the analyze the results,
 calculating the mean and error for various measuremed observables.
-We will first calculate the relevant global measurement, including the
+We will first calculate the relevant global measurements, including the
 average density ``\langle n \rangle = \langle n_\uparrow + n_\downarrow \rangle``
 and double occupancy ``\langle n_\uparrow n_\downarrow \rangle.``
 Note that the binning method is used to calculate the error bar for the correlated data.
@@ -984,9 +985,9 @@ println("Double occupancy, nup_ndn = ", double_occ_avg, " +/- ", double_occ_std)
 ````
 
 ````
-Avg Sign, S = 0.4932000000000052 +/- 0.01115910902741405
-Density, n = 1.241666974128627 +/- 0.0013833554885256192
-Double occupancy, nup_ndn = 0.28461517401001935 +/- 0.0014105302664993394
+Avg Sign, S = 0.4819999999999993 +/- 0.0120237859500005
+Density, n = 1.2433725408753702 +/- 0.0015394315036564956
+Double occupancy, nup_ndn = 0.285820258988176 +/- 0.0014044150442328474
 
 ````
 
@@ -1127,7 +1128,7 @@ println("Antiferromagentic Spin Susceptibility, chi_afm = ", χafm_avg, " +/- ",
 ````
 
 ````
-Antiferromagentic Spin Susceptibility, chi_afm = 2.1556883023033038 +/- 0.08097309647506552
+Antiferromagentic Spin Susceptibility, chi_afm = 2.0007689462134834 +/- 0.07205185269844562
 
 ````
 
@@ -1193,7 +1194,7 @@ println("Local s-wave pair susceptibility, P_s = ", Ps_avg, " +/- ", Ps_std)
 ````
 
 ````
-Local s-wave pair susceptibility, P_s = 0.06802133628019602 +/- 0.0008963215965298621
+Local s-wave pair susceptibility, P_s = 0.06860248364624422 +/- 0.0009178799538980425
 
 ````
 
@@ -1231,7 +1232,7 @@ println("Extended s-wave pair susceptibility, P_ext-s = ", Pexts_avg, " +/- ", P
 ````
 
 ````
-Extended s-wave pair susceptibility, P_ext-s = 0.16160737719288676 +/- 0.0022647296375625766
+Extended s-wave pair susceptibility, P_ext-s = 0.1615728699843233 +/- 0.001901552796263964
 
 ````
 
@@ -1269,7 +1270,7 @@ println("Extended s-wave pair susceptibility, P_d = ", Pd_avg, " +/- ", Pd_std)
 ````
 
 ````
-Extended s-wave pair susceptibility, P_d = 0.34896694245493975 +/- 0.01481734804268574
+Extended s-wave pair susceptibility, P_d = 0.3267340797347238 +/- 0.014117915056908221
 
 ````
 
