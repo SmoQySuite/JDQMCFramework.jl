@@ -21,12 +21,10 @@
 #
 # The repulsive Hubbard model Hamiltonian on a square lattice considered in this tutorial is given by
 # ```math
-# \hat{H} =
-#   -t \sum_{\sigma,\langle i,j\rangle} (\hat{c}^{\dagger}_{\sigma,i} \hat{c}^{\phantom \dagger}_{\sigma,j} + {\rm h.c.})
-#   + U \sum_i (\hat{n}_{\uparrow,i}-\tfrac{1}{2})(\hat{n}_{\downarrow,i}-\tfrac{1}{2})
-#   - \mu \sum_{\sigma,i} \hat{n}_{\sigma,i},
+# \hat{H} = -t \sum_{\sigma,\langle i,j\rangle} (\hat{c}^{\dagger}_{\sigma,i} \hat{c}^{\phantom \dagger}_{\sigma,j} + {\rm h.c.})
+#   + U \sum_i (\hat{n}_{\uparrow,i}-\tfrac{1}{2})(\hat{n}_{\downarrow,i}-\tfrac{1}{2}) - \mu \sum_{\sigma,i} \hat{n}_{\sigma,i},
 # ```
-# where ``\hat{c}^\dagger_{\sigma,i} \ (\hat{c}^{\phantom \dagger}_{\sigma,i})`` creates (annihilates) a spin ``\sigma``
+# where ``\hat{c}^\dagger_{\sigma,i} (\hat{c}^{\phantom \dagger}_{\sigma,i})`` creates (annihilates) a spin ``\sigma``
 # electron on site ``i`` in the lattice, and ``\hat{n}_{\sigma,i} = \hat{c}^\dagger_{\sigma,i} \hat{c}^{\phantom \dagger}_{\sigma,i}``
 # is the spin-``\sigma`` electron number operator for site ``i``. In the above Hamiltonian ``t`` is the nearest neighbor hopping integral,
 # ``\mu`` is the chemical potential, and ``U > 0`` controls the strength of the on-site Hubbard repulsion.
