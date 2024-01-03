@@ -9,7 +9,7 @@
 #
 # In fairness, tutorial is long as a lot goes into writing a full DQMC code.
 # However, in spite of the length, each step is relatively straightforward.
-# This is made possible by levarging the funcationality exported by the
+# This is made possible by leveraging the functionality exported by the
 # [`JDQMCFramework.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl.git) and other packages.
 # For instance, the [`JDQMCFramework.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl.git) package takes care of all the
 # numerical stabilization nonsense that is one of the most challenging parts of writing a DQMC code.
@@ -89,8 +89,8 @@ FFTW.set_num_threads(1)
 # In this example we will stick to a relatively small system size ``(4 \times 4)`` and
 # inverse temperature ``(\beta = 4)``. This is to ensure that this tutorial
 # can be run quickly on a personal computer.
-# Also, in this tutorial I will include many print statements so that when people
-# first run this example they can keep track of what is going on. That said, for a DQMC code
+# Also, in this tutorial I will include many print statements so that when
+# the tutorial is run users can keep track of what is going on. That said, for a DQMC code
 # that will be used in actual research you will want to replace the print statements with code
 # that writes relevant information and measurement results to file.
 
@@ -149,7 +149,7 @@ println("Number of burnin sweeps, N_burnin = ", N_burnin)
 N_measurements = 10_000
 println("Number of measurements, N_measurements = ", N_measurements)
 
-## Number of sweeps through the lattice performing local updates seperating each index set of measurements.
+## Number of local update sweeps seperating sequential measurements.
 N_sweeps = 1
 println("Number of local update sweeps seperating measurements, n_sweeps = ", N_sweeps)
 
@@ -253,9 +253,9 @@ bond_ny = lu.Bond(
 # ```
 # is used (`symmetric = false`), then ``\Delta\tau^\prime = \Delta\tau.``
 #
-# Note that there is also some branching logic below associated with whether or not the
+# Note the branching logic below associated with whether or not the
 # matrix ``e^{-\Delta\tau^\prime K}`` is calculated exactly, or represented by the sparse checkerboard approximation
-# using the package [`Checerboard.jl`](https://github.com/SmoQySuite/Checkerboard.jl.git).
+# using the package [`Checkerboard.jl`](https://github.com/SmoQySuite/Checkerboard.jl.git).
 
 ## Define Δτ′=Δτ/2 if symmetric = true, otherwise Δτ′=Δτ
 Δτ′ = symmetric ? Δτ/2 : Δτ
@@ -287,7 +287,7 @@ else
 #nb end;
 #jl end
 
-# In this example we are going to introduce a Ising Hubbard-Stratonovich (HS) field to decouple
+# In this example we are going to introduce an Ising Hubbard-Stratonovich (HS) field to decouple
 # the Hubbard interaction. The Ising HS transformation
 # ```math
 # e^{-\Delta\tau U (\hat{n}_{\uparrow,i,l}-\tfrac{1}{2})(\hat{n}_{\downarrow,i,l}-\tfrac{1}{2})} = 
@@ -299,10 +299,10 @@ else
 # ```
 # is a constant. We start the simulation from a random ``s_{i,l}`` Ising HS field configuration.
 
-## Define constant associated Ising HS transformation.
+## Define constant associated Ising Hubbard-Stratonovich (HS) transformation.
 α = acosh(exp(Δτ*U/2))
 
-## Initialize random Ising Hubbard-Stratonovich (HS) configuration.
+## Initialize a random Ising HS configuration.
 s = rand(rng, -1:2:1, N, Lτ)
 #md println("Random initial Ising HS configuration, s =")
 #md show(stdout, "text/plain", s)
@@ -427,14 +427,14 @@ Gdn = zeros(typeof(t), N, N)
 # ``G_\sigma(\tau,0)`` and ``G_\sigma(0,\tau).``
 
 ## Allcoate time-displaced Green's functions.
-Gup_τ0 = zeros(eltype(Gup), size(Gup)) # Gup(τ,0)
-Gup_0τ = zeros(eltype(Gup), size(Gup)) # Gup(0,τ)
-Gup_ττ = zeros(eltype(Gup), size(Gup)) # Gup(τ,τ)
-Gdn_τ0 = zeros(eltype(Gdn), size(Gdn)) # Gdn(τ,0)
-Gdn_0τ = zeros(eltype(Gdn), size(Gdn)) # Gdn(0,τ)
-#md Gdn_ττ = zeros(eltype(Gdn), size(Gdn)); # Gdn(τ,τ)
-#nb Gdn_ττ = zeros(eltype(Gdn), size(Gdn)); # Gdn(τ,τ)
-#jl Gdn_ττ = zeros(eltype(Gdn), size(Gdn)) # Gdn(τ,τ)
+Gup_τ0 = zero(Gup) # Gup(τ,0)
+Gup_0τ = zero(Gup) # Gup(0,τ)
+Gup_ττ = zero(Gup) # Gup(τ,τ)
+Gdn_τ0 = zero(Gdn) # Gdn(τ,0)
+Gdn_0τ = zero(Gdn) # Gdn(0,τ)
+#md Gdn_ττ = zero(Gdn); # Gdn(τ,τ)
+#nb Gdn_ττ = zero(Gdn); # Gdn(τ,τ)
+#jl Gdn_ττ = zero(Gdn) # Gdn(τ,τ)
 
 # Now we will allocate arrays to contain the various measurements we will make during the simulation,
 # including various correlation functions. Note that the definition for each measurement will be
@@ -1051,7 +1051,7 @@ S_density_avg, S_density_std = correlation_stats(S_density, avg_sign)
 # ```math
 # P_{s} = \frac{1}{N} \int_0^\beta \langle \hat{\Delta}_{s}(\tau) \hat{\Delta}_{s}(0) \rangle \ d\tau,
 # ```
-# where ``\hat{\Delta}_{s} = \sum_\mathbf{i} \hat{c}_{\downarrow,\mathbf{r}} \hat{c}_{\uparrow,\mathbf{r}}.``
+# where ``\hat{\Delta}_{s} = \sum_\mathbf{i} \hat{c}_{\downarrow,\mathbf{i}} \hat{c}_{\uparrow,\mathbf{i}}.``
 
 ## Fourier transform binned position space local s-wave correlation function data to get
 ## the binned momentum space local s-wave structure factor data.
@@ -1077,11 +1077,11 @@ println("Local s-wave pair susceptibility, P_s = ", Ps_avg, " +/- ", Ps_std)
 # where
 # ```math
 # \hat{\Delta}_{\textrm{ext-}s} = \frac{1}{2} \sum_\mathbf{i}
-#   (\hat{c}_{\downarrow,\mathbf{r}+\mathbf{x}}
-#   +\hat{c}_{\downarrow,\mathbf{r}-\mathbf{x}}
-#   +\hat{c}_{\downarrow,\mathbf{r}+\mathbf{y}}
-#   +\hat{c}_{\downarrow,\mathbf{r}-\mathbf{y}})
-#   \hat{c}_{\uparrow,\mathbf{r}}.
+#   (\hat{c}_{\downarrow,\mathbf{i}+\mathbf{x}}
+#   +\hat{c}_{\downarrow,\mathbf{i}-\mathbf{x}}
+#   +\hat{c}_{\downarrow,\mathbf{i}+\mathbf{y}}
+#   +\hat{c}_{\downarrow,\mathbf{i}-\mathbf{y}})
+#   \hat{c}_{\uparrow,\mathbf{i}}.
 # ```
 
 ## Fourier transform binned position space extended s-wave correlation function data to get
@@ -1108,11 +1108,11 @@ println("Extended s-wave pair susceptibility, P_ext-s = ", Pexts_avg, " +/- ", P
 # where
 # ```math
 # \hat{\Delta}_{d} = \frac{1}{2} \sum_\mathbf{i}
-#   (\hat{c}_{\downarrow,\mathbf{r}+\mathbf{x}}
-#   +\hat{c}_{\downarrow,\mathbf{r}-\mathbf{x}}
-#   -\hat{c}_{\downarrow,\mathbf{r}+\mathbf{y}}
-#   -\hat{c}_{\downarrow,\mathbf{r}-\mathbf{y}})
-#   \hat{c}_{\uparrow,\mathbf{r}}.
+#   (\hat{c}_{\downarrow,\mathbf{i}+\mathbf{x}}
+#   +\hat{c}_{\downarrow,\mathbf{i}-\mathbf{x}}
+#   -\hat{c}_{\downarrow,\mathbf{i}+\mathbf{y}}
+#   -\hat{c}_{\downarrow,\mathbf{i}-\mathbf{y}})
+#   \hat{c}_{\uparrow,\mathbf{i}}.
 # ```
 
 ## Fourier transform binned position space d-wave correlation function data to get
