@@ -255,7 +255,7 @@ bond_ny = lu.Bond(
 #
 # Note that there is also some branching logic below associated with whether or not the
 # matrix ``e^{-\Delta\tau^\prime K}`` is calculated exactly, or represented by the sparse checkerboard approximation
-# using the package [`Checerboard.jl`](https://github.com/SmoQySuite/Checkerboard.jl.git).
+# using the package [`Checkerboard.jl`](https://github.com/SmoQySuite/Checkerboard.jl.git).
 
 ## Define Δτ′=Δτ/2 if symmetric = true, otherwise Δτ′=Δτ
 Δτ′ = symmetric ? Δτ/2 : Δτ
