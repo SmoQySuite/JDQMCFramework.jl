@@ -31,14 +31,12 @@
 # Lastly, if ``\mu = 0.0,`` then the Hamiltonian is particle-hole symmetric, ensuring the system is half-filled ``(\langle n_\sigma \rangle = \tfrac{1}{2})``
 # and that there is no sign problem. In the the case of ``\mu \ne 0`` there will be a sign problem.
 #
-# A script version of this tutorial available for download at
-# [`tutorial_scripts/square_hubbard.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/master/tutorial_scripts/square_hubbard.jl),
-# and can be run with the command
+# The script version of this tutorial, which can be downloaded using the link found at the top of this page,
+# can be run with the command
 # ```
 # julia square_hubbard.jl
 # ```
-# at the command line in a terminal. This tutorial is also available as a notebook at
-# [`tutorial_notebooks/square_hubbard.ipynb`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/master/tutorial_notebooks/square_hubbard.ipynb).
+# in a terminal. This tutorial can also be downloaded as a notebook at the top of this page.
 #
 # We begin by importing the relevant packages we will need to use in this example.
 # Note that to run this tutorial you will need to install all the required Julia pacakges.
