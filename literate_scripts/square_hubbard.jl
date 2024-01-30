@@ -3,21 +3,21 @@
 # This tutorial implements a determinant quantum Monte Carlo (DQMC) simulation from "scratch"
 # using the [`JDQMCFramework.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl.git) package, along with several others.
 # The purpose of this tutorial is to empower researchers to write their own lightweight DQMC codes
-# in order to address specific research needs that follow outside the scope of existing high-level
+# in order to address specific research needs that fall outside the scope of existing high-level
 # DQMC packages like [`SmoQyDQMC.jl`](https://github.com/SmoQySuite/SmoQyDQMC.jl.git), and to enable
 # rapid prototyping of algorithmic improvements to existing DQMC methods.
 #
-# In fairness, tutorial is long as a lot goes into writing a full DQMC code.
+# This tutorial is relatively long as a lot goes into writing a full DQMC code.
 # However, in spite of the length, each step is relatively straightforward.
-# This is made possible by leveraging the functionality exported by the
+# This is made possible by leveraging the functionality exported by
 # [`JDQMCFramework.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl.git) and other packages.
 # For instance, the [`JDQMCFramework.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl.git) package takes care of all the
 # numerical stabilization nonsense that is one of the most challenging parts of writing a DQMC code.
 # Also, implementing various correlation measurements in a DQMC simulation is typically very time consuming and challening,
-# as it requires working through arduous Wick's contractions and then implementing each term correctly. Once again, this
-# difficulty is largely avoided by leveraging the functionality exported by the
-# [`JDQMCMeasurements.jl`](https://github.com/SmoQySuite/JDQMCMeasurements.jl.git), which implements a variety of standard
-# correlation function measurements for arbitary lattice geometries.
+# as it requires working through arduous Wick's contractions, and then implementing each term.
+# Once again, this hurdle is largely avoided by leveraging the functionality exported by the
+# [`JDQMCMeasurements.jl`](https://github.com/SmoQySuite/JDQMCMeasurements.jl.git) package,
+# which implements a variety of standard correlation function measurements for arbitary lattice geometries.
 #
 # The repulsive Hubbard model Hamiltonian on a square lattice considered in this tutorial is given by
 # ```math
@@ -26,27 +26,25 @@
 # ```
 # where ``\hat{c}^\dagger_{\sigma,i} (\hat{c}^{\phantom \dagger}_{\sigma,i})`` creates (annihilates) a spin ``\sigma``
 # electron on site ``i`` in the lattice, and ``\hat{n}_{\sigma,i} = \hat{c}^\dagger_{\sigma,i} \hat{c}^{\phantom \dagger}_{\sigma,i}``
-# is the spin-``\sigma`` electron number operator for site ``i``. In the above Hamiltonian ``t`` is the nearest neighbor hopping integral,
+# is the spin-``\sigma`` electron number operator for site ``i``. In the above Hamiltonian, ``t`` is the nearest neighbor hopping integral,
 # ``\mu`` is the chemical potential, and ``U > 0`` controls the strength of the on-site Hubbard repulsion.
-# Lastly, if ``\mu = 0.0`` the Hamiltonian is rendered particle-hole symmetric and half-filled such that ``\langle n_\sigma \rangle = \tfrac{1}{2}``,
-# and there is no sign problem. In the the case of ``\mu \ne 0`` there will be a sign problem.
+# Lastly, if ``\mu = 0.0,`` then the Hamiltonian is particle-hole symmetric, ensuring the system is half-filled ``(\langle n_\sigma \rangle = \tfrac{1}{2})``
+# and that there is no sign problem. In the the case of ``\mu \ne 0`` there will be a sign problem.
 #
-# A script version of this tutorial is found at
-# [`tutorial_scripts/square_hubbard.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/master/tutorial_scripts/square_hubbard.jl)
-# in the respository, and can be run with the command
+# A script version of this tutorial available for download at
+# [`tutorial_scripts/square_hubbard.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/master/tutorial_scripts/square_hubbard.jl),
+# and can be run with the command
 # ```
 # julia square_hubbard.jl
 # ```
-# at the command line in a terminal.
-# This tutorial is also available as a notebook, which can be found at
+# at the command line in a terminal. This tutorial is also available as a notebook at
 # [`tutorial_notebooks/square_hubbard.ipynb`](https://github.com/SmoQySuite/JDQMCFramework.jl/blob/master/tutorial_notebooks/square_hubbard.ipynb).
 #
-# We begin by importing the relevant packages we will need to use in this script.
+# We begin by importing the relevant packages we will need to use in this example.
 # Note that to run this tutorial you will need to install all the required Julia pacakges.
 # However, this is straightforward as all the packages used in this tutorial are registered
-# with the Julia
-# [General](https://github.com/JuliaRegistries/General.git)
-# package registry, meaning they can be easily installed with the Julia package manager
+# with the Julia [General](https://github.com/JuliaRegistries/General.git)
+# package registry. This means they can all be easily installed with the Julia package manager
 # using the `add` command in the same way that the [`JDQMCFramework.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl.git)
 # package is installed.
 
@@ -57,25 +55,25 @@ using LinearAlgebra
 ## Provides framework for implementing DQMC code.
 import JDQMCFramework as jdqmcf
 
-## Exports methods for measuring various correlation function in a DQMC simulation.
+## Exports methods for measuring various correlation functions in a DQMC simulation.
 import JDQMCMeasurements as jdqmcm
 
 ## Exports types and methods for representing lattice geometries.
 import LatticeUtilities as lu
 
-## Exports the checkerboard approximation for representing exponentiated hopping matrix.
+## Exports the checkerboard approximation for representing an exponentiated hopping matrix.
 import Checkerboard as cb
 
 ## Exports useful methods for analyzing correlated MCMC data.
 import BinningAnalysis as ba
 
-## Package for performing efficient fast fourier transforms (FFTs).
+## Package for performing Fast Fourier Transforms (FFTs).
 using FFTW
 
 # The next incantations are included for annoying technical reasons.
 # Without going into too much detail, the default multithreading behavior used by BLAS/LAPACK in Julia is somewhat sub-optimal.
 # As a result, it is typically a good idea to include these commands in Julia DQMC codes, as they ensure
-# that BLAS/LAPACK (and FFTW) run in a single-threaded fashion. For information on this issue,
+# that BLAS/LAPACK (and FFTW) run in a single-threaded fashion. For more information on this issue,
 # I refer readers to [this discussion](https://carstenbauer.github.io/ThreadPinning.jl/stable/explanations/blas/),
 # which is found in the documentation for the [`ThreadPinning.jl`](https://github.com/carstenbauer/ThreadPinning.jl.git) package.
 
@@ -87,7 +85,7 @@ FFTW.set_num_threads(1)
 
 # Now we define the relevant Hamiltonian parameter values that we want to simulate.
 # In this example we will stick to a relatively small system size ``(4 \times 4)`` and
-# inverse temperature ``(\beta = 4)``. This is to ensure that this tutorial
+# inverse temperature ``(\beta = 4)`` to ensure that this tutorial
 # can be run quickly on a personal computer.
 # Also, in this tutorial I will include many print statements so that when
 # the tutorial is run users can keep track of what is going on. That said, for a DQMC code
@@ -125,23 +123,23 @@ println("Disretization in imaginary time, dtau = ", Δτ)
 Lτ = round(Int, β/Δτ)
 println("Length of imaginary time axis, Ltau = ", Lτ)
 
-## Whether or not to use a symmetric definition for the propagator matrices.
+## Whether or not to use a symmetric or asymmetric definition for the propagator matrices.
 symmetric = false
 println("Whether symmetric or asymmetric propagator matrices are used, symmetric = ", symmetric)
 
 ## Whether or not to use the checkerboard approximation to represent the
-## exponentiated electorn kinetic energy matrix exp(-Δτ⋅K).
+## exponentiated electron kinetic energy matrix exp(-Δτ⋅K).
 checkerboard = false
-println("Whether heckerboard approximation is used, checkerboard = ", checkerboard)
+println("Whether the checkerboard approximation is used, checkerboard = ", checkerboard)
 
-## Period with which numerical stablization is performed i.e.
+## Period with which numerical stabilization is performed i.e.
 ## how many imarginary time slices seperate more expensive recomputations
 ## of the Green's function matrix using numerically stable routines.
 n_stab = 10
 println("Numerical stabilization period, n_stab = ", n_stab)
 
 ## The number of burnin sweeps through the lattice performing local updates that
-## are done to thermalize the system.
+## are performed to thermalize the system.
 N_burnin = 2_500
 println("Number of burnin sweeps, N_burnin = ", N_burnin)
 
@@ -153,7 +151,8 @@ println("Number of measurements, N_measurements = ", N_measurements)
 N_sweeps = 1
 println("Number of local update sweeps seperating measurements, n_sweeps = ", N_sweeps)
 
-## Number of bins use to performing binning analysis when calculating error bars.
+## Number of bins used to performing a binning analysis when calculating final error bars
+## for measured observables.
 N_bins = 50
 println("Number of measurement bins, N_bins = ", N_bins)
 
@@ -203,7 +202,7 @@ println("The neighbor table, neighbor_table =")
 show(stdout, "text/plain", neighbor_table)
 println("\n")
 
-## Total number of sites/orbitals in lattice.
+## The total number of sites/orbitals in the lattice.
 N = lu.nsites(unit_cell, lattice) # For square lattice this is simply N = L^2
 #md println("Total number of sites in lattice, N = ", N)
 #nb println("Total number of sites in lattice, N = ", N)
@@ -213,10 +212,10 @@ N_bonds = size(neighbor_table, 2)
 #md println("Total number of bonds in lattice, N_bonds = ", N_bonds)
 #nb println("Total number of bonds in lattice, N_bonds = ", N_bonds)
 
-# We define a few other bonds here that will be needed to measure
+# Now we define a few other bonds that are needed to measure
 # the local s-wave, extended s-wave and d-wave pair susceptibilities.
 
-## Define a "trivial" bond that maps an site back onto itself.
+## Define a "trivial" bond that maps a site back onto itself.
 bond_trivial = lu.Bond(
     orbitals = (1,1),
     displacement = [0,0]
@@ -309,9 +308,9 @@ s = rand(rng, -1:2:1, N, Lτ)
 #nb println("Random initial Ising HS configuration, s =")
 #nb show(stdout, "text/plain", s)
 
-# Next we to initialize propagator matrices ``B_{\sigma,l}`` for each imaginary time slice ``l \in [1,L_\tau]``.
-# We first initialize a pair of vectors `Bup` and `Bdn` that will contain the ``L_\tau`` propagators for each time slice.
-# The is some branching logic below the types of propagator matrix definition that need to be used based on the boolean flags
+# Next we initialize a propagator matrix ``B_{\sigma,l}`` for each imaginary time slice ``l \in [1,L_\tau]``.
+# We first initialize a pair of vectors `Bup` and `Bdn` that will contain the ``L_\tau`` propagators associated with each time slice.
+# The branching logic below enforces the correct propagator matrix definition is ued based on the boolean flags
 # `symmetric` and `checkerboard` defined above.
 
 ## Matrix element type for exponentiated electron kinetic energy matrix exp{-Δτ′⋅K}
@@ -323,28 +322,28 @@ T_expnΔτV = typeof(α)
 ## Initialize empty vector to contain propagator matrices for each imaginary time slice.
 if checkerboard && symmetric
 
-    ## Propagator defined as B[σ,l] = exp{-Δτ⋅K/2}⋅exp{-Δτ⋅V[σ,l]}⋅exp{-Δτ⋅K/2}
+    ## Propagator defined as B[σ,l] = exp{-Δτ⋅K/2}⋅exp{-Δτ⋅V[σ,l]}⋅exp{-Δτ⋅K/2},
     ## where the dense matrix exp{-Δτ⋅K/2} is approximated by the sparse checkerboard matrix.
     Bup = jdqmcf.SymChkbrdPropagator{T_expnΔτK, T_expnΔτV}[]
     Bdn = jdqmcf.SymChkbrdPropagator{T_expnΔτK, T_expnΔτV}[]
 
 elseif checkerboard && !symmetric
 
-    ## Propagator defined as B[σ,l] = exp{-Δτ⋅V[σ,l]}⋅exp{-Δτ⋅K}
+    ## Propagator defined as B[σ,l] = exp{-Δτ⋅V[σ,l]}⋅exp{-Δτ⋅K},
     ## where the dense matrix exp{-Δτ⋅K} is approximated by the sparse checkerboard matrix.
     Bup = jdqmcf.AbstractChkbrdPropagator{T_expnΔτK, T_expnΔτV}[]
     Bdn = jdqmcf.AbstractChkbrdPropagator{T_expnΔτK, T_expnΔτV}[]
 
 elseif !checkerboard && symmetric
 
-    ## Propagator defined as B[σ,l] = exp{-Δτ⋅K/2}⋅exp{-Δτ⋅V[σ,l]}⋅exp{-Δτ⋅K/2}
+    ## Propagator defined as B[σ,l] = exp{-Δτ⋅K/2}⋅exp{-Δτ⋅V[σ,l]}⋅exp{-Δτ⋅K/2},
     ## where the dense matrix exp{-Δτ⋅K/2} is exactly calculated.
     Bup = jdqmcf.SymExactPropagator{T_expnΔτK, T_expnΔτV}[]
     Bdn = jdqmcf.SymExactPropagator{T_expnΔτK, T_expnΔτV}[]
 
 elseif !checkerboard && !symmetric
 
-    ## Propagator defined as B[σ,l] = exp{-Δτ⋅V[σ,l]}⋅exp{-Δτ⋅K}
+    ## Propagator defined as B[σ,l] = exp{-Δτ⋅V[σ,l]}⋅exp{-Δτ⋅K},
     ## where the dense matrix exp{-Δτ⋅K} is exactly calculated.
     Bup = jdqmcf.AsymExactPropagator{T_expnΔτK, T_expnΔτV}[]
     Bdn = jdqmcf.AsymExactPropagator{T_expnΔτK, T_expnΔτV}[]
@@ -352,7 +351,7 @@ elseif !checkerboard && !symmetric
 #nb end;
 #jl end
 
-# Having an initialized the vector `Bup` and `Bdn` that will conatin the propagator matrices, we now construct the
+# Having an initialized the vector `Bup` and `Bdn` that will contain the propagator matrices, we now construct the
 # propagator matrices for each time-slice based on the initial HS field configuration `s`.
 
 ## Iterate over time-slices.
@@ -395,8 +394,8 @@ for l in 1:Lτ
 end
 
 # Now we instantiate two instances for the [`FermionGreensCalculator`](@ref) type, one for each spin
-# species, spin up and spin down. This object enabls the efficient and numerically stable calculation
-# of the Green's functions behind-the-scenes so to speak, so that we do not need to concern ourselves with
+# species, spin up and spin down. This object enables the efficient and numerically stable calculation
+# of the Green's functions behind-the-scenes, so that we do not need to concern ourselves with
 # implementing numerical stablization routines ourselves.
 
 ## Initialize a FermionGreensCalculator for both spin up and down electrons.
@@ -423,7 +422,7 @@ Gdn = zeros(typeof(t), N, N)
 
 # In order to perform the DQMC simulation all we need are the equal-time Green's function matrices
 # ``G_\sigma(0,0)`` calculated above. However, in order to make time-displaced correlation function
-# measurements we also need to initialize size more matrices, which correspond to ``G_\sigma(\tau,\tau),``
+# measurements we also need to initialize six more matrices, which correspond to ``G_\sigma(\tau,\tau),``
 # ``G_\sigma(\tau,0)`` and ``G_\sigma(0,\tau).``
 
 ## Allcoate time-displaced Green's functions.
@@ -441,16 +440,16 @@ Gdn_0τ = zero(Gdn) # Gdn(0,τ)
 # supplied later in the tutorial when we begin processing the data to calculate the final statistics
 # for each measured observable.
 
-## Vector to contain binned average sign measurements.
+## Vector to contain binned average sign measurement.
 avg_sign = zeros(eltype(Gup), N_bins)
 
-## Vector to contain binned density measurements.
+## Vector to contain binned density measurement.
 density = zeros(eltype(Gup), N_bins)
 
-## Vector to contain binned double occupancy measurements.
+## Vector to contain binned double occupancy measurement.
 double_occ = zeros(eltype(Gup), N_bins)
 
-## Array to contain binned position-space time-displaced Green's function measurement.
+## Array to contain binned position-space time-displaced Green's function measurements.
 C_greens = zeros(Complex{Float64}, N_bins, L, L, Lτ+1)
 
 ## Array to contain binned position-space time-displaced Spin-Z correlation function measurements.
@@ -610,14 +609,14 @@ function _local_update!(
 #jl end
 
 # Next we implement a function to make measurements during the simulation, including time-displaced measurements.
-# Note that if we want to calculate the expectation value of some observable ``\langle \mathcal{O} \rangle``,
+# Note that if we want to calculate the expectation value fir some observable ``\langle \mathcal{O} \rangle``,
 # then during the simulation we actually measure ``\langle \mathcal{S O} \rangle_{\mathcal{W}}``, where
 # ``\langle \bullet \rangle_{\mathcal{W}}`` denotes an average with respect to states sampled according
 # to the DQMC weights
 # ```math
 # \mathcal{W} = | \det G_\uparrow^{-1} \det G_\downarrow^{-1} |,
 # ```
-# and
+# such that
 # ```math
 # \mathcal{S} = \text{sign}(\det G_\uparrow^{-1} \det G_\downarrow^{-1})
 # ```
