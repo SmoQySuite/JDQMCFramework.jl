@@ -65,7 +65,7 @@ checkerboard = false
 println("Whether the checkerboard approximation is used, checkerboard = ", checkerboard)
 
 # Period with which numerical stabilization is performed i.e.
-# how many imarginary time slices seperate more expensive recomputations
+# how many imaginary time slices separate more expensive recomputations
 # of the Green's function matrix using numerically stable routines.
 n_stab = 10
 println("Numerical stabilization period, n_stab = ", n_stab)
@@ -79,7 +79,7 @@ println("Number of burnin sweeps, N_burnin = ", N_burnin)
 N_measurements = 10_000
 println("Number of measurements, N_measurements = ", N_measurements)
 
-# Number of local update sweeps seperating sequential measurements.
+# Number of local update sweeps separating sequential measurements.
 N_sweeps = 1
 println("Number of local update sweeps seperating measurements, n_sweeps = ", N_sweeps)
 
@@ -618,7 +618,7 @@ function run_simulation!(
         # Iterate over updates and measurements in bin.
         for n in 1:N_binsize
 
-            # Itereate over number of local update sweeps per measurement.
+            # Iterate over number of local update sweeps per measurement.
             for sweep in 1:N_sweeps
                 # Attempt local update to every Ising HS field.
                 (logdetGup, sgndetGup, logdetGdn, sgndetGdn, δG′, ac) = local_update!(
@@ -678,7 +678,7 @@ acceptance_rate, δG = run_simulation!(
 println("Acceptance Rate = ", acceptance_rate)
 println("Largest Numerical Error = ", δG)
 
-# Calcate the average sign for the simulation.
+# Calculate the average sign for the simulation.
 sign_avg, sign_std = ba.jackknife(identity, avg_sign)
 println("Avg Sign, S = ", sign_avg, " +/- ", sign_std)
 
@@ -793,7 +793,7 @@ S_loc_swave = copy(C_loc_swave)
 jdqmcm.fourier_transform!(S_loc_swave, 1, 1, (1,4), unit_cell, lattice)
 
 # Integrate the binned local s-wave structure factor data to get the
-# binned local s-wave pair suspectibility data.
+# binned local s-wave pair susceptibility data.
 P_loc_swave = susceptibility(S_loc_swave, Δτ)
 
 # Calculate the average local s-wave pair susceptibility for all scattering momentum q.
@@ -810,7 +810,7 @@ S_ext_swave = copy(C_ext_swave)
 jdqmcm.fourier_transform!(S_ext_swave, 1, 1, (1,4), unit_cell, lattice)
 
 # Integrate the binned extended s-wave structure factor data to get the
-# binned extended s-wave pair suspectibility data.
+# binned extended s-wave pair susceptibility data.
 P_ext_swave = susceptibility(S_ext_swave, Δτ)
 
 # Calculate the average extended s-wave pair susceptibility for all scattering momentum q.
@@ -827,13 +827,13 @@ S_dwave = copy(C_dwave)
 jdqmcm.fourier_transform!(S_dwave, 1, 1, (1,4), unit_cell, lattice)
 
 # Integrate the binned d-wave structure factor data to get the
-# binned d-wave pair suspectibility data.
+# binned d-wave pair susceptibility data.
 P_dwave = susceptibility(S_dwave, Δτ)
 
 # Calculate the average d-wave pair susceptibility for all scattering momentum q.
 P_dwave_avg, P_dwave_std = correlation_stats(P_dwave, avg_sign)
 
-# Report the d-wave pair suspcetibility.
+# Report the d-wave pair susceptibility.
 Pd_avg = real(P_dwave_avg[1,1])
 Pd_std = P_dwave_std[1,1]
 println("Extended s-wave pair susceptibility, P_d = ", Pd_avg, " +/- ", Pd_std)
