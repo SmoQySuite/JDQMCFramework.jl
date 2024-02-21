@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · JDQMCFramework.jl</title><meta name="title" content="Home · JDQMCFramework.jl"/><meta property="og:title" content="Home · JDQMCFramework.jl"/><meta property="twitter:title" content="Home · JDQMCFramework.jl"/><meta name="description" content="Documentation for JDQMCFramework.jl."/><meta property="og:description" content="Documentation for JDQMCFramework.jl."/><meta property="twitter:description" content="Documentation for JDQMCFramework.jl."/><meta property="og:url" content="https://SmoQySuite.github.io/JDQMCFramework.jl/"/><meta property="twitter:url" content="https://SmoQySuite.github.io/JDQMCFramework.jl/"/><link rel="canonical" href="https://SmoQySuite.github.io/JDQMCFramework.jl/"/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href>JDQMCFramework.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Home</a><ul class="internal"><li><a class="tocitem" href="#Funding"><span>Funding</span></a></li><li><a class="tocitem" href="#Installation"><span>Installation</span></a></li><li><a class="tocitem" href="#Citation"><span>Citation</span></a></li><li><a class="tocitem" href="#Formalism-and-Definitions"><span>Formalism and Definitions</span></a></li><li><a class="tocitem" href="#Basic-Usage"><span>Basic Usage</span></a></li></ul></li><li><a class="tocitem" href="api/">API</a></li><li><span class="tocitem">Examples</span><ul><li><a class="tocitem" href="examples/square_hubbard/">Tutorial 1: Square Lattice Hubbard Model DQMC Simulation</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Home</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Home</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/SmoQySuite/JDQMCFramework.jl/blob/master/docs/src/index.md#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="JDQMCFramework.jl"><a class="docs-heading-anchor" href="#JDQMCFramework.jl">JDQMCFramework.jl</a><a id="JDQMCFramework.jl-1"></a><a class="docs-heading-anchor-permalink" href="#JDQMCFramework.jl" title="Permalink"></a></h1><p>Documentation for <a href="https://github.com/cohensbw/JDQMCFramework.jl">JDQMCFramework</a>. This is a utility package that exports a suite of types and routines to simplify the process of writing a DQMC code.</p><p>Matrix stabilization routines are supplied by the <a href="https://github.com/cohensbw/StableLinearAlgebra.jl.git"><code>StableLinearAlgebra.jl</code></a> package.</p><p>The checkerboard decomposition functionality supported here is provided by the <a href="https://github.com/cohensbw/Checkerboard.jl.git"><code>Checkerboard.jl</code></a> package.</p><h2 id="Funding"><a class="docs-heading-anchor" href="#Funding">Funding</a><a id="Funding-1"></a><a class="docs-heading-anchor-permalink" href="#Funding" title="Permalink"></a></h2><p>The development of this code was supported by the U.S. Department of Energy, Office of Science, Basic Energy Sciences, under Award Number DE-SC0022311.</p><h2 id="Installation"><a class="docs-heading-anchor" href="#Installation">Installation</a><a id="Installation-1"></a><a class="docs-heading-anchor-permalink" href="#Installation" title="Permalink"></a></h2><p>To install <a href="https://github.com/SmoQySuite/JDQMCFramework.jl.git"><code>JDQMCFramework.jl</code></a>, simply open the Julia REPL and run the commands</p><pre><code class="language-julia hljs">julia&gt; ]
+pkg&gt; add JDQMCFramework</code></pre><p>or equivalently via <code>Pkg</code> do</p><pre><code class="language-julia hljs">julia&gt; using Pkg; Pkg.add(&quot;JDQMCFramework&quot;)</code></pre><h2 id="Citation"><a class="docs-heading-anchor" href="#Citation">Citation</a><a id="Citation-1"></a><a class="docs-heading-anchor-permalink" href="#Citation" title="Permalink"></a></h2><p>If you found this library to be useful in the course of academic work, please consider citing us:</p><pre><code class="language-bibtex hljs">@misc{SmoQyDQMC,
+      title={SmoQyDQMC.jl: A flexible implementation of determinant quantum Monte Carlo for Hubbard and electron-phonon interactions}, 
+      author={Benjamin Cohen-Stead and Sohan Malkaruge Costa and James Neuhaus and Andy Tanjaroon Ly and Yutan Zhang and Richard Scalettar and Kipton Barros and Steven Johnston},
+      year={2023},
+      eprint={2311.09395},
+      archivePrefix={arXiv},
+      primaryClass={cond-mat.str-el},
+      url={https://arxiv.org/abs/2311.09395}
+}</code></pre><h2 id="Formalism-and-Definitions"><a class="docs-heading-anchor" href="#Formalism-and-Definitions">Formalism and Definitions</a><a id="Formalism-and-Definitions-1"></a><a class="docs-heading-anchor-permalink" href="#Formalism-and-Definitions" title="Permalink"></a></h2><p>This section describes the formalism and definitions adopted by the JDQMCFramework package. The following discussion assumes an existing familiarity with the determinant quantum Monte Carlo (DQMC) algorithm, a method for simulating systems of itinerant fermions on a lattice at finite temperature in the grand canonical ensemble. The DQMC formalism starts by representing the partition funciton as a path integral</p><p class="math-container">\[\begin{align*}
+Z= &amp; \textrm{Tr}\,e^{-\beta\hat{H}}=\textrm{Tr}\left[\prod_{l=1}^{L_{\tau}}e^{-\Delta\tau\hat{H}}\right]
+\end{align*}\]</p><p>in imaginary time <span>$\tau=l\cdot\Delta\tau$</span>, at inverse temperature <span>$\beta=L_{\tau}\cdot\Delta\tau$</span>. Next, the Suzuki-Trotter approximation is applied, and Hubbard-Stratonivich transformations are used as needed to render the Hamiltonian quadratic in fermion creation and annihilation operators. Lastly, the fermionic degrees of freedom are integrated out.</p><p>The resulting approximate expression for the partition function allows for the definition of Monte Carlo weights of the form</p><p class="math-container">\[W(\mathbf{x})=e^{-S_{B}}\prod_{\sigma}\det M_{\sigma},\]</p><p>where <span>$\mathbf{x}$</span> signifies all the relevant degrees of freedom that need to be sampled. While not written explicitly, the bosonic action <span>$S_{B}$</span> and each fermion determinant matrix <span>$M_{\sigma}$</span> depend on <span>$\mathbf{x}$</span>. In the absence of a mean field pairing term or some similarly exotic interaction, the index <span>$\sigma$</span> typically corresponds to the fermion spin species. In the case of electrons this means <span>$\sigma=\{\uparrow,\downarrow\}$</span>.</p><p>Each fermion determinant matrix is of the form</p><p class="math-container">\[\begin{align*}
+M_{\sigma}(\tau)= &amp; I+B_{\sigma}(\tau,0)B_{\sigma}(\beta,\tau)\\
+= &amp; I+B_{\sigma,l}B_{\sigma,l-1}\dots B_{\sigma,1}B_{\sigma,L_{\tau}}\dots B_{\sigma,l+2}B_{\sigma,l+1}
+\end{align*}\]</p><p>where</p><p class="math-container">\[B_{\sigma}(\tau,\tau&#39;)=B_{\sigma,l}B_{\sigma,l-1}\dots B_{\sigma,l&#39;+1}\]</p><p>such that <span>$\det M_{\sigma}(\tau)=\det M_{\sigma}(\tau&#39;)$</span> for any pair <span>$(l,l&#39;)\in[1,L_{\tau}]$</span>.</p><p>Each propagator matrix <span>$B_{\sigma,l}=B_{\sigma}(\tau,\tau-\Delta\tau)$</span> may be represented in either the symmetric form</p><p class="math-container">\[B_{\sigma,l}=e^{-\tfrac{\Delta\tau}{2}K_{l}} e^{-\Delta\tau V_{l}} e^{-\tfrac{\Delta\tau}{2}K_{l}}\]</p><p>or the asymmetric form</p><p class="math-container">\[B_{\sigma,l} = e^{-\Delta\tau V_{l}} e^{-\Delta\tau K_{l}},\]</p><p>where <span>$V_{l}$</span> is a diagonal matrix corresponding to the on-site energy for each site in the lattice, and <span>$K_{l}$</span> is the strictly off-diagonal hopping matrix.</p><p>The single-particle fermion Green&#39;s function is given by </p><p class="math-container">\[G_{\sigma,i,j}(\tau,\tau&#39;)=\langle\hat{\mathcal{T}}\hat{c}_{\sigma,i}(\tau)\hat{c}_{\sigma,j}^{\dagger}(\tau&#39;)\rangle=\begin{cases}
+\langle\hat{c}_{\sigma,i}(\tau)\hat{c}_{\sigma,j}^{\dagger}(\tau&#39;)\rangle &amp; \tau\ge\tau&#39;\\
+-\langle\hat{c}_{\sigma,j}^{\dagger}(\tau&#39;)\hat{c}_{\sigma,i}(\tau)\rangle &amp; \tau&lt;\tau&#39;,
+\end{cases}\]</p><p>where <span>$\hat{c}_{\sigma,i}^{\dagger}\,(\hat{c}_{\sigma,i})$</span> is the fermion creation (annihilation) operator for a fermion with spin <span>$\sigma$</span> on site <span>$i$</span> on the lattice, and <span>$\hat{\mathcal{T}}$</span> is the time-ordering operator. The equal-time Green&#39;s function is related to the fermion determinant matrix by</p><p class="math-container">\[G_{\sigma,i,j}(\tau,\tau)=M_{\sigma,i,j}^{-1}(\tau),\]</p><p>where again <span>$\tau=l\cdot\Delta\tau$</span>. The equal-time Green&#39;s function matrix can be advanced to the next imaginary time slice using the relationship</p><p class="math-container">\[G_{\sigma}(\tau+\Delta\tau,\tau+\Delta\tau)=B_{\sigma,l+1}G_{\sigma}(\tau,\tau)B_{\sigma,l+1}^{-1}\]</p><p>and</p><p class="math-container">\[G_{\sigma}(\tau-\Delta\tau,\tau-\Delta\tau)=B_{\sigma,l}^{-1}G_{\sigma}(\tau,\tau)B_{\sigma,l}.\]</p><p>The unequal-time Green&#39;s function is accessible using the relations</p><p class="math-container">\[\begin{align*}
+G_{\sigma}(\tau,0) = &amp; B_{\sigma}(\tau,0)G_{\sigma}(0,0)\\
+                   = &amp; [B_{\sigma}^{-1}(\tau,0) + B_{\sigma}(\beta,\tau)]^{-1},
+\end{align*}\]</p><p>and</p><p class="math-container">\[\begin{align*}
+G_{\sigma}(0,\tau) = &amp; -[I-G_{\sigma}(0,0)] B_{\sigma}^{-1}(\tau,0) \\
+                   = &amp; -[B_{\sigma}^{-1}(\beta,\tau) + B_{\sigma}(\tau,0)]^{-1},
+\end{align*}\]</p><p>where the second relationship may be shown by applying the Woodbury matrix identity. These relationships also imply</p><p class="math-container">\[G_{\sigma}(\tau,0) = B_{\sigma}^{-1}(\tau&#39;,\tau)G_{\sigma}(\tau&#39;,0)\]</p><p>and</p><p class="math-container">\[G_{\sigma}(0,\tau) = G_{\sigma}(0,\tau&#39;) B_{\sigma}(\tau&#39;,\tau),\]</p><p>for <span>$\tau\in[0,\beta-\Delta\tau]$</span> and <span>$\tau&lt;\tau&#39;&lt;\beta$</span>. By applying the anti-periodic boundary conditions of the single-particle Green&#39;s function in imaginary time it immediately follows that</p><p class="math-container">\[G_{\sigma}(\beta,0) = I-G_{\sigma}(0,0)\]</p><p>and</p><p class="math-container">\[G_\sigma(0,\beta) = -G_{\sigma}(0,0),\]</p><p>where</p><p class="math-container">\[G_{\sigma}(0,0)=[I+B_{\sigma}(\beta,0)]^{-1}=[I+B_{\sigma,L_{\tau}}\dots B_{\sigma,1}]^{-1},\]</p><p>subject to the boundary condition <span>$G_{\sigma}(0,0)=G_{\sigma}(\beta,\beta)$</span>.</p><p>The DQMC method also requires periodic re-calculation of the fermion Green&#39;s function matrix as <span>$G_{\sigma}(\tau,\tau)$</span> is propagated to later or ealier imaginary times to maintain numerical stability. Therefore, we introduce a parameter <span>$n_{s},$</span> which describes the frequency with which numerical stabilization needs to occur. The number of &quot;stabilization intervals&quot; in imaginary time is then given by <span>$N_{s}=\left\lceil L_{\tau}/n_{s}\right \rceil$</span>, and we introduce the notation</p><p class="math-container">\[\bar{B}_{\sigma,n}=\prod_{l=(n-1)\cdot n_{s}+1}^{\min(n\cdot n_{s},N_{s})}B_{\sigma,l},\]</p><p>where <span>$n\in[1,N_{s}]$</span>, to represent the product of propagator matrices over a single stabilization interval. Using this definition we may express <span>$G_{\sigma}(0,0)$</span> as</p><p class="math-container">\[G_{\sigma}(0,0) = (I + B_{\sigma,L_\tau} B_{\sigma,L_\tau-1} \dots B_{\sigma, 2} B_{\sigma,1})^{-1}
+                = (I + \bar{B}_{\sigma,N_s} \bar{B}_{\sigma,N_s-1} \dots \bar{B}_{\sigma, 2} \bar{B}_{\sigma,1})^{-1}.\]</p><h2 id="Basic-Usage"><a class="docs-heading-anchor" href="#Basic-Usage">Basic Usage</a><a id="Basic-Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-Usage" title="Permalink"></a></h2><p>In this section we introduce some of the basics of using this package by setting up the framework for a DQMC simulations in the case of a simple non-interacting square lattice tight binding model, assuming two electron spin species, spin up and spin down. While this is a &quot;tivial&quot; example, it is instructive.</p><pre><code class="language-julia hljs">using LinearAlgebra
+using LatticeUtilities
+using JDQMCFramework</code></pre><p>First let us define the relevant model parameters.</p><pre><code class="language-julia hljs"># hopping amplitude
+t = 1.0
+
+# chemical potential
+μ = 0.0
+
+# lattice size
+L = 4
+
+# inverse temperature
+β = 3.7
+
+# discretization in imaginary time
+Δτ = 0.1
+
+# frequency of numerical stabilization
+n_stab = 10</code></pre><p>Next we calculate the length of the imaginary time axis <span>$L_\tau$</span> using the <a href="api/#JDQMCFramework.eval_length_imaginary_axis"><code>eval_length_imaginary_axis</code></a> method.</p><pre><code class="language-julia hljs">Lτ = eval_length_imaginary_axis(β, Δτ)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">37</code></pre><p>Using functionality imported from the <a href="https://github.com/cohensbw/LatticeUtilities.jl.git"><code>LatticeUtilities.jl</code></a> package, we construct the neighbor table for a square lattice.</p><pre><code class="language-julia hljs"># define unit cell
+unit_cell = UnitCell(lattice_vecs = [[1.,0.],[0.,1.]], basis_vecs = [[0.,0.]])
+
+# define size of lattice
+lattice = Lattice(L = [L,L], periodic = [true,true])
+
+# define bonds/hoppings in x and y directions
+bond_x = Bond(orbitals = (1,1), displacement = [1,0])
+bond_y = Bond(orbitals = (1,1), displacement = [0,1])
+
+# construct neighbor table
+neighbor_table = build_neighbor_table([bond_x, bond_y], unit_cell, lattice)
+
+# calculate number of sites in lattice
+N = nsites(unit_cell, lattice)
+
+# calculate number of bonds in lattice
+Nbonds = size(neighbor_table, 2)
+
+(N, Nbonds)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(16, 32)</code></pre><p>Next we construct the strictly off-diagonal hopping matrix <span>$K,$</span> and a vector to represent the diagonal on-site energy matrix <span>$V.$</span></p><pre><code class="language-julia hljs"># build hopping matrix
+K = zeros(typeof(t), N, N)
+build_hopping_matrix!(K, neighbor_table, fill(t, Nbonds))
+
+# build vector representing diagonal on-site energy matrix
+V = fill(-μ, N)</code></pre><p>Now we define a the propagator <span>$B_{\sigma,l}$</span> for each spin species <span>$\sigma$</span> and imaginary time slice <span>$\tau = \Delta\tau \cdot l.$</span> Of course, in the non-interacting limit considered here all the propagators matrices are identical. This will no longer be the case if interactions are introduced, in which case each <span>$B_{\sigma,l}$</span> matrix will in general be unique.</p><pre><code class="language-julia hljs">expmΔτV = exp.(-Δτ*V)
+expmΔτK = exp(-Δτ*K)
+exppΔτK = exp(+Δτ*K)
+
+# null vector spin up propagators to fill
+Bup = AsymExactPropagator{eltype(expmΔτK),eltype(expmΔτV)}[]
+
+# null vecotr of spin down propagators to fill
+Bdn = AsymExactPropagator{eltype(expmΔτK),eltype(expmΔτV)}[]
+
+# construct propagator for each spin species and append to appropriate vector
+for l in 1:Lτ
+    B_l = AsymExactPropagator(expmΔτV, expmΔτK, exppΔτK)
+    push!(Bup, B_l)
+    push!(Bdn, B_l)
+end</code></pre><p>In the above we chose to represent the propagator matrices using the <a href="api/#JDQMCFramework.AsymExactPropagator"><code>AsymExactPropagator</code></a> type, which assumes the <span>$B_l = e^{-\Delta\tau K_l} e^{-\Delta\tau V_l}$</span> definition, where the <span>$K_l$</span> hopping matrix is exactly exponentiated. This package includes the other possible definitions <a href="api/#JDQMCFramework.AsymChkbrdPropagator"><code>AsymChkbrdPropagator</code></a>, <a href="api/#JDQMCFramework.SymExactPropagator"><code>SymExactPropagator</code></a> and <a href="api/#JDQMCFramework.SymChkbrdPropagator"><code>SymChkbrdPropagator</code></a>.</p><p>Next we instantiate two instances of the <a href="api/#JDQMCFramework.FermionGreensCalculator"><code>FermionGreensCalculator</code></a> type, one for each of the two electron spin species, spin up and spin down.</p><pre><code class="language-julia hljs">fgc_up = FermionGreensCalculator(Bup, β, Δτ, n_stab)
+fgc_dn = FermionGreensCalculator(Bdn, β, Δτ, n_stab)</code></pre><p>Now we initialize the spin up and spin down equal time Green&#39;s function matrices <span>$G_\uparrow(0,0)$</span> and <span>$G_\downarrow(0,0).$</span></p><pre><code class="language-julia hljs">Gup = zeros(N,N)
+logdetGup, sgndetGup = calculate_equaltime_greens!(Gup, fgc_up)
+
+Gdn = zeros(N,N)
+logdetGdn, sgndetGdn = calculate_equaltime_greens!(Gdn, fgc_dn)</code></pre><p>Now we will demonstrate how to synchronously iterate over the imaginary time slices for both the spin up and spin down sectors.</p><pre><code class="language-julia hljs"># Iterate over imaginary time τ=Δτ⋅l.
+for l in fgc_up
+
+    # Propagate equal-time Green&#39;s function matrix to current imaginary time G(τ±Δτ,τ±Δτ) ==&gt; G(τ,τ)
+    # depending on whether iterating over imaginary time in the forward or reverse direction
+    propagate_equaltime_greens!(Gup, fgc_up, Bup)
+    propagate_equaltime_greens!(Gdn, fgc_dn, Bdn)
+
+    # LOCAL UPDATES OR EVALUATION OF DERIVATIVE OF FERMIONIC ACTION FOR THE CURRENT
+    # IMAGINARY TIME SLICE WOULD GO HERE
+
+    # Periodically re-calculate the Green&#39;s function matrix for numerical stability.
+    # Comment: if not performing updates, but just evaluating the derivative of the action, then
+    # set update_B̄=false to avoid wasting cpu time re-computing B_barₙ matrices.
+    logdetGup, sgndetGup, δGup, δθup = stabilize_equaltime_greens!(Gup, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=true)
+    logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_equaltime_greens!(Gdn, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=true)
+
+    # Keep up and down spin Green&#39;s functions synchronized as iterating over imaginary time.
+    iterate(fgc_dn, fgc_up.forward)
+end</code></pre><p>Note that if we iterate over imaginary time again, it will iterate in the opposite direction. This is expected behavior. Each time you iterate over imaginary time the direction of iteration reverses. While not immediately obvious, this allows for a reduction in the number of required matrix factorizations.</p><p>This package also exports two routines, <a href="api/#JDQMCFramework.local_update_det_ratio"><code>local_update_det_ratio</code></a> and <a href="api/#JDQMCFramework.local_update_greens!"><code>local_update_greens!</code></a>, that are useful for implementing local updates in a DQMC simulation.</p><p>Lastly, we will will calculate the unequal-time Green&#39;s functions <span>$G_{\sigma}(\tau,0)$</span> and <span>$G_{\sigma}(0,\tau)$</span>, and the equal-time Green&#39;s function <span>$G_{\sigma}(\tau,\tau)$</span> for all imaginary time slices. This functionality is important </p><pre><code class="language-julia hljs"># initialize unequal-time Green&#39;s functions
+Gup_τ0 = similar(Gdn) # G₊(τ,0)
+Gup_0τ = similar(Gdn) # G₊(0,τ)
+Gup_ττ = similar(Gdn) # G₊(τ,τ)
+Gdn_τ0 = similar(Gdn) # G₋(τ,0)
+Gdn_0τ = similar(Gdn) # G₋(0,τ)
+Gdn_ττ = similar(Gdn) # G₋(τ,τ)
+initialize_unequaltime_greens!(Gup_τ0, Gup_0τ, Gup_ττ, Gup)
+initialize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, Gdn)
+
+# EQUAL-TIME CORRELATION MEASUREMENTS WOULD GO HERE
+
+# Iterate over imaginary time τ=Δτ⋅l.
+for l in fgc_up
+
+    # Propagate Green&#39;s function matrices to current imaginary time slice
+    propagate_unequaltime_greens!(Gup_τ0, Gup_0τ, Gup_ττ, fgc_up, Bup)
+    propagate_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, fgc_dn, Bdn)
+
+    # UNEQUAL-TIME CORRELATION FUNCTION MEASUREMENTS WOULD GO HERE
+
+    # Periodically re-calculate the Green&#39;s function matrix for numerical stability.
+    logdetGup, sgndetGup, δGup, δθup = stabilize_unequaltime_greens!(Gup_τ0, Gup_0τ, Gup_ττ, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=false)
+    logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=false)
+
+    # Keep up and down spin Green&#39;s functions synchronized as iterating over imaginary time.
+    iterate(fgc_dn, fgc_up.forward)
+end</code></pre></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Wednesday 21 February 2024 21:34">Wednesday 21 February 2024</span>. Using Julia version 1.10.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
