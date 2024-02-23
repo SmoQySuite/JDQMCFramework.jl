@@ -1,11 +1,17 @@
 @doc raw"""
-    calculate_equaltime_greens!(G::AbstractMatrix{T}, fgc::FermionGreensCalculator{T})::Tuple{T,E} where {T}
+    calculate_equaltime_greens!(
+        G::AbstractMatrix{T},
+        fgc::FermionGreensCalculator{T,E}
+    )::Tuple{E,T} where {T,E}
 
 Calculate the equal-time Greens function ``G(0,0) = G(\beta,\beta) = [I + B(\beta,0)]^{-1}`` using a numerically stable procedure.
 This method also returns ``\log(\vert \det G \vert)`` and ``\textrm{sign}(\det G).``
 Note that this routine requires `fgc.l == 1` or `fgc.l == fgc.Lτ`.
 """
-function calculate_equaltime_greens!(G::AbstractMatrix{T}, fgc::FermionGreensCalculator{T,E})::Tuple{E,T} where {T,E}
+function calculate_equaltime_greens!(
+    G::AbstractMatrix{T},
+    fgc::FermionGreensCalculator{T,E}
+)::Tuple{E,T} where {T,E}
 
     (; forward, l, Lτ, N_stab, ldr_ws) = fgc
     @assert l == 1 || l == Lτ
@@ -24,8 +30,11 @@ function calculate_equaltime_greens!(G::AbstractMatrix{T}, fgc::FermionGreensCal
 end
 
 @doc raw"""
-    calculate_equaltime_greens!(G::AbstractMatrix{T}, fgc::FermionGreensCalculator{T,E},
-                                B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T}}
+    calculate_equaltime_greens!(
+        G::AbstractMatrix{T},
+        fgc::FermionGreensCalculator{T,E},
+        B::AbstractVector{P}
+    )::Tuple{E,T} where {T, E, P<:AbstractPropagator{T}}
 
 Calculate the equal-time Greens function ``G(0,0) = G(\beta,\beta) = [I + B(\beta,0)]^{-1}`` using a numerically stable procedure.
 Also re-calculate the ``\bar{B}_n`` matrices and the LDR matrix factorizations representing
@@ -34,8 +43,11 @@ propagator matrix ``B_l`` has been modified, and the equal-time Green's function
 This method also returns ``\log(\vert \det G \vert)`` and ``\textrm{sign}(\det G).``
 Note that this routine requires `fgc.l == 1` or `fgc.l == fgc.Lτ`.
 """
-function calculate_equaltime_greens!(G::AbstractMatrix{T}, fgc::FermionGreensCalculator{T,E},
-                                     B::AbstractVector{P})::Tuple{E,T} where {T, E, P<:AbstractPropagator{T}}
+function calculate_equaltime_greens!(
+    G::AbstractMatrix{T},
+    fgc::FermionGreensCalculator{T,E},
+    B::AbstractVector{P}
+)::Tuple{E,T} where {T, E, P<:AbstractPropagator{T}}
 
     # iterate over imaginary time
     for l in fgc
@@ -51,8 +63,11 @@ end
 
 
 @doc raw"""
-    propagate_equaltime_greens!(G::AbstractMatrix{T}, fgc::FermionGreensCalculator{T,E},
-                                B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T}}
+    propagate_equaltime_greens!(
+        G::AbstractMatrix{T},
+        fgc::FermionGreensCalculator{T,E},
+        B::AbstractVector{P}
+    ) where {T, E, P<:AbstractPropagator{T}}
 
 Propagate the equal-time Green's function matrix `G` from the previous imaginary time slice to the current
 imaginary time slice `fgc.l`. If iterating over imaginary time in the forward direction (`fgc.forward = true`)
@@ -67,8 +82,11 @@ G(\tau-\Delta\tau,\tau-\Delta\tau)= B_{l}^{-1} \cdot G(\tau,\tau) \cdot B_{l}
 ```
 is used instead, where the ``B_l`` propagator is given by `B[l]`.
 """
-function propagate_equaltime_greens!(G::AbstractMatrix{T}, fgc::FermionGreensCalculator{T,E},
-                                     B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T}}
+function propagate_equaltime_greens!(
+    G::AbstractMatrix{T},
+    fgc::FermionGreensCalculator{T,E},
+    B::AbstractVector{P}
+) where {T, E, P<:AbstractPropagator{T}}
 
     (; n_stab, l, Lτ, forward) = fgc
     ldr_ws = fgc.ldr_ws::LDRWorkspace{T,E}
@@ -99,9 +117,14 @@ end
 
 
 @doc raw"""
-    stabilize_equaltime_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::T,
-                                fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P};
-                                update_B̄::Bool=true)::Tuple{E,T,E,E} where {T, E, P<:AbstractPropagator{T}}
+    stabilize_equaltime_greens!(
+        G::AbstractMatrix{T},
+        logdetG::E, sgndetG::T,
+        fgc::FermionGreensCalculator{T,E},
+        B::AbstractVector{P};
+        # KEYWORD ARGUMENTS
+        update_B̄::Bool=true
+    )::Tuple{E,T,E,E} where {T, E, P<:AbstractPropagator{T}}
 
 Stabilize the equal-time Green's function as iterating through imaginary time ``\tau = \Delta\tau \cdot l.``
 For a given imaginary time slice `fgc.l`, this routine should be called *after* all changes to the ``B_l``
@@ -132,9 +155,14 @@ time ``\tau = \Delta\tau \cdot l`` in the forward and reverse directions respect
 If `update_B̄ = true`, then the ``\bar{B}_n`` matrices are re-calculated as needed, but if
 `update_B̄ = false,` then they are left unchanged.
 """
-function stabilize_equaltime_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::T,
-                                     fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P};
-                                     update_B̄::Bool=true)::Tuple{E,T,E,E} where {T, E, P<:AbstractPropagator{T}}
+function stabilize_equaltime_greens!(
+    G::AbstractMatrix{T},
+    logdetG::E, sgndetG::T,
+    fgc::FermionGreensCalculator{T,E},
+    B::AbstractVector{P};
+    # KEYWORD ARGUMENTS
+    update_B̄::Bool=true
+)::Tuple{E,T,E,E} where {T, E, P<:AbstractPropagator{T}}
 
     (; l, Lτ, forward, n_stab, N_stab, G′) = fgc
     F = fgc.F::Vector{LDR{T,E}}
@@ -226,14 +254,22 @@ end
 
 
 @doc raw"""
-    initialize_unequaltime_greens!(Gτ0::AbstractMatrix{T}, G0τ::AbstractMatrix{T}, Gττ::AbstractMatrix{T},
-                                   G00::AbstractMatrix{T}) where {T<:Number}
+    initialize_unequaltime_greens!(
+        Gτ0::AbstractMatrix{T},
+        G0τ::AbstractMatrix{T},
+        Gττ::AbstractMatrix{T},
+        G00::AbstractMatrix{T}
+    ) where {T<:Number}
 
 Initialize the Green's function matrices ``G(\tau,0),`` ``G(0,\tau),`` and ``G(\tau,\tau)`` for ``\tau = 0``
 based on the matrix ``G(0,0).``
 """
-function initialize_unequaltime_greens!(Gτ0::AbstractMatrix{T}, G0τ::AbstractMatrix{T}, Gττ::AbstractMatrix{T},
-                                        G00::AbstractMatrix{T}) where {T<:Number}
+function initialize_unequaltime_greens!(
+    Gτ0::AbstractMatrix{T},
+    G0τ::AbstractMatrix{T},
+    Gττ::AbstractMatrix{T},
+    G00::AbstractMatrix{T}
+) where {T<:Number}
 
     # G(τ=0,τ=0) = G(0,0)
     copyto!(Gττ, G00)
@@ -250,8 +286,13 @@ end
 
 
 @doc raw"""
-    propagate_unequaltime_greens!(Gτ0::AbstractMatrix{T}, G0τ::AbstractMatrix{T}, Gττ::AbstractMatrix{T},
-                                  fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T}}
+    propagate_unequaltime_greens!(
+        Gτ0::AbstractMatrix{T},
+        G0τ::AbstractMatrix{T},
+        Gττ::AbstractMatrix{T},
+        fgc::FermionGreensCalculator{T,E},
+        B::AbstractVector{P}
+    ) where {T, E, P<:AbstractPropagator{T}}
 
 Propagate the Green's function matrices ``G(\tau,0)``, ``G(0,\tau)`` and ``G(\tau,\tau)``
 from the previous imaginary time slice to the current
@@ -275,8 +316,13 @@ G(\tau,\tau) = & B_{l+1}^{-1} \cdot G(\tau+\Delta\tau, \tau+\Delta\tau) \cdot B_
 ```
 are used instead, where the ``B_l`` propagator is given by `B[l]`.
 """
-function propagate_unequaltime_greens!(Gτ0::AbstractMatrix{T}, G0τ::AbstractMatrix{T}, Gττ::AbstractMatrix{T},
-                                       fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T}}
+function propagate_unequaltime_greens!(
+    Gτ0::AbstractMatrix{T},
+    G0τ::AbstractMatrix{T},
+    Gττ::AbstractMatrix{T},
+    fgc::FermionGreensCalculator{T,E},
+    B::AbstractVector{P}
+) where {T, E, P<:AbstractPropagator{T}}
 
     (; n_stab, l, Lτ, forward) = fgc
     ldr_ws = fgc.ldr_ws::LDRWorkspace{T,E}
@@ -332,10 +378,16 @@ end
 
 
 @doc raw"""
-    stabilize_unequaltime_greens!(Gτ0::AbstractMatrix{T}, G0τ::AbstractMatrix{T},
-                                  Gττ::AbstractMatrix{T}, logdetG::E, sgndetG::T,
-                                  fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P};
-                                  update_B̄::Bool=true)::Tuple{E,T,E,E} where {T, E, P<:AbstractPropagator{T}}
+    stabilize_unequaltime_greens!(
+        Gτ0::AbstractMatrix{T},
+        G0τ::AbstractMatrix{T},
+        Gττ::AbstractMatrix{T},
+        logdetG::E, sgndetG::T,
+        fgc::FermionGreensCalculator{T,E},
+        B::AbstractVector{P};
+        # KEYWORD ARGUMENTS
+        update_B̄::Bool=true
+    )::Tuple{E,T,E,E} where {T, E, P<:AbstractPropagator{T}}
 
 Stabilize the Green's function matrice ``G(\tau,0)``, ``G(0,\tau)`` and ``G(\tau,\tau)``
 as iterating through imaginary time ``\tau = \Delta\tau \cdot l.``
@@ -375,10 +427,16 @@ time ``\tau = \Delta\tau \cdot l`` in the forward and reverse directions respect
 If `update_B̄ = true`, then the ``\bar{B}_n`` matrices are re-calculated as needed, but if
 `update_B̄ = false,` then they are left unchanged.
 """
-function stabilize_unequaltime_greens!(Gτ0::AbstractMatrix{T}, G0τ::AbstractMatrix{T},
-                                       Gττ::AbstractMatrix{T}, logdetG::E, sgndetG::T,
-                                       fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P};
-                                       update_B̄::Bool=true)::Tuple{E,T,E,E} where {T, E, P<:AbstractPropagator{T}}
+function stabilize_unequaltime_greens!(
+    Gτ0::AbstractMatrix{T},
+    G0τ::AbstractMatrix{T},
+    Gττ::AbstractMatrix{T},
+    logdetG::E, sgndetG::T,
+    fgc::FermionGreensCalculator{T,E},
+    B::AbstractVector{P};
+    # KEYWORD ARGUMENTS
+    update_B̄::Bool=true
+)::Tuple{E,T,E,E} where {T, E, P<:AbstractPropagator{T}}
 
     (; l, Lτ, forward, n_stab, N_stab, G′) = fgc
     F = fgc.F::Vector{LDR{T,E}}
@@ -490,8 +548,11 @@ end
 
 
 @doc raw"""
-    local_update_det_ratio(G::AbstractMatrix{T}, B::AbstractPropagator{T},
-                           V′::T, i::Int, Δτ::E)::Tuple{T,T} where {T,E}
+    local_update_det_ratio(
+        G::AbstractMatrix{T},
+        B::AbstractPropagator{T},
+        V′::T, i::Int, Δτ::E
+    )::Tuple{T,T} where {T,E}
 
 Calculate the determinant ratio ``R_{l,i}`` associated with a local update to the equal-time
 Green's function ``G(\tau,\tau).`` Also returns ``\Delta_{l,i},`` which is defined below.
@@ -535,8 +596,11 @@ then the matrix `G` needs to instead represent the transformed equal-time Green'
 \tilde{G}(\tau,\tau) = \Gamma_l^{-1}(\Delta\tau/2) \cdot G(\tau,\tau) \cdot \Gamma_l(\Delta\tau/2).
 ```
 """
-function local_update_det_ratio(G::AbstractMatrix{T}, B::AbstractPropagator{T},
-                                V′::T, i::Int, Δτ::E)::Tuple{T,T} where {T,E}
+function local_update_det_ratio(
+    G::AbstractMatrix{T},
+    B::AbstractPropagator{T},
+    V′::T, i::Int, Δτ::E
+)::Tuple{T,T} where {T,E}
 
     Λ = B.expmΔτV::Vector{E}
     Δ = exp(-Δτ*V′)/Λ[i] - 1
@@ -547,8 +611,12 @@ end
 
 
 @doc raw"""
-    local_update_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::T, B::AbstractPropagator{T}, R::T, Δ::T, i::Int,
-                         u::AbstractVector{T}, v::AbstractVector{T})::Tuple{E,T} where {T, E<:AbstractFloat}
+    local_update_greens!(
+        G::AbstractMatrix{T}, logdetG::E, sgndetG::T,
+        B::AbstractPropagator{T},
+        R::T, Δ::T, i::Int,
+        u::AbstractVector{T}, v::AbstractVector{T}
+    )::Tuple{E,T} where {T, E<:AbstractFloat}
 
 Update the equal-time Green's function matrix `G` resulting from a local update in-place.
 
@@ -577,8 +645,12 @@ An important note is that if the propagator matrices are represented in a symmet
 to the transformed eqaul-time Green's function matrices ``\tilde{G}^\prime(\tau,\tau)`` and ``\tilde{G}(\tau,\tau).``
 Refer to the [`local_update_det_ratio`](@ref) docstring for more information.
 """
-function local_update_greens!(G::AbstractMatrix{T}, logdetG::E, sgndetG::T, B::AbstractPropagator{T}, R::T, Δ::T, i::Int,
-                              u::AbstractVector{T}, v::AbstractVector{T})::Tuple{E,T} where {T, E<:AbstractFloat}
+function local_update_greens!(
+    G::AbstractMatrix{T}, logdetG::E, sgndetG::T,
+    B::AbstractPropagator{T},
+    R::T, Δ::T, i::Int,
+    u::AbstractVector{T}, v::AbstractVector{T}
+)::Tuple{E,T} where {T, E<:AbstractFloat}
 
     expmΔτV = B.expmΔτV::Vector{E}
 

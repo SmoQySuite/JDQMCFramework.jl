@@ -36,13 +36,17 @@ end
 
 
 @doc raw"""
-    FermionGreensCalculator(B::AbstractVector{P}, β::E, Δτ::E,
-                            n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
+    FermionGreensCalculator(
+        B::AbstractVector{P},
+        β::E, Δτ::E, n_stab::Int
+    ) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
 
 Initialize and return [`FermionGreensCalculator`](@ref) struct based on the vector of propagators `B` passed to the function.
 """
-function FermionGreensCalculator(B::AbstractVector{P}, β::E, Δτ::E,
-                                 n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
+function FermionGreensCalculator(
+    B::AbstractVector{P},
+    β::E, Δτ::E, n_stab::Int
+) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
 
     # get length of imaginary time axis
     Lτ = eval_length_imaginary_axis(β, Δτ)
@@ -126,17 +130,25 @@ end
 
 
 @doc raw"""
-    resize!(fgc::FermionGreensCalculator{T,E}, G::Matrix{T}, logdetG::E, sgndetG::T,
-            B::Vector{P}, n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
+    resize!(
+        fgc::FermionGreensCalculator{T,E},
+        G::Matrix{T}, logdetG::E, sgndetG::T,
+        B::Vector{P}, n_stab::Int
+    ) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
 
-    resize!(fgc::FermionGreensCalculator{T,E}, n_stab::Int) where {T,E}
+    resize!(
+        fgc::FermionGreensCalculator{T,E}, n_stab::Int
+    ) where {T,E}
 
 Update `fgc` to reflect a new stabilizaiton frequency `n_stab`.
 If `G`, `logdetG`, `sgndetG` and `B` are also passed then the equal-time Green's function `G` is re-calculated
 and the corresponding updated values for `(logdetG, sgndetG)` are returned.
 """
-function resize!(fgc::FermionGreensCalculator{T,E}, G::Matrix{T}, logdetG::E, sgndetG::T,
-                 B::Vector{P}, n_stab::Int) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
+function resize!(
+    fgc::FermionGreensCalculator{T,E},
+    G::Matrix{T}, logdetG::E, sgndetG::T,
+    B::Vector{P}, n_stab::Int
+) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
 
     # check if stablization frequency is being updated
     if fgc.n_stab != n_stab
@@ -151,7 +163,9 @@ function resize!(fgc::FermionGreensCalculator{T,E}, G::Matrix{T}, logdetG::E, sg
     return (logdetG, sgndetG)
 end
 
-function resize!(fgc::FermionGreensCalculator{T,E}, n_stab::Int) where {T,E}
+function resize!(
+    fgc::FermionGreensCalculator{T,E}, n_stab::Int
+) where {T,E}
 
     (; N, Lτ) = fgc
     B_bar = fgc.B_bar::Vector{Matrix{T}}
@@ -194,12 +208,18 @@ end
 
 
 @doc raw"""
-    copyto!(fgc_out::FermionGreensCalculator{T,E}, fgc_in::FermionGreensCalculator{T,E}) where {T,E}
+    copyto!(
+        fgc_out::FermionGreensCalculator{T,E},
+        fgc_in::FermionGreensCalculator{T,E}
+    ) where {T,E}
 
 Copy the contents of `fgc_in` to `fgc_out`. If `fgc_out.n_stab != fgc_in.n_stab` is true, then
 `fgc_out` will be resized using [`resize!`](@ref) to match `fgc_in`.
 """
-function copyto!(fgc_out::FermionGreensCalculator{T,E}, fgc_in::FermionGreensCalculator{T,E}) where {T,E}
+function copyto!(
+    fgc_out::FermionGreensCalculator{T,E},
+    fgc_in::FermionGreensCalculator{T,E}
+) where {T,E}
 
     # resize fgc_out to match fgc_in if necessary
     if fgc_out.n_stab != fgc_in.n_stab
@@ -276,7 +296,10 @@ end
 
 
 @doc raw"""
-    update_factorizations!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T}}
+    update_factorizations!(
+        fgc::FermionGreensCalculator{T,E},
+        B::AbstractVector{P}
+    ) where {T, E, P<:AbstractPropagator{T}}
 
 If current imaginary time slice `fgc.l` corresponds to the boundary of a stabilization interval,
 calculate a LDR factorization to represent ``B(0, \tau)`` or ``B(\tau-\Delta\tau, \beta)``
@@ -286,7 +309,10 @@ This method should be called *after* all changes to the current time slice propa
 ``B_l`` have been made
 This method will also recompute ``\bar{B}_n`` as needed.
 """
-function update_factorizations!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T, E, P<:AbstractPropagator{T}}
+function update_factorizations!(
+    fgc::FermionGreensCalculator{T,E},
+    B::AbstractVector{P}
+) where {T, E, P<:AbstractPropagator{T}}
 
     # update B_bar matrix when necessary
     update_B̄!(fgc, B)
@@ -298,7 +324,9 @@ function update_factorizations!(fgc::FermionGreensCalculator{T,E}, B::AbstractVe
 end
 
 @doc raw"""
-    update_factorizations!(fgc::FermionGreensCalculator{T,E}) where {T, E}
+    update_factorizations!(
+        fgc::FermionGreensCalculator{T,E}
+    ) where {T, E}
 
 If current imaginary time slice `fgc.l` corresponds to the boundary of a stabilization interval,
 calculate a LDR factorization to represent ``B(\tau, 0)`` or ``B(\beta, \tau-\Delta\tau)``
@@ -308,7 +336,9 @@ This method should be called *after* all changes to the current time slice propa
 ``B_l`` have been made, and any required updates to a ``\bar{B}_n`` matrix have
 been performed using the [`JDQMCFramework.update_B̄!`](@ref) routine.
 """
-function update_factorizations!(fgc::FermionGreensCalculator{T,E}) where {T, E}
+function update_factorizations!(
+    fgc::FermionGreensCalculator{T,E}
+) where {T, E}
 
     (; l, Lτ, n_stab, N_stab, forward) = fgc
     F = fgc.F::Vector{LDR{T,E}}
@@ -357,13 +387,19 @@ end
 
 
 @doc raw"""
-    update_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T,E,P<:AbstractPropagator{T}}
+    update_B̄!(
+        fgc::FermionGreensCalculator{T,E},
+        B::AbstractVector{P}
+    ) where {T,E,P<:AbstractPropagator{T}}
 
 Recalculate ``\bar{B}_n`` if the current timeslice `fgc.l` corresponds to the boundary of a stabilization interval,
 accounting for whether imaginary time is being iterated over in the forward (`fgc.forward = true`) or
 reverse (`fgc.forward = false`) direction.
 """
-function update_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}) where {T,E,P<:AbstractPropagator{T}}
+function update_B̄!(
+    fgc::FermionGreensCalculator{T,E},
+    B::AbstractVector{P}
+) where {T,E,P<:AbstractPropagator{T}}
 
     (; forward, n_stab, l, Lτ) = fgc
 
@@ -391,7 +427,10 @@ end
 
 
 @doc raw"""
-    calculate_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}, n::Int) where {T,E,P<:AbstractPropagator{T}}
+    calculate_B̄!(
+        fgc::FermionGreensCalculator{T,E},
+        B::AbstractVector{P}, n::Int
+    ) where {T,E,P<:AbstractPropagator{T}}
 
 Given `B`, a vector of all the propagator matrices ``B_l``, calculate the matrix product
 ```math
@@ -399,7 +438,10 @@ Given `B`, a vector of all the propagator matrices ``B_l``, calculate the matrix
 ```
 with the result getting written to `fgc.B_bar[n]`.
 """
-function calculate_B̄!(fgc::FermionGreensCalculator{T,E}, B::AbstractVector{P}, n::Int) where {T,E,P<:AbstractPropagator{T}}
+function calculate_B̄!(
+    fgc::FermionGreensCalculator{T,E},
+    B::AbstractVector{P}, n::Int
+) where {T,E,P<:AbstractPropagator{T}}
 
     (; B_bar, n_stab, Lτ, N_stab, ldr_ws) = fgc
     @assert 1 <= n <= N_stab
@@ -416,13 +458,17 @@ end
 
 
 @doc raw"""
-    stabilization_interval(fgc::FermionGreensCalculator)::Tuple{Int,Int}
+    stabilization_interval(
+        fgc::FermionGreensCalculator
+    )::Tuple{Int,Int}
 
 Given the current imaginary time slice `fgc.l`, return the corresponding
 stabilization interval `n = ceil(Int, fgc.l/fgc.n_stab)`, and the relative location
 within that stabilization interval `l′ = mod1(fgc.l, fgc.n_stab)`, such that `l′∈[1,n_stab]`. 
 """
-function stabilization_interval(fgc::FermionGreensCalculator)::Tuple{Int,Int}
+function stabilization_interval(
+    fgc::FermionGreensCalculator
+)::Tuple{Int,Int}
 
     # calculate stabilization interval
     n = ceil(Int, fgc.l/fgc.n_stab)

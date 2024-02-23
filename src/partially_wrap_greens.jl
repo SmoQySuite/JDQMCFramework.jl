@@ -2,7 +2,7 @@
     partially_wrap_greens_forward!(
         G::Matrix{T},
         B::P,
-        M::Matrix{T} = similar(G) # used to avoid dynamic memory allocation
+        M::Matrix{T} = similar(G)
     ) where {T, E, P<:AbstractPropagator{T,E}}
 
 If the propagator `B` is represented in the symmetric form
@@ -16,7 +16,11 @@ then apply the transformation
 ```
 to the equal-time Green's function matrix `G` in-place.
 """
-function partially_wrap_greens_forward!(G::Matrix{T}, B::P, M::Matrix{T}=similar(G)) where {T, E, P<:AbstractPropagator{T,E}}
+function partially_wrap_greens_forward!(
+    G::Matrix{T},
+    B::P,
+    M::Matrix{T} = similar(G)
+) where {T, E, P<:AbstractPropagator{T,E}}
 
     # only apply transformation if symmetric/hermitian definition for propagator is being used
     _partially_wrap_greens_forward!(G, B, M)
@@ -60,7 +64,7 @@ end
     partially_wrap_greens_reverse!(
         G::Matrix{T},
         B::P,
-        M::Matrix{T} = similar(G) # used to avoid dynamic memory allocation
+        M::Matrix{T} = similar(G)
     ) where {T, E, P<:AbstractPropagator{T,E}}
 
 If the propagator `B` is represented in the symmetric form
@@ -74,7 +78,11 @@ G(\tau,\tau) = \Gamma_l(\Delta\tau/2) \cdot \tilde{G}(\tau,\tau) \cdot \Gamma_l^
 ```
 to the equal-time Green's function matrix `G` in-place.
 """
-function partially_wrap_greens_reverse!(G::Matrix{T}, B::P, M::Matrix{T}=similar(G)) where {T, E, P<:AbstractPropagator{T,E}}
+function partially_wrap_greens_reverse!(
+    G::Matrix{T},
+    B::P,
+    M::Matrix{T} = similar(G)
+) where {T, E, P<:AbstractPropagator{T,E}}
 
     # only apply transformation if symmetric/hermitian definition for propagator is being used
     _partially_wrap_greens_reverse!(G, B, M)

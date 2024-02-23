@@ -35,7 +35,7 @@ electron on site ``i`` in the lattice, and ``\hat{n}_{\sigma,i} = \hat{c}^\dagge
 is the spin-``\sigma`` electron number operator for site ``i``. In the above Hamiltonian, ``t`` is the nearest neighbor hopping integral,
 ``\mu`` is the chemical potential, and ``U > 0`` controls the strength of the on-site Hubbard repulsion.
 Lastly, if ``\mu = 0.0,`` then the Hamiltonian is particle-hole symmetric, ensuring the system is half-filled ``(\langle n_\sigma \rangle = \tfrac{1}{2})``
-and that there is no sign problem. In the the case of ``\mu \ne 0`` there will be a sign problem.
+and that there is no sign problem. In the case of ``\mu \ne 0`` there will be a sign problem.
 
 The script version of this tutorial, which can be downloaded using the link found at the top of this page,
 can be run with the command
@@ -45,7 +45,7 @@ julia square_hubbard.jl
 in a terminal. This tutorial can also be downloaded as a notebook at the top of this page.
 
 We begin by importing the relevant packages we will need to use in this example.
-Note that to run this tutorial you will need to install all the required Julia pacakges.
+Note that to run this tutorial you will need to install all the required Julia packages.
 However, this is straightforward as all the packages used in this tutorial are registered
 with the Julia [General](https://github.com/JuliaRegistries/General.git)
 package registry. This means they can all be easily installed with the Julia package manager
@@ -143,7 +143,7 @@ checkerboard = false
 println("Whether the checkerboard approximation is used, checkerboard = ", checkerboard)
 
 # Period with which numerical stabilization is performed i.e.
-# how many imarginary time slices seperate more expensive recomputations
+# how many imaginary time slices separate more expensive recomputations
 # of the Green's function matrix using numerically stable routines.
 n_stab = 10
 println("Numerical stabilization period, n_stab = ", n_stab)
@@ -157,7 +157,7 @@ println("Number of burnin sweeps, N_burnin = ", N_burnin)
 N_measurements = 10_000
 println("Number of measurements, N_measurements = ", N_measurements)
 
-# Number of local update sweeps seperating sequential measurements.
+# Number of local update sweeps separating sequential measurements.
 N_sweeps = 1
 println("Number of local update sweeps seperating measurements, n_sweeps = ", N_sweeps)
 
@@ -324,7 +324,7 @@ show(stdout, "text/plain", s)
 
 Next we initialize a propagator matrix ``B_{\sigma,l}`` for each imaginary time slice ``l \in [1,L_\tau]``.
 We first initialize a pair of vectors `Bup` and `Bdn` that will contain the ``L_\tau`` propagators associated with each time slice.
-The branching logic below enforces the correct propagator matrix definition is ued based on the boolean flags
+The branching logic below enforces the correct propagator matrix definition is used based on the boolean flags
 `symmetric` and `checkerboard` defined above.
 
 ````@example square_hubbard
@@ -631,7 +631,7 @@ nothing #hide
 ````
 
 Next we implement a function to make measurements during the simulation, including time-displaced measurements.
-Note that if we want to calculate the expectation value fir some observable ``\langle \mathcal{O} \rangle``,
+Note that if we want to calculate the expectation value for some observable ``\langle \mathcal{O} \rangle``,
 then during the simulation we actually measure ``\langle \mathcal{S O} \rangle_{\mathcal{W}}``, where
 ``\langle \bullet \rangle_{\mathcal{W}}`` denotes an average with respect to states sampled according
 to the DQMC weights
@@ -827,7 +827,7 @@ function run_simulation!(
         # Iterate over updates and measurements in bin.
         for n in 1:N_binsize
 
-            # Itereate over number of local update sweeps per measurement.
+            # Iterate over number of local update sweeps per measurement.
             for sweep in 1:N_sweeps
                 # Attempt local update to every Ising HS field.
                 (logdetGup, sgndetGup, logdetGdn, sgndetGdn, δG′, ac) = local_update!(
@@ -903,7 +903,7 @@ The Jackknife algorithm is also used to propagate error and correct for bias whe
 to account for the sign problem.
 
 ````@example square_hubbard
-# Calcate the average sign for the simulation.
+# Calculate the average sign for the simulation.
 sign_avg, sign_std = ba.jackknife(identity, avg_sign)
 println("Avg Sign, S = ", sign_avg, " +/- ", sign_std)
 
@@ -919,7 +919,7 @@ println("Double occupancy, nup_ndn = ", double_occ_avg, " +/- ", double_occ_std)
 Now we move onto processing the measured correlation function data.
 We define two functions to assist with this process.
 The first function integrates the binned time-displaced correlation function data
-over the imaginary time axis in order to generate binned suscetibility data.
+over the imaginary time axis in order to generate binned susceptibility data.
 Note that the integration over the imaginary time axis is performed using Simpson's
 rule, which is accurate to order ``\mathcal{O}(\Delta\tau^4)``.
 
@@ -1089,7 +1089,7 @@ S_loc_swave = copy(C_loc_swave)
 jdqmcm.fourier_transform!(S_loc_swave, 1, 1, (1,4), unit_cell, lattice)
 
 # Integrate the binned local s-wave structure factor data to get the
-# binned local s-wave pair suspectibility data.
+# binned local s-wave pair susceptibility data.
 P_loc_swave = susceptibility(S_loc_swave, Δτ)
 
 # Calculate the average local s-wave pair susceptibility for all scattering momentum q.
@@ -1122,7 +1122,7 @@ S_ext_swave = copy(C_ext_swave)
 jdqmcm.fourier_transform!(S_ext_swave, 1, 1, (1,4), unit_cell, lattice)
 
 # Integrate the binned extended s-wave structure factor data to get the
-# binned extended s-wave pair suspectibility data.
+# binned extended s-wave pair susceptibility data.
 P_ext_swave = susceptibility(S_ext_swave, Δτ)
 
 # Calculate the average extended s-wave pair susceptibility for all scattering momentum q.
@@ -1155,13 +1155,13 @@ S_dwave = copy(C_dwave)
 jdqmcm.fourier_transform!(S_dwave, 1, 1, (1,4), unit_cell, lattice)
 
 # Integrate the binned d-wave structure factor data to get the
-# binned d-wave pair suspectibility data.
+# binned d-wave pair susceptibility data.
 P_dwave = susceptibility(S_dwave, Δτ)
 
 # Calculate the average d-wave pair susceptibility for all scattering momentum q.
 P_dwave_avg, P_dwave_std = correlation_stats(P_dwave, avg_sign)
 
-# Report the d-wave pair suspcetibility.
+# Report the d-wave pair susceptibility.
 Pd_avg = real(P_dwave_avg[1,1])
 Pd_std = P_dwave_std[1,1]
 println("Extended s-wave pair susceptibility, P_d = ", Pd_avg, " +/- ", Pd_std)
