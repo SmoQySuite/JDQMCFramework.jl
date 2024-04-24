@@ -62,9 +62,6 @@ import LatticeUtilities as lu
 ## Exports the checkerboard approximation for representing an exponentiated hopping matrix.
 import Checkerboard as cb
 
-## Exports useful methods for analyzing correlated MCMC data.
-import BinningAnalysis as ba
-
 ## Package for performing Fast Fourier Transforms (FFTs).
 using FFTW
 
@@ -881,15 +878,15 @@ println("Largest Numerical Error = ", δG)
 # to account for the sign problem.
 
 ## Calculate the average sign for the simulation.
-sign_avg, sign_std = ba.jackknife(identity, avg_sign)
+sign_avg, sign_std = jdqmcm.jackknife(identity, avg_sign)
 println("Avg Sign, S = ", sign_avg, " +/- ", sign_std)
 
 ## Calculate the average density.
-density_avg, density_std = ba.jackknife(/, density, avg_sign)
+density_avg, density_std = jdqmcm.jackknife(/, density, avg_sign)
 println("Density, n = ", density_avg, " +/- ", density_std)
 
 ## Calculate the average double occupancy.
-double_occ_avg, double_occ_std = ba.jackknife(/, double_occ, avg_sign)
+double_occ_avg, double_occ_std = jdqmcm.jackknife(/, double_occ, avg_sign)
 println("Double occupancy, nup_ndn = ", double_occ_avg, " +/- ", double_occ_std)
 
 # Now we move onto processing the measured correlation function data.
@@ -933,11 +930,22 @@ function correlation_stats(
     S_avg = zeros(Complex{T}, size(S)[2:end])
     S_std = zeros(T, size(S)[2:end])
 
+    ## Number of bins.
+    N_bins = length(avg_sign)
+
+    ## Preallocate arrays to make the jackknife error analysis faster.
+    jackknife_samples = (zeros(Complex{T}, N_bins), zeros(T, N_bins))
+    jackknife_g       = zeros(Complex{T}, N_bins)
+
     ## Iterate over correlation functions.
     for n in CartesianIndices(S_avg)
         ## Use the jackknife method to calculage average and error.
         vals = @view S[:,n]
-        S_avg[n], S_std[n] = ba.jackknife(/, vals, avg_sign)
+        S_avg[n], S_std[n] = jdqmcm.jackknife(
+            /, vals, avg_sign,
+            jackknife_samples = jackknife_samples,
+            jackknife_g = jackknife_g
+        )
     end
 
     return S_avg, S_std
