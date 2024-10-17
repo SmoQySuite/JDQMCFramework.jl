@@ -264,4 +264,77 @@ end
         # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
         iterate(fgc_dn, fgc_up.forward)
     end
+
+
+    # initialize unequal-time Green's functions
+    Gup_00 = Gup
+    Gdn_00 = Gdn
+    initialize_unequaltime_greens!(Gup_τ0, Gup_0τ, Gup_ττ, Gup_00)
+    initialize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, Gdn_00)
+
+    # Iterate over imaginary time τ=Δτ⋅l.
+    @testset for l in fgc_up
+
+        # Propagate Green's function matrix to current imaginary time G(l,l).
+        propagate_unequaltime_greens!(Gup_τ0, Gup_0τ, Gup_ττ, fgc_up, Bup)
+        propagate_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, fgc_dn, Bdn)
+
+        # LOCAL UPDATES OR EVALUATION OF DERIVATIVE OF FERMIONIC ACTION WOULD GO HERE
+
+        # test that spin up unequal-time Green's function is correct
+        G_τ0 = @view G_ret[:,:,l+1]
+        G_0τ = @view G_adv[:,:,l+1]
+        @test G ≈ Gup_ττ
+        @test G ≈ Gup_00
+        @test G_τ0 ≈ Gup_τ0
+        @test G_0τ ≈ Gup_0τ
+        @test G ≈ Gdn_ττ
+        @test G ≈ Gdn_00
+        @test G_τ0 ≈ Gdn_τ0
+        @test G_0τ ≈ Gdn_0τ
+
+        # Periodically re-calculate the Green's function matrix for numerical stability.
+        # If not performing updates, but just evaluating the derivative of the action, then
+        # set update_B̄=false to avoid wasting cpu time re-computing B_barₙ matrices.
+        logdetGup, sgndetGup, δGup, δθup = stabilize_unequaltime_greens!(Gup_τ0, Gup_0τ, Gup_ττ, Gup_00, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=false)
+        logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, Gdn_00, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=false)
+
+        # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
+        iterate(fgc_dn, fgc_up.forward)
+    end
+
+    # initialize unequal-time Green's functions
+    initialize_unequaltime_greens!(Gup_τ0, Gup_0τ, Gup_ττ, Gup_00)
+    initialize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, Gdn_00)
+
+    # Iterate over imaginary time τ=Δτ⋅l.
+    @testset for l in fgc_up
+
+        # Propagate Green's function matrix to current imaginary time G(l,l).
+        propagate_unequaltime_greens!(Gup_τ0, Gup_0τ, Gup_ττ, fgc_up, Bup)
+        propagate_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, fgc_dn, Bdn)
+
+        # LOCAL UPDATES OR EVALUATION OF DERIVATIVE OF FERMIONIC ACTION WOULD GO HERE
+
+        # test that spin up unequal-time Green's function is correct
+        G_τ0 = @view G_ret[:,:,l+1]
+        G_0τ = @view G_adv[:,:,l+1]
+        @test G ≈ Gup_ττ
+        @test G ≈ Gup_00
+        @test G_τ0 ≈ Gup_τ0
+        @test G_0τ ≈ Gup_0τ
+        @test G ≈ Gdn_ττ
+        @test G ≈ Gdn_00
+        @test G_τ0 ≈ Gdn_τ0
+        @test G_0τ ≈ Gdn_0τ
+
+        # Periodically re-calculate the Green's function matrix for numerical stability.
+        # If not performing updates, but just evaluating the derivative of the action, then
+        # set update_B̄=false to avoid wasting cpu time re-computing B_barₙ matrices.
+        logdetGup, sgndetGup, δGup, δθup = stabilize_unequaltime_greens!(Gup_τ0, Gup_0τ, Gup_ττ, Gup_00, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=false)
+        logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, Gdn_00, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=false)
+
+        # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
+        iterate(fgc_dn, fgc_up.forward)
+    end
 end

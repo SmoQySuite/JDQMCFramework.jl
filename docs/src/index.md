@@ -4,16 +4,16 @@ CurrentModule = JDQMCFramework
 
 # JDQMCFramework.jl
 
-Documentation for [JDQMCFramework](https://github.com/cohensbw/JDQMCFramework.jl).
+Documentation for [JDQMCFramework.jl](https://github.com/SmoQySuite/JDQMCFramework.jl.git).
 This is a utility package that exports a suite of types and routines to simplify the
 process of writing a DQMC code.
 
 Matrix stabilization routines are supplied by the
-[`StableLinearAlgebra.jl`](https://github.com/cohensbw/StableLinearAlgebra.jl.git)
+[StableLinearAlgebra.jl](https://github.com/SmoQySuite/StableLinearAlgebra.jl.git)
 package.
 
 The checkerboard decomposition functionality supported here is provided by the
-[`Checkerboard.jl`](https://github.com/cohensbw/Checkerboard.jl.git) package.
+[Checkerboard.jl](https://github.com/SmoQySuite/Checkerboard.jl.git) package.
 
 ## Funding
 

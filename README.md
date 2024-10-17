@@ -14,7 +14,7 @@ The development of this code was supported by the U.S. Department of Energy, Off
 under Award Number DE-SC0022311.
 
 ## Installation
-To install [`JDQMCFramework.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl.git),
+To install [JDQMCFramework.jl](https://github.com/SmoQySuite/JDQMCFramework.jl.git),
 simply open the Julia REPL and run the commands
 ```julia
 julia> ]
