@@ -410,7 +410,7 @@ instead re-computes
 G(\tau-\Delta\tau,0)               = & [B^{-1}(\tau-\Delta\tau,0) + B(\beta,\tau-\Delta\tau)]^{-1} \\
 G(0,\tau-\Delta\tau)               = & [B^{-1}(\beta,\tau-\Delta\tau) + B(\tau-\Delta\tau,0)]^{-1} \\
 G(\tau-\Delta\tau,\tau-\Delta\tau) = & [I + B(\tau-\Delta\tau,0)B(\beta,\tau-\Delta\tau)]^{-1}
-\begin{align*}
+\end{align*}
 ```
 for `fgc.l`.
 
@@ -583,7 +583,7 @@ G(\tau-\Delta\tau,0)               = & [B^{-1}(\tau-\Delta\tau,0) + B(\beta,\tau
 G(0,\tau-\Delta\tau)               = & [B^{-1}(\beta,\tau-\Delta\tau) + B(\tau-\Delta\tau,0)]^{-1} \\
 G(\tau-\Delta\tau,\tau-\Delta\tau) = & [I + B(\tau-\Delta\tau,0)B(\beta,\tau-\Delta\tau)]^{-1} \\
 G(0,0)                             = & [I + B(\beta,\tau-\Delta\tau)B(\tau-\Delta\tau,0)]^{-1}
-\begin{align*}
+\end{align*}
 ```
 for `fgc.l`.
 
