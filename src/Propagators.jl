@@ -161,10 +161,10 @@ size(B::AbstractPropagator, dim::Int) = length(B.expmΔτV)
 
 Return whether a propagator is hermitian or not.
 """
-ishermitian(B::AbstractPropagator)    = return _ishermitian(B)
-_ishermitian(B::SymExactPropagator)   = return true
-_ishermitian(B::SymChkbrdPropagator)  = return true
-_ishermitian(B::AsymExactPropagator)  = return false
+ishermitian(B::AbstractPropagator) = return _ishermitian(B)
+_ishermitian(B::SymExactPropagator{T,E}) where {T,E} = return (E <: AbstractFloat)
+_ishermitian(B::SymChkbrdPropagator{T,E}) where {T,E} = return (E <: AbstractFloat)
+_ishermitian(B::AsymExactPropagator) = return false
 _ishermitian(B::AsymChkbrdPropagator) = return false
 
 
@@ -221,7 +221,10 @@ Return the matrix element type of the propagator `T`.
 """
 function eltype(B::AbstractPropagator{T,E}) where {T,E}
 
-    return T
+    V = real(E)
+    V = (E <: AbstractFloat) ? V : E
+    V = (T <: AbstractFloat) ? V : T
+    return V
 end
 
 
