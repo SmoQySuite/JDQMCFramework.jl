@@ -50,7 +50,8 @@ function exp!(
     
     # calculate the matrix product exp(α⋅H) = U⋅exp(α⋅ϵ)⋅Uᵀ
     @. ϵ = exp(α*ϵ)
-    mul_D!(H, ϵ, Uᵀ)
+    Dϵ = Diagonal(ϵ)
+    mul!(H, Dϵ, Uᵀ)
     mul!(expαH, U, H)
     
     return nothing
@@ -90,11 +91,12 @@ function exp!(
     
     # calculate the matrix product exp(α⋅H) = U⋅exp(α⋅ϵ)⋅Uᵀ
     @. ϵ = exp(α*ϵ)
-    mul_D!(H, ϵ, Uᵀ)
+    Dϵ = Diagonal(ϵ)
+    mul!(H, Dϵ, Uᵀ)
     mul!(exppαH, U, H)
 
     # calculate the matrix product exp(-α⋅H) = U⋅exp(-α⋅ϵ)⋅Uᵀ
-    div_D!(H, ϵ, Uᵀ)
+    ldiv!(H, Dϵ, Uᵀ)
     mul!(expmαH, U, H)
     
     return nothing

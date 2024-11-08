@@ -229,40 +229,54 @@ end
 
 
 @doc raw"""
-    mul!(A::AbstractMatrix{T}, B::SymExactPropagator{T}, C::AbstractMatrix{T};
-         M::AbstractMatrix{T}=similar(A)) where {T}
+    mul!(
+        A::AbstractVecOrMat, B::SymExactPropagator, C::AbstractVecOrMat;
+        M::AbstractVecOrMat = similar(A)
+    )
 
-    mul!(A::AbstractMatrix{T}, B::AsymExactPropagator{T}, C::AbstractMatrix{T};
-         M::AbstractMatrix{T}=similar(A)) where {T}
+    mul!(
+        A::AbstractVecOrMat, B::AsymExactPropagator, C::AbstractVecOrMat;
+        M::AbstractVecOrMat = similar(A)
+    )
 
-    mul!(A::AbstractMatrix{T}, B::AbstractChkbrdPropagator{T}, C::AbstractMatrix{T};
-         M=nothing) where {T}
+    mul!(
+        A::AbstractVecOrMat, B::AbstractChkbrdPropagator, C::AbstractVecOrMat;
+        M = nothing
+    )
 
 Calculate the product ``A := B \cdot C``, where ``B`` is a propagator matrix represented
 by an instance of a type inheriting from [`AbstractPropagator`](@ref).
 If `B` is asymmetric and `B.adjointed = true`, then ``A = B^\dagger \cdot C`` is evaluated instead.
 """
-function mul!(A::AbstractMatrix{T}, B::SymExactPropagator{T}, C::AbstractMatrix{T};
-              M::AbstractMatrix{T}=similar(A)) where {T}
+function mul!(
+    A::AbstractVecOrMat, B::SymExactPropagator, C::AbstractVecOrMat;
+    M::AbstractVecOrMat = similar(A)
+)
 
     mul!(M, B.expmΔτKo2, C) # exp(-Δτ⋅K/2)⋅C
-    lmul_D!(B.expmΔτV, M) # exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)⋅C
+    expmΔτV = Diagonal(B.expmΔτV)
+    lmul!(expmΔτV, M) # exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)⋅C
     mul!(A, B.expmΔτKo2, M) # A = B⋅C = exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)⋅C
 
     return nothing
 end
 
-function mul!(A::AbstractMatrix{T}, B::AsymExactPropagator{T}, C::AbstractMatrix{T};
-              M::AbstractMatrix{T}=similar(A)) where {T}
+function mul!(
+    A::AbstractVecOrMat, B::AsymExactPropagator, C::AbstractVecOrMat;
+    M::AbstractVecOrMat = similar(A)
+)
 
     mul!(A, B.expmΔτK, C) # exp(-Δτ⋅K)⋅C
-    lmul_D!(B.expmΔτV, A) # A = B⋅C = exp(-Δτ⋅V)⋅[exp(-Δτ⋅K)⋅C]
+    expmΔτV = Diagonal(B.expmΔτV)
+    lmul!(expmΔτV, A) # A = B⋅C = exp(-Δτ⋅V)⋅[exp(-Δτ⋅K)⋅C]
 
     return nothing
 end
 
-function mul!(A::AbstractMatrix{T}, B::AbstractChkbrdPropagator{T}, C::AbstractMatrix{T};
-              M=nothing) where {T}
+function mul!(
+    A::AbstractVecOrMat, B::AbstractChkbrdPropagator, C::AbstractVecOrMat;
+    M = nothing
+)
 
     copyto!(A, C)
     lmul!(B, A)
@@ -272,40 +286,54 @@ end
 
 
 @doc raw"""
-    mul!(A::AbstractMatrix{T}, C::AbstractMatrix{T}, B::SymExactPropagator{T};
-         M::AbstractMatrix{T} = similar(A)) where {T}
+    mul!(
+        A::AbstractVecOrMat, C::AbstractVecOrMat, B::SymExactPropagator;
+        M::AbstractVecOrMat = similar(A)
+    )
 
-    mul!(A::AbstractMatrix{T}, C::AbstractMatrix{T}, B::AsymExactPropagator{T};
-         M::AbstractMatrix{T} = similar(A)) where {T}
+    mul!(
+        A::AbstractVecOrMat, C::AbstractVecOrMat, B::AsymExactPropagator;
+        M::AbstractVecOrMat = similar(A)
+    )
 
-    mul!(A::AbstractMatrix{T}, C::AbstractMatrix{T}, B::AbstractChkbrdPropagator{T};
-         M=nothing) where {T}
+    mul!(
+        A::AbstractVecOrMat, C::AbstractVecOrMat, B::AbstractChkbrdPropagator;
+        M = nothing
+    )
 
 Calculate the matrix product ``A := C \cdot B``, where ``B`` is a propagator matrix
 represented by an instance of a type inheriting from [`AbstractPropagator`](@ref).
 If `B` is asymmetric and `B.adjointed = true`, then ``A = C \cdot B^\dagger`` is evaluated instead.
 """
-function mul!(A::AbstractMatrix{T}, C::AbstractMatrix{T}, B::SymExactPropagator{T};
-              M::AbstractMatrix{T} = similar(A)) where {T}
+function mul!(
+    A::AbstractVecOrMat, C::AbstractVecOrMat, B::SymExactPropagator;
+    M::AbstractVecOrMat = similar(A)
+)
 
+    expmΔτV = Diagonal(B.expmΔτV)
     mul!(M, C, B.expmΔτKo2) # C⋅exp(-Δτ⋅K/2)
-    rmul_D!(M, B.expmΔτV) # C⋅exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)
+    rmul!(M, expmΔτV) # C⋅exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)
     mul!(A, M, B.expmΔτKo2) # A := B⋅C = C⋅exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)
 
     return nothing
 end
 
-function mul!(A::AbstractMatrix{T}, C::AbstractMatrix{T}, B::AsymExactPropagator{T};
-              M::AbstractMatrix{T} = similar(A)) where {T}
+function mul!(
+    A::AbstractVecOrMat, C::AbstractVecOrMat, B::AsymExactPropagator;
+    M::AbstractVecOrMat = similar(A)
+)
 
-    mul_D!(M, C, B.expmΔτV) # C⋅exp(-Δτ⋅V)
+    expmΔτV = Diagonal(B.expmΔτV)
+    mul!(M, C, expmΔτV) # C⋅exp(-Δτ⋅V)
     mul!(A, M, B.expmΔτK) # A := C⋅B = [C⋅exp(-Δτ⋅V)]⋅exp(-Δτ⋅K)
 
     return nothing
 end
 
-function mul!(A::AbstractMatrix{T}, C::AbstractMatrix{T}, B::AbstractChkbrdPropagator{T};
-              M = nothing) where {T}
+function mul!(
+    A::AbstractVecOrMat, C::AbstractVecOrMat, B::AbstractChkbrdPropagator;
+    M = nothing
+)
 
     copyto!(A, C)
     rmul!(A, B)
@@ -315,113 +343,153 @@ end
 
 
 @doc raw"""
-    lmul!(B::SymExactPropagator{T}, A::AbstractMatrix{T};
-          M::AbstractMatrix{T} = similar(A)) where {T}
+    lmul!(
+        B::SymExactPropagator, A::AbstractVecOrMat;
+        M::AbstractVecOrMat = similar(A)
+    )
 
-    lmul!(B::AsymExactPropagator{T}, A::AbstractMatrix{T};
-          M::AbstractMatrix{T} = similar(A)) where {T}
+    lmul!(
+        B::AsymExactPropagator, A::AbstractVecOrMat;
+        M::AbstractVecOrMat = similar(A)
+    )
 
-    lmul!(B::AsymExactPropagator{T}, A::AbstractMatrix{T};
-          M::AbstractMatrix{T} = similar(A)) where {T}
+    lmul!(
+        B::SymChkbrdPropagator, A::AbstractVecOrMat;
+        M = nothing
+    )
 
-    lmul!(B::AsymChkbrdPropagator{T}, A::AbstractMatrix{T};
-          M = nothing) where {T}
+    lmul!(
+        B::AsymChkbrdPropagator, A::AbstractVecOrMat;
+        M = nothing
+    )
 
 Calculate the matrix product ``A := B \cdot A``, where ``B`` is a propagator matrix
 represented by an instance of a type inheriting from [`AbstractPropagator`](@ref).
 If `B` is asymmetric and `B.adjointed = true`, when ``A := B^\dagger \cdot A`` is evaluated instead.
 """
-function lmul!(B::SymExactPropagator{T}, A::AbstractMatrix{T};
-               M::AbstractMatrix{T} = similar(A)) where {T}
+function lmul!(
+    B::SymExactPropagator, A::AbstractVecOrMat;
+    M::AbstractVecOrMat = similar(A)
+)
 
     mul!(M, B.expmΔτKo2, A) # exp(-Δτ⋅K/2)⋅A
-    lmul_D!(B.expmΔτV, M) # exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)⋅A
+    expmΔτV = Diagonal(B.expmΔτV)
+    lmul!(expmΔτV, M) # exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)⋅A
     mul!(A, B.expmΔτKo2, M) # A := B⋅A = exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)⋅A
     
     return nothing
 end
 
-function lmul!(B::AsymExactPropagator{T}, A::AbstractMatrix{T};
-               M::AbstractMatrix{T} = similar(A)) where {T}
+function lmul!(
+    B::AsymExactPropagator, A::AbstractVecOrMat;
+    M::AbstractVecOrMat = similar(A)
+)
 
     mul!(M, B.expmΔτK, A) # exp(-Δτ⋅K)⋅A
-    mul_D!(A, B.expmΔτV, M) # A := B⋅A = exp(-Δτ⋅V)⋅[exp(-Δτ⋅K)⋅A]
+    expmΔτV = Diagonal(B.expmΔτV)
+    mul!(A, expmΔτV, M) # A := B⋅A = exp(-Δτ⋅V)⋅[exp(-Δτ⋅K)⋅A]
 
     return nothing
 end
 
-function lmul!(B::SymChkbrdPropagator{T}, A::AbstractMatrix{T};
-               M = nothing) where {T}
+function lmul!(
+    B::SymChkbrdPropagator, A::AbstractVecOrMat;
+    M = nothing
+)
 
     expmΔτKo2ᵀ = adjoint(B.expmΔτKo2)
     lmul!(expmΔτKo2ᵀ, A) # exp(-Δτ⋅K/2)ᵀ⋅A
-    lmul_D!(B.expmΔτV, A) # exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)ᵀ⋅A
+    expmΔτV = Diagonal(B.expmΔτV)
+    lmul!(expmΔτV, A) # exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)ᵀ⋅A
     lmul!(B.expmΔτKo2, A) # A := B⋅A = exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)ᵀ⋅A
 
     return nothing
 end
 
-function lmul!(B::AsymChkbrdPropagator{T}, A::AbstractMatrix{T};
-               M = nothing) where {T}
+function lmul!(
+    B::AsymChkbrdPropagator, A::AbstractVecOrMat;
+    M = nothing
+)
 
     lmul!(B.expmΔτK, A) # exp(-Δτ⋅K)⋅A
-    lmul_D!(B.expmΔτV, A) # A := B⋅A = exp(-Δτ⋅V)⋅[exp(-Δτ⋅K)⋅A]
+    expmΔτV = Diagonal(B.expmΔτV)
+    lmul!(expmΔτV, A) # A := B⋅A = exp(-Δτ⋅V)⋅[exp(-Δτ⋅K)⋅A]
 
     return nothing
 end
 
 
 @doc raw"""
-    rmul!(A::AbstractMatrix{T}, B::SymExactPropagator{T};
-          M::AbstractMatrix{T} = similar(A)) where {T}
+    rmul!(
+        A::AbstractVecOrMat, B::SymExactPropagator;
+        M::AbstractVecOrMat = similar(A)
+    )
 
-    rmul!(A::AbstractMatrix{T}, B::AsymExactPropagator{T};
-          M::AbstractMatrix{T} = similar(A)) where {T}
+    rmul!(
+        A::AbstractVecOrMat, B::AsymExactPropagator;
+        M::AbstractVecOrMat = similar(A)
+    )
 
-    rmul!(A::AbstractMatrix{T}, B::SymChkbrdPropagator{T};
-          M = nothing) where {T}
+    rmul!(
+        A::AbstractVecOrMat, B::SymChkbrdPropagator;
+        M = nothing
+    )
 
-    rmul!(A::AbstractMatrix{T}, B::AsymChkbrdPropagator{T};
-          M = nothing) where {T}
+    rmul!(
+        A::AbstractVecOrMat, B::AsymChkbrdPropagator;
+        M = nothing
+    )
 
 Calculate the matrix product ``A := A \cdot B``, where ``B`` is a propagator matrix
 represented by an instance of a type inheriting from [`AbstractPropagator`](@ref).
 If `B` is asymmetric and `B.adjointed = true`, then ``A := A \cdot B^\dagger`` is evaluated instead. 
 """
-function rmul!(A::AbstractMatrix{T}, B::SymExactPropagator{T};
-               M::AbstractMatrix{T} = similar(A)) where {T}
+function rmul!(
+    A::AbstractVecOrMat, B::SymExactPropagator;
+    M::AbstractVecOrMat = similar(A)
+)
     
     mul!(M, A, B.expmΔτKo2) # A⋅exp(-Δτ⋅K/2)
-    rmul_D!(M, B.expmΔτV) # A⋅exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)
+    expmΔτV = Diagonal(B.expmΔτV)
+    rmul!(M, expmΔτV) # A⋅exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)
     mul!(A, M, B.expmΔτKo2) # A := A⋅B = A⋅exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)
     
     return nothing
 end
 
-function rmul!(A::AbstractMatrix{T}, B::AsymExactPropagator{T};
-               M::AbstractMatrix{T} = similar(A)) where {T}
+function rmul!(
+    A::AbstractVecOrMat, B::AsymExactPropagator;
+    M::AbstractVecOrMat = similar(A)
+)
 
-    mul_D!(M, A, B.expmΔτV) # A⋅exp(-Δτ⋅V)
+    expmΔτV = Diagonal(B.expmΔτV)
+    mul!(M, A, expmΔτV) # A⋅exp(-Δτ⋅V)
     mul!(A, M, B.expmΔτK) # A := A⋅B = [A⋅exp(-Δτ⋅V)]⋅exp(-Δτ⋅K)
 
     return nothing
 end
 
-function rmul!(A::AbstractMatrix{T}, B::SymChkbrdPropagator{T};
-               M = nothing) where {T}
+function rmul!(
+    A::AbstractVecOrMat, B::SymChkbrdPropagator;
+    M = nothing
+)
 
     expmΔτKo2ᵀ = adjoint(B.expmΔτKo2)
     rmul!(A, B.expmΔτKo2) # A⋅exp(-Δτ⋅K/2)
-    rmul_D!(A, B.expmΔτV) # A⋅exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)
+    expmΔτV = Diagonal(B.expmΔτV)
+    rmul!(A, expmΔτV) # A⋅exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)
     rmul!(A, expmΔτKo2ᵀ) # A := A⋅B = A⋅exp(-Δτ⋅K/2)ᵀ⋅exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)ᵀ
 
     return nothing
 end
 
-function rmul!(A::AbstractMatrix{T}, B::AsymChkbrdPropagator{T};
-               M = nothing) where {T}
+function rmul!(
+    A::AbstractVecOrMat, B::AsymChkbrdPropagator;
+    M = nothing
+)
 
-    rmul_D!(A, B.expmΔτV) # A⋅exp(-Δτ⋅V)
+    expmΔτV = Diagonal(B.expmΔτV)
+    rmul!(A, expmΔτV) # A⋅exp(-Δτ⋅V)
     rmul!(A, B.expmΔτK) # A := A⋅B = [A⋅exp(-Δτ⋅V)]⋅exp(-Δτ⋅K)
 
     return nothing
@@ -429,18 +497,24 @@ end
 
 
 @doc raw"""
-    ldiv!(A::AbstractMatrix{T}, B::AbstractExactPropagator{T}, C::AbstractMatrix{T};
-          M::AbstractMatrix{T} = similar(A)) where {T}
+    ldiv!(
+        A::AbstractVecOrMat, B::AbstractExactPropagator, C::AbstractVecOrMat;
+        M::AbstractVecOrMat = similar(A)
+    )
 
-    ldiv!(A::AbstractMatrix{T}, B::AbstractChkbrdPropagator{T}, C::AbstractMatrix{T};
-          M = nothing) where {T}
+    ldiv!(
+        A::AbstractVecOrMat, B::AbstractChkbrdPropagator, C::AbstractVecOrMat;
+        M = nothing
+    )
 
 Calculate the matrix product ``A := B^{-1} \cdot C``, where ``B`` is a propagator matrix
 represented by an instance of a type inheriting from [`AbstractPropagator`](@ref).
 If `B` is asymmetric and `B.adjointed = true`, then ``A = [B^\dagger]^{-1} \cdot C`` is evaluated instead.
 """
-function ldiv!(A::AbstractMatrix{T}, B::AbstractExactPropagator{T}, C::AbstractMatrix{T};
-               M::AbstractMatrix{T} = similar(A)) where {T}
+function ldiv!(
+    A::AbstractVecOrMat, B::AbstractExactPropagator, C::AbstractVecOrMat;
+    M::AbstractVecOrMat = similar(A)
+)
 
     copyto!(A, C)
     ldiv!(B, A, M=M)
@@ -448,8 +522,10 @@ function ldiv!(A::AbstractMatrix{T}, B::AbstractExactPropagator{T}, C::AbstractM
     return nothing
 end
 
-function ldiv!(A::AbstractMatrix{T}, B::AbstractChkbrdPropagator{T}, C::AbstractMatrix{T};
-               M = nothing) where {T}
+function ldiv!(
+    A::AbstractVecOrMat, B::AbstractChkbrdPropagator, C::AbstractVecOrMat;
+    M = nothing
+)
 
     copyto!(A, C)
     ldiv!(B, A)
@@ -459,56 +535,76 @@ end
 
 
 @doc raw"""
-    ldiv!(B::SymExactPropagator{T}, A::AbstractMatrix{T};
-          M::AbstractMatrix{T} = similar(A)) where {T}
+    ldiv!(
+        B::SymExactPropagator, A::AbstractVecOrMat;
+        M::AbstractVecOrMat = similar(A)
+    )
     
-    ldiv!(B::AsymExactPropagator{T}, A::AbstractMatrix{T};
-          M::AbstractMatrix{T} = similar(A)) where {T}
+    ldiv!(
+        B::AsymExactPropagator, A::AbstractVecOrMat;
+        M::AbstractVecOrMat = similar(A)
+    )
 
-    ldiv!(B::SymChkbrdPropagator{T}, A::AbstractMatrix{T};
-          M = nothing) where {T}
+    ldiv!(
+        B::SymChkbrdPropagator, A::AbstractVecOrMat;
+        M = nothing
+    )
 
-    ldiv!(B::AsymChkbrdPropagator{T}, A::AbstractMatrix{T};
-          M = nothing) where {T}
+    ldiv!(
+        B::AsymChkbrdPropagator, A::AbstractVecOrMat;
+        M = nothing
+    )
 
 Calculate the matrix product ``A := B^{-1} \cdot A``, where ``B`` is a propagator matrix
 represented by an instance of a type inheriting from [`AbstractPropagator`](@ref).
 If `B` is asymmetric and `B.adjointed = true`, then ``A := [B^\dagger]^{-1} \cdot A`` is evaluated instead.
 """
-function ldiv!(B::SymExactPropagator{T}, A::AbstractMatrix{T};
-               M::AbstractMatrix{T} = similar(A)) where {T}
+function ldiv!(
+    B::SymExactPropagator, A::AbstractVecOrMat;
+    M::AbstractVecOrMat = similar(A)
+)
 
     mul!(M, B.exppΔτKo2, A) # exp(+Δτ⋅K/2)⋅A
-    ldiv_D!(B.expmΔτV, M) # exp(+Δτ⋅V)⋅exp(+Δτ⋅K/2)⋅A
+    expmΔτV = Diagonal(B.expmΔτV)
+    ldiv!(expmΔτV, M) # exp(+Δτ⋅V)⋅exp(+Δτ⋅K/2)⋅A
     mul!(A, B.exppΔτKo2, M) # A := B⁻¹⋅A = exp(+Δτ⋅K/2)⋅exp(+Δτ⋅V)⋅exp(+Δτ⋅K/2)⋅A
     
     return nothing
 end
 
-function ldiv!(B::AsymExactPropagator{T}, A::AbstractMatrix{T};
-               M::AbstractMatrix{T} = similar(A)) where {T}
-    
-    div_D!(M, B.expmΔτV, A) # exp(+Δτ⋅V)⋅A
+function ldiv!(
+    B::AsymExactPropagator, A::AbstractVecOrMat;
+    M::AbstractVecOrMat = similar(A)
+)
+
+    expmΔτV = Diagonal(B.expmΔτV)
+    ldiv!(M, expmΔτV, A) # exp(+Δτ⋅V)⋅A
     mul!(A, B.exppΔτK, M) # A := B⁻¹⋅A = exp(+Δτ⋅K)⋅[exp(+Δτ⋅V)⋅A]
     
     return nothing
 end
 
-function ldiv!(B::SymChkbrdPropagator{T}, A::AbstractMatrix{T};
-               M = nothing) where {T}
+function ldiv!(
+    B::SymChkbrdPropagator, A::AbstractVecOrMat;
+    M = nothing
+)
     
-    expmΔτKo2ᵀ = transpose(B.expmΔτKo2)
+    expmΔτKo2ᵀ = adjoint(B.expmΔτKo2)
     ldiv!(B.expmΔτKo2, A) # exp(+Δτ⋅K/2)⋅A
-    ldiv_D!(B.expmΔτV, A) # exp(+Δτ⋅V)⋅exp(+Δτ⋅K/2)⋅A
+    expmΔτV = Diagonal(B.expmΔτV)
+    ldiv!(expmΔτV, A) # exp(+Δτ⋅V)⋅exp(+Δτ⋅K/2)⋅A
     ldiv!(expmΔτKo2ᵀ, A) # A := B⁻¹⋅A = [exp(+Δτ⋅K/2)]ᵀ⋅exp(+Δτ⋅V)⋅exp(+Δτ⋅K/2)⋅A
     
     return nothing
 end
 
-function ldiv!(B::AsymChkbrdPropagator{T}, A::AbstractMatrix{T};
-               M = nothing) where {T}
+function ldiv!(
+    B::AsymChkbrdPropagator, A::AbstractVecOrMat;
+    M = nothing
+)
 
-    ldiv_D!(B.expmΔτV, A) # exp(+Δτ⋅V)⋅A
+    expmΔτV = Diagonal(B.expmΔτV)
+    ldiv!(expmΔτV, A) # exp(+Δτ⋅V)⋅A
     ldiv!(B.expmΔτK, A) # A := B⁻¹⋅A = exp(+Δτ⋅K)⋅[exp(+Δτ⋅V)⋅A]
     
     return nothing
@@ -516,18 +612,24 @@ end
 
 
 @doc raw"""
-    rldiv!(A::AbstractMatrix{T}, C::AbstractMatrix{T}, B::AbstractExactPropagator{T};
-          M::AbstractMatrix{T} = similar(A)) where {T}
+    rldiv!(
+        A::AbstractVecOrMat, C::AbstractVecOrMat, B::AbstractExactPropagator;
+        M::AbstractVecOrMat = similar(A)
+    )
 
-    rdiv!(A::AbstractMatrix{T}, C::AbstractMatrix{T}, B::AbstractChkbrdPropagator{T};
-          M = nothing) where {T}
+    rdiv!(
+        A::AbstractMatrix, C::AbstractMatrix, B::AbstractChkbrdPropagator;
+        M = nothing
+    )
 
 Calculate the matrix product ``A := C \cdot B^{-1}``, where ``B`` is a propagator matrix
 represented by an instance of a type inheriting from [`AbstractPropagator`](@ref).
 If `B` is asymmetric and `B` is asymmetric and `B.adjointed = true`, then ``A = C \cdot [B^\dagger]^{-1}`` is evaluated instead.
 """
-function rdiv!(A::AbstractMatrix{T}, C::AbstractMatrix{T}, B::AbstractExactPropagator{T};
-               M::AbstractMatrix{T} = similar(A)) where {T}
+function rdiv!(
+    A::AbstractVecOrMat, C::AbstractVecOrMat, B::AbstractExactPropagator;
+    M::AbstractVecOrMat = similar(A)
+)
 
     copyto!(A, C)
     rdiv!(A, B, M=M)
@@ -535,8 +637,10 @@ function rdiv!(A::AbstractMatrix{T}, C::AbstractMatrix{T}, B::AbstractExactPropa
     return nothing
 end
 
-function rdiv!(A::AbstractMatrix{T}, C::AbstractMatrix{T}, B::AbstractChkbrdPropagator{T};
-               M = nothing) where {T}
+function rdiv!(
+    A::AbstractVecOrMat, C::AbstractVecOrMat, B::AbstractChkbrdPropagator;
+    M = nothing
+)
 
     copyto!(A, C)
     rdiv!(A, B)
@@ -546,57 +650,78 @@ end
 
 
 @doc raw"""
-    rdiv!(A::AbstractMatrix{T}, B::SymExactPropagator{T};
-          M::AbstractMatrix{T} = similar(A)) where {T}
+    rdiv!(
+        A::AbstractVecOrMat, B::SymExactPropagator;
+        M::AbstractVecOrMat = similar(A)
+    )
     
-    rdiv!(A::AbstractMatrix{T}, B::AsymExactPropagator{T};
-          M::AbstractMatrix{T} = similar(A)) where {T}
+    rdiv!(
+        A::AbstractVecOrMat, B::AsymExactPropagator;
+        M::AbstractVecOrMat = similar(A)
+    )
 
-    rdiv!(A::AbstractMatrix{T}, B::SymChkbrdPropagator{T};
-          M = nothing) where {T}
+    rdiv!(
+        A::AbstractVecOrMat, B::SymChkbrdPropagator;
+        M = nothing
+    )
 
-    rdiv!(A::AbstractMatrix{T}, B::AsymChkbrdPropagator{T};
-          M = nothing) where {T}
+    rdiv!(
+        A::AbstractVecOrMat, B::AsymChkbrdPropagator;
+        M = nothing
+    )
 
 Calculate the matrix product ``A := A \cdot B^{-1}``, where ``B`` is a propagator matrix
 represented by an instance of a type inheriting from [`AbstractPropagator`](@ref).
 If `B` is asymmetric and `B.adjointed = true`, then ``A := A \cdot [B^\dagger]^{-1}`` is evaluated instead.
 """
-function rdiv!(A::AbstractMatrix{T}, B::SymExactPropagator{T};
-               M::AbstractMatrix{T} = similar(A)) where {T}
+function rdiv!(
+    A::AbstractVecOrMat, B::SymExactPropagator;
+    M::AbstractVecOrMat = similar(A)
+)
 
     mul!(M, A, B.exppΔτKo2) # A⋅exp(+Δτ⋅K/2)
-    rdiv_D!(M, B.expmΔτV) # A⋅exp(+Δτ⋅K/2)⋅exp(+Δτ⋅V)
+    expmΔτV = Diagonal(B.expmΔτV)
+    rdiv!(M, expmΔτV) # A⋅exp(+Δτ⋅K/2)⋅exp(+Δτ⋅V)
     mul!(A, M, B.exppΔτKo2) # A := A⋅B⁻¹ = A⋅exp(+Δτ⋅K/2)⋅exp(+Δτ⋅V)⋅exp(+Δτ⋅K/2)
     
     return nothing
 end
 
-function rdiv!(A::AbstractMatrix{T}, B::AsymExactPropagator{T};
-               M::AbstractMatrix{T} = similar(A)) where {T}
+function rdiv!(
+    A::AbstractVecOrMat, B::AsymExactPropagator;
+    M::AbstractVecOrMat = similar(A)
+)
 
     mul!(M, A, B.exppΔτK) # A⋅exp(+Δτ⋅K)
-    div_D!(A, M, B.expmΔτV) # A := A⋅B⁻¹ = [A⋅exp(+Δτ⋅K)]⋅exp(+Δτ⋅V)
+    expmΔτV = Diagonal(B.expmΔτV)
+    rdiv!(M, expmΔτV) # A⋅exp(+Δτ⋅K)⋅exp(+Δτ⋅V)
+    copyto!(A, M)
 
     return nothing
 end
 
-function rdiv!(A::AbstractMatrix{T}, B::SymChkbrdPropagator{T};
-               M = nothing) where {T}
+function rdiv!(
+    A::AbstractVecOrMat, B::SymChkbrdPropagator;
+    M = nothing
+)
 
     expmΔτKo2ᵀ = adjoint(B.expmΔτKo2)
     rdiv!(A, expmΔτKo2ᵀ) # A⋅[exp(+Δτ⋅K/2)]ᵀ
-    rdiv_D!(A, B.expmΔτV) # A⋅[exp(+Δτ⋅K/2)]ᵀ⋅exp(+Δτ⋅V)
+    expmΔτV = Diagonal(B.expmΔτV)
+    rdiv!(A, expmΔτV) # A⋅[exp(+Δτ⋅K/2)]ᵀ⋅exp(+Δτ⋅V)
     rdiv!(A, B.expmΔτKo2) # A := A⋅B⁻¹ = A⋅[exp(+Δτ⋅K/2)]ᵀ⋅exp(+Δτ⋅V)⋅exp(+Δτ⋅K/2)
     
     return nothing
 end
 
-function rdiv!(A::AbstractMatrix{T}, B::AsymChkbrdPropagator{T};
-               M = nothing) where {T}
+function rdiv!(
+    A::AbstractVecOrMat, B::AsymChkbrdPropagator;
+    M = nothing
+)
 
     rdiv!(A, B.expmΔτK) # A⋅exp(+ΔτK)
-    rdiv_D!(A, B.expmΔτV) # A := A⋅B⁻¹ = [A⋅exp(+ΔτK)]⋅exp(+Δτ⋅V)
+    expmΔτV = Diagonal(B.expmΔτV)
+    rdiv!(A, expmΔτV) # A := A⋅B⁻¹ = [A⋅exp(+ΔτK)]⋅exp(+Δτ⋅V)
 
     return nothing
 end

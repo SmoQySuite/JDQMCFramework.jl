@@ -2,6 +2,7 @@
 
 ## Propagator Types
 
+- [`JDQMCFramework.Continuous`](@ref)
 - [`AbstractPropagator`](@ref)
 - [`AbstractExactPropagator`](@ref)
 - [`AbstractChkbrdPropagator`](@ref)
@@ -12,6 +13,7 @@
 - [`SymPropagators`](@ref)
 
 ```@docs
+JDQMCFramework.Continuous
 AbstractPropagator
 AbstractExactPropagator
 AbstractChkbrdPropagator
@@ -100,14 +102,12 @@ build_hopping_matrix!
 
 ## Developer API
 
-- [`JDQMCFramework.Continuous`](@ref)
 - [`JDQMCFramework.update_factorizations!`](@ref)
 - [`JDQMCFramework.update_B̄!`](@ref)
 - [`JDQMCFramework.calculate_B̄!`](@ref)
 - [`JDQMCFramework.stabilization_interval`](@ref)
 
 ```@docs
-JDQMCFramework.Continuous
 JDQMCFramework.update_factorizations!
 JDQMCFramework.update_B̄!
 JDQMCFramework.calculate_B̄!
