@@ -729,18 +729,19 @@ end
 
 @doc raw"""
     local_update_det_ratio(
-        G::AbstractMatrix{T},
-        B::AbstractPropagator{T},
+        G::AbstractMatrix,
+        B::AbstractPropagator,
         V′::T, i::Int, Δτ::E
-    )::Tuple{T,T} where {T,E}
+    ) where {T<:Number, E<:AbstractFloat}
 
 Calculate the determinant ratio ``R_{l,i}`` associated with a local update to the equal-time
 Green's function ``G(\tau,\tau).`` Also returns ``\Delta_{l,i},`` which is defined below.
+Specifically, this function returns the tuple ``(R_{l,i}, \Delta_{l,i})``.
 
 # Arguments
 
-- `G::AbstractMatrix{T}`: Equal-time Green's function matrix ``G(\tau,\tau).``
-- `B::AbstractPropagator{T,E}`: Represents the propagator matrix ``B_l,`` where ``\tau = \Delta\tau \cdot l.``
+- `G::AbstractMatrix`: Equal-time Green's function matrix ``G(\tau,\tau).``
+- `B::AbstractPropagator`: Represents the propagator matrix ``B_l,`` where ``\tau = \Delta\tau \cdot l.``
 - `V′::T`: The new value for the ``V^{\prime}_{l,i,i}`` matrix element in the diagonal on-site energy matrix ``V_l.``
 - `i::Int`: Diagonal matrix element index in ``V_l`` being updated.
 - `Δτ::E`: Discretization in imaginary time ``\Delta\tau.``
@@ -777,14 +778,14 @@ then the matrix `G` needs to instead represent the transformed equal-time Green'
 ```
 """
 function local_update_det_ratio(
-    G::AbstractMatrix{T},
-    B::AbstractPropagator{T},
+    G::AbstractMatrix,
+    B::AbstractPropagator,
     V′::T, i::Int, Δτ::E
-)::Tuple{T,T} where {T,E}
+) where {T<:Number, E<:AbstractFloat}
 
-    Λ = B.expmΔτV::Vector{E}
-    Δ = exp(-Δτ*V′)/Λ[i] - 1
-    R = 1 + Δ*(1 - G[i,i])
+    Λ = B.expmΔτV
+    Δ = exp(-Δτ*V′)/Λ[i] - 1.0
+    R = 1.0 + Δ * (1.0 - G[i,i])
 
     return (R, Δ)
 end
@@ -794,9 +795,9 @@ end
     local_update_greens!(
         G::AbstractMatrix{T}, logdetG::E, sgndetG::T,
         B::AbstractPropagator{T},
-        R::T, Δ::T, i::Int,
+        R::T, Δ::F, i::Int,
         u::AbstractVector{T}, v::AbstractVector{T}
-    )::Tuple{E,T} where {T, E<:AbstractFloat}
+    )::Tuple{E,T} where {T<:Number, F<:Number, E<:AbstractFloat}
 
 Update the equal-time Green's function matrix `G` resulting from a local update in-place.
 
@@ -807,7 +808,7 @@ Update the equal-time Green's function matrix `G` resulting from a local update 
 - `sgndetG::T`: The sign/phase of the determinant of the initial Green's function matrix, ``\textrm{sign}( \det G(\tau,\tau) ).``
 - `B::AbstractPropagator{T,E}`: Propagator that needs to be updated to reflect accepted local update.
 - `R::T`: The determinant ratio ``R_{l,i} = \frac{\det G(\tau,\tau)}{\det G^\prime(\tau,\tau)}.``
-- `Δ::T`: Change in the exponentiated on-site energy matrix, ``\Delta_{l,i} = e^{-\Delta\tau (V^\prime_{l,(i,i)} - V_{l,(i,i)})} - 1.``
+- `Δ::F`: Change in the exponentiated on-site energy matrix, ``\Delta_{l,i} = e^{-\Delta\tau (V^\prime_{l,(i,i)} - V_{l,(i,i)})} - 1.``
 - `i::Int`: Matrix element of diagonal on-site energy matrix ``V_l`` that is being updated.
 - `u::AbstractVector{T}`: Vector of length `size(G,1)` that is used to avoid dynamic memory allocations.
 - `v::AbstractVector{T}`: Vector of length `size(G,2)` that is used to avoid dynamic memory allocations.
@@ -828,9 +829,9 @@ Refer to the [`local_update_det_ratio`](@ref) docstring for more information.
 function local_update_greens!(
     G::AbstractMatrix{T}, logdetG::E, sgndetG::T,
     B::AbstractPropagator{T},
-    R::T, Δ::T, i::Int,
+    R::T, Δ::F, i::Int,
     u::AbstractVector{T}, v::AbstractVector{T}
-)::Tuple{E,T} where {T, E<:AbstractFloat}
+)::Tuple{E,T} where {T<:Number, F<:Number, E<:AbstractFloat}
 
     expmΔτV = B.expmΔτV::Vector{E}
 
@@ -839,9 +840,8 @@ function local_update_greens!(
     copyto!(u, G0i)
 
     # v = G[i,:] - I[i,:] <== row vector
-    Gi0 = @view G[i,:]
-    copyto!(v, Gi0) # v = G[i,:]
-    v[i] = v[i] - 1 # v = G[i,:] - I[i,:]
+    @views @. v = conj(G[i,:]) # v = G[i,:]
+    v[i] = v[i] - 1.0 # v = G[i,:] - I[i,:]
 
     # G′ = G + (Δ/R)⋅[u⨂v] = G + (Δ/R)⋅G[:,i]⨂(G[i,:] - I[i,:])
     # where ⨂ denotes an outer product

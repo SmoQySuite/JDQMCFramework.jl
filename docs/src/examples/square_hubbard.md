@@ -99,7 +99,7 @@ that writes relevant information and measurement results to file.
 
 ````@example square_hubbard
 # Nearest-neighbor hopping amplitude.
-t = 1.0
+t = 1.0 * exp(1.0im * π/16)
 println("Nearest-neighbor hopping amplitude, t = ", t)
 
 # Hubbard interaction.
@@ -284,7 +284,7 @@ else
     for bond in 1:N_bonds
         i, j = neighbor_table[1, bond], neighbor_table[2, bond]
         K[i,j] = -t
-        K[j,i] = -t
+        K[j,i] = -conj(t)
     end
 
     # Calculate the exponentiated kinetic energy matrix, exp(-Δτ⋅K).
@@ -343,8 +343,8 @@ elseif checkerboard && !symmetric
 
     # Propagator defined as B[σ,l] = exp{-Δτ⋅V[σ,l]}⋅exp{-Δτ⋅K},
     # where the dense matrix exp{-Δτ⋅K} is approximated by the sparse checkerboard matrix.
-    Bup = jdqmcf.AbstractChkbrdPropagator{T_expnΔτK, T_expnΔτV}[]
-    Bdn = jdqmcf.AbstractChkbrdPropagator{T_expnΔτK, T_expnΔτV}[]
+    Bup = jdqmcf.AsymChkbrdPropagator{T_expnΔτK, T_expnΔτV}[]
+    Bdn = jdqmcf.AsymChkbrdPropagator{T_expnΔτK, T_expnΔτV}[]
 
 elseif !checkerboard && symmetric
 
@@ -902,15 +902,15 @@ to account for the sign problem.
 ````@example square_hubbard
 # Calculate the average sign for the simulation.
 sign_avg, sign_std = jdqmcm.jackknife(identity, avg_sign)
-println("Avg Sign, S = ", sign_avg, " +/- ", sign_std)
+println("Avg Sign, S = ", real(sign_avg), " +/- ", sign_std)
 
 # Calculate the average density.
 density_avg, density_std = jdqmcm.jackknife(/, density, avg_sign)
-println("Density, n = ", density_avg, " +/- ", density_std)
+println("Density, n = ", real(density_avg), " +/- ", density_std)
 
 # Calculate the average double occupancy.
 double_occ_avg, double_occ_std = jdqmcm.jackknife(/, double_occ, avg_sign)
-println("Double occupancy, nup_ndn = ", double_occ_avg, " +/- ", double_occ_std)
+println("Double occupancy, nup_ndn = ", real(double_occ_avg), " +/- ", double_occ_std)
 ````
 
 Now we move onto processing the measured correlation function data.
@@ -949,8 +949,8 @@ measurement based on the input binned correlation function data.
 # Calculate average correlation function values based on binned data.
 function correlation_stats(
     S::AbstractArray{Complex{T}},
-    avg_sign::Vector{T}
-) where {T<:AbstractFloat}
+    avg_sign::Vector{E}
+) where {T<:AbstractFloat, E<:Number}
 
     # Allocate arrays to contain the mean and standard deviation of
     # measured correlation function.
@@ -961,7 +961,7 @@ function correlation_stats(
     N_bins = length(avg_sign)
 
     # Preallocate arrays to make the jackknife error analysis faster.
-    jackknife_samples = (zeros(Complex{T}, N_bins), zeros(T, N_bins))
+    jackknife_samples = (zeros(Complex{T}, N_bins), zeros(E, N_bins))
     jackknife_g       = zeros(Complex{T}, N_bins)
 
     # Iterate over correlation functions.
@@ -1172,6 +1172,6 @@ P_dwave_avg, P_dwave_std = correlation_stats(P_dwave, avg_sign)
 # Report the d-wave pair susceptibility.
 Pd_avg = real(P_dwave_avg[1,1])
 Pd_std = P_dwave_std[1,1]
-println("Extended s-wave pair susceptibility, P_d = ", Pd_avg, " +/- ", Pd_std)
+println("Extended d-wave pair susceptibility, P_d = ", Pd_avg, " +/- ", Pd_std)
 ````
 
