@@ -24,7 +24,7 @@ BLAS.set_num_threads(1)
 FFTW.set_num_threads(1)
 
 # Nearest-neighbor hopping amplitude.
-t = 1.0
+t = 1.0 * exp(1.0im * π/16)
 println("Nearest-neighbor hopping amplitude, t = ", t)
 
 # Hubbard interaction.
@@ -149,7 +149,7 @@ bond_nx = lu.Bond(
 bond_ny = lu.Bond(
     orbitals = (1,1),
     displacement = [0,-1]
-)
+);
 
 # Define Δτ′=Δτ/2 if symmetric = true, otherwise Δτ′=Δτ
 Δτ′ = symmetric ? Δτ/2 : Δτ
@@ -168,7 +168,7 @@ else
     for bond in 1:N_bonds
         i, j = neighbor_table[1, bond], neighbor_table[2, bond]
         K[i,j] = -t
-        K[j,i] = -t
+        K[j,i] = -conj(t)
     end
 
     # Calculate the exponentiated kinetic energy matrix, exp(-Δτ⋅K).
@@ -177,7 +177,7 @@ else
 
     # Calculate the inverse of the exponentiated kinetic energy matrix, exp(+Δτ⋅K).
     exppΔτ′K = exp(+Δτ′*K)
-end
+end;
 
 # Define constant associated Ising Hubbard-Stratonovich (HS) transformation.
 α = acosh(exp(Δτ*U/2))
@@ -203,8 +203,8 @@ elseif checkerboard && !symmetric
 
     # Propagator defined as B[σ,l] = exp{-Δτ⋅V[σ,l]}⋅exp{-Δτ⋅K},
     # where the dense matrix exp{-Δτ⋅K} is approximated by the sparse checkerboard matrix.
-    Bup = jdqmcf.AbstractChkbrdPropagator{T_expnΔτK, T_expnΔτV}[]
-    Bdn = jdqmcf.AbstractChkbrdPropagator{T_expnΔτK, T_expnΔτV}[]
+    Bup = jdqmcf.AsymChkbrdPropagator{T_expnΔτK, T_expnΔτV}[]
+    Bdn = jdqmcf.AsymChkbrdPropagator{T_expnΔτK, T_expnΔτV}[]
 
 elseif !checkerboard && symmetric
 
@@ -219,7 +219,7 @@ elseif !checkerboard && !symmetric
     # where the dense matrix exp{-Δτ⋅K} is exactly calculated.
     Bup = jdqmcf.AsymExactPropagator{T_expnΔτK, T_expnΔτV}[]
     Bdn = jdqmcf.AsymExactPropagator{T_expnΔτK, T_expnΔτV}[]
-end
+end;
 
 # Iterate over time-slices.
 for l in 1:Lτ
@@ -262,7 +262,7 @@ end
 
 # Initialize a FermionGreensCalculator for both spin up and down electrons.
 fermion_greens_calc_up = jdqmcf.FermionGreensCalculator(Bup, β, Δτ, n_stab)
-fermion_greens_calc_dn = jdqmcf.FermionGreensCalculator(Bdn, β, Δτ, n_stab)
+fermion_greens_calc_dn = jdqmcf.FermionGreensCalculator(Bdn, β, Δτ, n_stab);
 
 # Calculate spin-up equal-time Green's function matrix.
 Gup = zeros(typeof(t), N, N)
@@ -270,7 +270,7 @@ logdetGup, sgndetGup = jdqmcf.calculate_equaltime_greens!(Gup, fermion_greens_ca
 
 # Calculate spin-down equal-time Green's function matrix.
 Gdn = zeros(typeof(t), N, N)
-logdetGdn, sgndetGdn = jdqmcf.calculate_equaltime_greens!(Gdn, fermion_greens_calc_dn)
+logdetGdn, sgndetGdn = jdqmcf.calculate_equaltime_greens!(Gdn, fermion_greens_calc_dn);
 
 # Allcoate time-displaced Green's functions.
 Gup_τ0 = zero(Gup) # Gup(τ,0)
@@ -278,7 +278,7 @@ Gup_0τ = zero(Gup) # Gup(0,τ)
 Gup_ττ = zero(Gup) # Gup(τ,τ)
 Gdn_τ0 = zero(Gdn) # Gdn(τ,0)
 Gdn_0τ = zero(Gdn) # Gdn(0,τ)
-Gdn_ττ = zero(Gdn) # Gdn(τ,τ)
+Gdn_ττ = zero(Gdn); # Gdn(τ,τ)
 
 # Vector to contain binned average sign measurement.
 avg_sign = zeros(eltype(Gup), N_bins)
@@ -308,7 +308,7 @@ C_ext_swave = zeros(Complex{Float64}, N_bins, L, L, Lτ+1)
 C_dwave = zeros(Complex{Float64}, N_bins, L, L, Lτ+1)
 
 # Array to contain binned momentum-space d-wave pair susceptibility.
-P_d_q = zeros(Complex{Float64}, N_bins, L, L)
+P_d_q = zeros(Complex{Float64}, N_bins, L, L);
 
 # Function to perform local updates to all Ising HS fields.
 function local_update!(
@@ -439,7 +439,7 @@ function _local_update!(
     acceptance_rate = accepted / N
 
     return logdetGup, sgndetGup, logdetGdn, sgndetGdn, acceptance_rate
-end
+end;
 
 # Make measurements.
 function make_measurements!(
@@ -569,7 +569,7 @@ function make_correlation_measurements!(
     end
 
     return nothing
-end
+end;
 
 # High-level function to run the DQMC simulation.
 function run_simulation!(
@@ -661,7 +661,7 @@ function run_simulation!(
     println()
 
     return acceptance_rate, δG
-end
+end;
 
 # Run the DQMC simulation.
 acceptance_rate, δG = run_simulation!(
@@ -677,15 +677,15 @@ println("Largest Numerical Error = ", δG)
 
 # Calculate the average sign for the simulation.
 sign_avg, sign_std = jdqmcm.jackknife(identity, avg_sign)
-println("Avg Sign, S = ", sign_avg, " +/- ", sign_std)
+println("Avg Sign, S = ", real(sign_avg), " +/- ", sign_std)
 
 # Calculate the average density.
 density_avg, density_std = jdqmcm.jackknife(/, density, avg_sign)
-println("Density, n = ", density_avg, " +/- ", density_std)
+println("Density, n = ", real(density_avg), " +/- ", density_std)
 
 # Calculate the average double occupancy.
 double_occ_avg, double_occ_std = jdqmcm.jackknife(/, double_occ, avg_sign)
-println("Double occupancy, nup_ndn = ", double_occ_avg, " +/- ", double_occ_std)
+println("Double occupancy, nup_ndn = ", real(double_occ_avg), " +/- ", double_occ_std)
 
 # Given the binned time-displaced correlation function/structure factor data,
 # calculate and return the corresponding binned susceptibility data.
@@ -710,8 +710,8 @@ end
 # Calculate average correlation function values based on binned data.
 function correlation_stats(
     S::AbstractArray{Complex{T}},
-    avg_sign::Vector{T}
-) where {T<:AbstractFloat}
+    avg_sign::Vector{E}
+) where {T<:AbstractFloat, E<:Number}
 
     # Allocate arrays to contain the mean and standard deviation of
     # measured correlation function.
@@ -722,7 +722,7 @@ function correlation_stats(
     N_bins = length(avg_sign)
 
     # Preallocate arrays to make the jackknife error analysis faster.
-    jackknife_samples = (zeros(Complex{T}, N_bins), zeros(T, N_bins))
+    jackknife_samples = (zeros(Complex{T}, N_bins), zeros(E, N_bins))
     jackknife_g       = zeros(Complex{T}, N_bins)
 
     # Iterate over correlation functions.
@@ -793,7 +793,7 @@ C_density_avg, C_density_std = correlation_stats(C_density, avg_sign)
 S_density_avg, S_density_std = correlation_stats(S_density, avg_sign)
 
 # Calculate the average charge susceptibility for all scattering momentum q.
-χ_density_avg, χ_density_std = correlation_stats(χ_spinz, avg_sign)
+χ_density_avg, χ_density_std = correlation_stats(χ_spinz, avg_sign);
 
 # Fourier transform binned position space local s-wave correlation function data to get
 # the binned momentum space local s-wave structure factor data.
@@ -844,4 +844,4 @@ P_dwave_avg, P_dwave_std = correlation_stats(P_dwave, avg_sign)
 # Report the d-wave pair susceptibility.
 Pd_avg = real(P_dwave_avg[1,1])
 Pd_std = P_dwave_std[1,1]
-println("Extended s-wave pair susceptibility, P_d = ", Pd_avg, " +/- ", Pd_std)
+println("Extended d-wave pair susceptibility, P_d = ", Pd_avg, " +/- ", Pd_std)
