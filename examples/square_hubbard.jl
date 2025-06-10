@@ -88,7 +88,7 @@ FFTW.set_num_threads(1)
 # that writes relevant information and measurement results to file.
 
 ## Nearest-neighbor hopping amplitude.
-t = 1.0 * exp(1.0im * π/16)
+t = 1.0
 println("Nearest-neighbor hopping amplitude, t = ", t)
 
 ## Hubbard interaction.
