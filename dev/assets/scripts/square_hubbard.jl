@@ -24,7 +24,7 @@ BLAS.set_num_threads(1)
 FFTW.set_num_threads(1)
 
 # Nearest-neighbor hopping amplitude.
-t = 1.0 * exp(1.0im * π/16)
+t = 1.0
 println("Nearest-neighbor hopping amplitude, t = ", t)
 
 # Hubbard interaction.
@@ -348,8 +348,8 @@ function local_update!(
         # the transformation G ==> G̃ = exp{+Δτ⋅K/2}⋅G⋅exp{-Δτ⋅K/2}.
         # If asymmetric propagator definition is used (symmetric = false),
         # then this does nothing.
-        jdqmcf.partially_wrap_greens_forward!(Gup, Bup[l], A)
-        jdqmcf.partially_wrap_greens_forward!(Gdn, Bdn[l], A)
+        jdqmcf.partially_wrap_greens_reverse!(Gup, Bup[l], A)
+        jdqmcf.partially_wrap_greens_reverse!(Gdn, Bdn[l], A)
 
         # Get the HS fields associated with the current imaginary time-slice.
         s_l = @view s[:,l]
@@ -367,8 +367,8 @@ function local_update!(
         # the transformation G̃ ==> G = exp{-Δτ⋅K/2}⋅G̃⋅exp{+Δτ⋅K/2}.
         # If asymmetric propagator definition is used (symmetric = false),
         # then this does nothing.
-        jdqmcf.partially_wrap_greens_reverse!(Gup, Bup[l], A)
-        jdqmcf.partially_wrap_greens_reverse!(Gdn, Bdn[l], A)
+        jdqmcf.partially_wrap_greens_forward!(Gup, Bup[l], A)
+        jdqmcf.partially_wrap_greens_forward!(Gdn, Bdn[l], A)
 
         # Periodically re-calculate the Green's function matrix for numerical stability.
         logdetGup, sgndetGup, δGup, δθup = jdqmcf.stabilize_equaltime_greens!(
@@ -581,6 +581,9 @@ function run_simulation!(
     C_loc_swave, C_ext_swave, C_dwave
 )
 
+    # Get start time for simulation.
+    t_start = time()
+
     # Initialize variable to keep track of largest corrected numerical error.
     δG = 0.0
 
@@ -660,11 +663,14 @@ function run_simulation!(
     println("Simuilation Complete.")
     println()
 
-    return acceptance_rate, δG
+    # Get simulation runtime
+    runtime = time() - t_start
+
+    return acceptance_rate, δG, runtime
 end;
 
 # Run the DQMC simulation.
-acceptance_rate, δG = run_simulation!(
+acceptance_rate, δG, runtime = run_simulation!(
     s, μ, α, Δτ, rng, N_burnin, N_bins, N_binsize, N_sweeps,
     Gup, logdetGup, sgndetGup, Gup_ττ, Gup_τ0, Gup_0τ, Bup, fermion_greens_calc_up,
     Gdn, logdetGdn, sgndetGdn, Gdn_ττ, Gdn_τ0, Gdn_0τ, Bdn, fermion_greens_calc_dn,
@@ -674,6 +680,7 @@ acceptance_rate, δG = run_simulation!(
 )
 println("Acceptance Rate = ", acceptance_rate)
 println("Largest Numerical Error = ", δG)
+println("Simulation Run Time (sec) = ", runtime)
 
 # Calculate the average sign for the simulation.
 sign_avg, sign_std = jdqmcm.jackknife(identity, avg_sign)
