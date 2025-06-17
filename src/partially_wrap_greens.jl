@@ -1,9 +1,9 @@
 @doc raw"""
-    partially_wrap_greens_forward!(
-        G::Matrix{T},
-        B::P,
-        M::Matrix{T} = similar(G)
-    ) where {T, E, P<:AbstractPropagator{T,E}}
+    partially_wrap_greens_reverse!(
+        G::Matrix{H},
+        B::AbstractPropagator,
+        M::Matrix{H} = similar(G)
+    ) where {H<:Continuous}
 
 If the propagator `B` is represented in the symmetric form
 ```math
@@ -16,20 +16,20 @@ then apply the transformation
 ```
 to the equal-time Green's function matrix `G` in-place.
 """
-function partially_wrap_greens_forward!(
-    G::Matrix{T},
-    B::P,
-    M::Matrix{T} = similar(G)
-) where {T, E, P<:AbstractPropagator{T,E}}
+function partially_wrap_greens_reverse!(
+    G::Matrix{H},
+    B::AbstractPropagator,
+    M::Matrix{H} = similar(G)
+) where {H<:Continuous}
 
     # only apply transformation if symmetric/hermitian definition for propagator is being used
-    _partially_wrap_greens_forward!(G, B, M)
+    _partially_wrap_greens_reverse!(G, B, M)
 
     return nothing
 end
 
 # perform the G̃(τ,τ) = Γ⁻¹[l]⋅G(τ,τ)⋅Γ[l] transformation in the case the Γ[l]=exp(-Δτ⋅K[l]/2) is the exactly exponentiated hopping matrix
-function _partially_wrap_greens_forward!(G::Matrix{T}, B::SymExactPropagator{T,E}, M::Matrix{T}) where {T,E}
+function _partially_wrap_greens_reverse!(G::Matrix{H}, B::SymExactPropagator, M::Matrix{H}) where {H<:Continuous}
 
     (; expmΔτKo2, exppΔτKo2) = B
     mul!(M, G, expmΔτKo2) # G(τ,τ)⋅Γ[l]
@@ -39,7 +39,7 @@ function _partially_wrap_greens_forward!(G::Matrix{T}, B::SymExactPropagator{T,E
 end
 
 # perform the G̃(τ,τ) = Γ⁻¹[l]⋅G(τ,τ)⋅Γ[l] transformation in the case the Γ[l] is the checkerboard approximation of exp(-Δτ⋅K[l]/2)
-function _partially_wrap_greens_forward!(G::Matrix{T}, B::SymChkbrdPropagator{T,E}, ignore...) where {T,E}
+function _partially_wrap_greens_reverse!(G::Matrix, B::SymChkbrdPropagator, ignore...)
 
     (; expmΔτKo2) = B
     rmul!(G, expmΔτKo2) # G(τ,τ)⋅Γ[l]
@@ -49,23 +49,23 @@ function _partially_wrap_greens_forward!(G::Matrix{T}, B::SymChkbrdPropagator{T,
 end
 
 # do nothing for asymmetric propagator
-function _partially_wrap_greens_forward!(G::Matrix{T}, B::AsymExactPropagator{T,E}, ignore...) where {T,E}
+function _partially_wrap_greens_reverse!(G::Matrix, B::AsymExactPropagator, ignore...)
 
     return nothing
 end
 
 # do nothing for asymmetric propagator
-function _partially_wrap_greens_forward!(G::Matrix{T}, B::AsymChkbrdPropagator{T,E}, ignore...) where {T,E}
+function _partially_wrap_greens_reverse!(G::Matrix, B::AsymChkbrdPropagator, ignore...)
 
     return nothing
 end
 
 @doc raw"""
-    partially_wrap_greens_reverse!(
-        G::Matrix{T},
-        B::P,
-        M::Matrix{T} = similar(G)
-    ) where {T, E, P<:AbstractPropagator{T,E}}
+    partially_wrap_greens_forward!(
+        G::Matrix{H},
+        B::AbstractPropagator,
+        M::Matrix{H} = similar(G)
+    ) where {H<:Continuous}
 
 If the propagator `B` is represented in the symmetric form
 ```math
@@ -78,20 +78,20 @@ G(\tau,\tau) = \Gamma_l(\Delta\tau/2) \cdot \tilde{G}(\tau,\tau) \cdot \Gamma_l^
 ```
 to the equal-time Green's function matrix `G` in-place.
 """
-function partially_wrap_greens_reverse!(
-    G::Matrix{T},
-    B::P,
-    M::Matrix{T} = similar(G)
-) where {T, E, P<:AbstractPropagator{T,E}}
+function partially_wrap_greens_forward!(
+    G::Matrix{H},
+    B::AbstractPropagator,
+    M::Matrix{H} = similar(G)
+) where {H<:Continuous}
 
     # only apply transformation if symmetric/hermitian definition for propagator is being used
-    _partially_wrap_greens_reverse!(G, B, M)
+    _partially_wrap_greens_forward!(G, B, M)
 
     return nothing
 end
 
 # perform the G(τ,τ) = Γ[l]⋅G̃(τ,τ)⋅Γ⁻¹[l] transformation in the case the Γ[l]=exp(-Δτ⋅K[l]/2) is the exactly exponentiated hopping matrix
-function _partially_wrap_greens_reverse!(G::Matrix{T}, B::SymExactPropagator{T,E}, M::Matrix{T}) where {T,E}
+function _partially_wrap_greens_forward!(G::Matrix{H}, B::SymExactPropagator, M::Matrix{H}) where {H<:Continuous}
 
     (; expmΔτKo2, exppΔτKo2) = B
     mul!(M, G, exppΔτKo2) # G̃(τ,τ)⋅Γ⁻¹[l]
@@ -101,7 +101,7 @@ function _partially_wrap_greens_reverse!(G::Matrix{T}, B::SymExactPropagator{T,E
 end
 
 # perform the G(τ,τ) = Γ[l]⋅G̃(τ,τ)⋅Γ⁻¹[l] transformation in the case the Γ[l] is the checkerboard approximation of exp(-Δτ⋅K[l]/2)
-function _partially_wrap_greens_reverse!(G::Matrix{T}, B::SymChkbrdPropagator{T,E}, ignore...) where {T,E}
+function _partially_wrap_greens_forward!(G::Matrix, B::SymChkbrdPropagator, ignore...)
 
     (; expmΔτKo2) = B
     rdiv!(G, expmΔτKo2) # G̃(τ,τ)⋅Γ⁻¹[l]
@@ -111,13 +111,13 @@ function _partially_wrap_greens_reverse!(G::Matrix{T}, B::SymChkbrdPropagator{T,
 end
 
 # do nothing for asymmetric propagator
-function _partially_wrap_greens_reverse!(G::Matrix{T}, B::AsymExactPropagator{T,E}, ignore...) where {T,E}
+function _partially_wrap_greens_forward!(G::Matrix, B::AsymExactPropagator, ignore...)
 
     return nothing
 end
 
 # do nothing for asymmetric propagator
-function _partially_wrap_greens_reverse!(G::Matrix{T}, B::AsymChkbrdPropagator{T,E}, ignore...) where {T,E}
+function _partially_wrap_greens_forward!(G::Matrix, B::AsymChkbrdPropagator, ignore...)
 
     return nothing
 end

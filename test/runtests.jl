@@ -2,6 +2,7 @@ using JDQMCFramework
 using Test
 using LinearAlgebra
 using LatticeUtilities
+using Checkerboard
 
 # fermi function
 function fermi(ϵ, β)
@@ -49,17 +50,18 @@ end
     lattice = Lattice(L = [L,L], periodic = [true,true])
     bond_x = Bond(orbitals = (1,1), displacement = [1,0])
     bond_y = Bond(orbitals = (1,1), displacement = [0,1])
-    neighbor_table = build_neighbor_table([bond_x, bond_y], unit_cell, lattice)
+    nt = build_neighbor_table([bond_x, bond_y], unit_cell, lattice)
 
     # calculate number of sites in lattice
     N = nsites(unit_cell, lattice)
 
     # calculate number of bonds in lattice
-    Nbonds = size(neighbor_table, 2)
+    Nbonds = size(nt, 2)
 
     # build hopping matrix
+    ts = fill(t, Nbonds)
     K = zeros(typeof(t), N, N)
-    build_hopping_matrix!(K, neighbor_table, fill(t, Nbonds))
+    build_hopping_matrix!(K, nt, ts)
 
     # build diagonal on-site energy matrix
     V = fill(-μ, N)
@@ -79,10 +81,56 @@ end
     # calculate equal-time Green's function matrix
     G, logdetG, sgndetG = retarded_greens(0, β, ϵ, U)
 
-    # define vector of propagators
+    # define exact exponentiated potential and kinetic energy matrices
     expmΔτV = exp.(-Δτ*V)
     expmΔτK = exp(-Δτ*K)
     exppΔτK = exp(+Δτ*K)
+
+    # construct symmetric exact propagator
+    B_sym_exact = SymExactPropagator(expmΔτV, expmΔτK, exppΔτK)
+
+    # test multiplies
+    G′ = copy(G)
+    lmul!(B_sym_exact, G′)
+    ldiv!(B_sym_exact, G′)
+    @test G′ ≈ G
+    rmul!(G′, B_sym_exact)
+    rdiv!(G′, B_sym_exact)
+    @test G′ ≈ G
+
+    # construct asymmetric checkerboard propagator
+    expnΔτK_chkbrd = CheckerboardMatrix(nt, ts, Δτ)
+    B_asym_chkbrd = AsymChkbrdPropagator(expmΔτV, expnΔτK_chkbrd)
+
+    # test multiplies
+    G′ = copy(G)
+    lmul!(B_asym_chkbrd, G′)
+    ldiv!(B_asym_chkbrd, G′)
+    @test G′ ≈ G
+    rmul!(G′, B_asym_chkbrd)
+    rdiv!(G′, B_asym_chkbrd)
+    @test G′ ≈ G
+
+    # construct asymmetric checkerboard propagator
+    expnΔτKo2_chkbrd = CheckerboardMatrix(nt, ts, Δτ/2)
+    B_sym_chkbrd = SymChkbrdPropagator(expmΔτV, expnΔτKo2_chkbrd)
+
+    # test multiplies
+    G′ = copy(G)
+    lmul!(B_sym_chkbrd, G′)
+    ldiv!(B_sym_chkbrd, G′)
+    @test G′ ≈ G
+    rmul!(G′, B_sym_chkbrd)
+    rdiv!(G′, B_sym_chkbrd)
+    @test G′ ≈ G
+
+    # test partially wrap green's functions
+    G′ = copy(G)
+    partially_wrap_greens_reverse!(G′, B_sym_chkbrd)
+    partially_wrap_greens_forward!(G′, B_sym_chkbrd)
+    @test G′ ≈ G
+
+    # define vector of asymmetric exact propagators
     Bup = AsymExactPropagator{eltype(expmΔτK),eltype(expmΔτV)}[]; # spin up propagators
     Bdn = AsymExactPropagator{eltype(expmΔτK),eltype(expmΔτV)}[]; # spin down propagators
     for l in 1:Lτ

@@ -478,7 +478,7 @@ function rmul!(
     rmul!(A, B.expmΔτKo2) # A⋅exp(-Δτ⋅K/2)
     expmΔτV = Diagonal(B.expmΔτV)
     rmul!(A, expmΔτV) # A⋅exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)
-    rmul!(A, expmΔτKo2ᵀ) # A := A⋅B = A⋅exp(-Δτ⋅K/2)ᵀ⋅exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)ᵀ
+    rmul!(A, expmΔτKo2ᵀ) # A := A⋅B = A⋅exp(-Δτ⋅K/2)⋅exp(-Δτ⋅V)⋅exp(-Δτ⋅K/2)ᵀ
 
     return nothing
 end
@@ -612,7 +612,7 @@ end
 
 
 @doc raw"""
-    rldiv!(
+    rdiv!(
         A::AbstractVecOrMat, C::AbstractVecOrMat, B::AbstractExactPropagator;
         M::AbstractVecOrMat = similar(A)
     )

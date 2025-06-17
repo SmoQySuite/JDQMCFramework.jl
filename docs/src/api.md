@@ -44,8 +44,8 @@ FermionGreensCalculator(::FermionGreensCalculator{T,E}) where {T,E}
 - [`stabilize_unequaltime_greens!`](@ref)
 - [`local_update_det_ratio`](@ref)
 - [`local_update_greens!`](@ref)
-- [`partially_wrap_greens_forward!`](@ref)
 - [`partially_wrap_greens_reverse!`](@ref)
+- [`partially_wrap_greens_forward!`](@ref)
 
 ```@docs
 calculate_equaltime_greens!
@@ -56,8 +56,8 @@ propagate_unequaltime_greens!
 stabilize_unequaltime_greens!
 local_update_det_ratio
 local_update_greens!
-partially_wrap_greens_forward!
 partially_wrap_greens_reverse!
+partially_wrap_greens_forward!
 ```
 
 ## Overloaded Functions
