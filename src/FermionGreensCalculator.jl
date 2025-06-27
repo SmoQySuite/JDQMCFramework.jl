@@ -38,15 +38,15 @@ end
 @doc raw"""
     FermionGreensCalculator(
         B::AbstractVector{P},
-        β::E, Δτ::E, n_stab::Int
-    ) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
+        β::R, Δτ::R, n_stab::Int
+    ) where {T, E, R<:AbstractFloat, P<:AbstractPropagator{T,E}}
 
 Initialize and return [`FermionGreensCalculator`](@ref) struct based on the vector of propagators `B` passed to the function.
 """
 function FermionGreensCalculator(
     B::AbstractVector{P},
-    β::E, Δτ::E, n_stab::Int
-) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
+    β::R, Δτ::R, n_stab::Int
+) where {T, E, R<:AbstractFloat, P<:AbstractPropagator{T,E}}
 
     # get length of imaginary time axis
     Lτ = eval_length_imaginary_axis(β, Δτ)
@@ -60,18 +60,21 @@ function FermionGreensCalculator(
     # make sure that the discretization in imaginary time is valid
     @assert (Lτ*Δτ) ≈ β
 
+    # determine type of propagator matrix elements
+    H = (T<:Complex || E<:Complex) ? Complex{R} : R
+
     # calculate the number of numerical stabalization intervals
     N_stab = ceil(Int, Lτ/n_stab)
 
     # allocate array to represent partical products of B matrices,
     # setting each equal to the identity matrix
-    B_bar = Matrix{T}[]
+    B_bar = Matrix{H}[]
     for n in 1:N_stab
-        push!(B_bar, Matrix{T}(I, N, N))
+        push!(B_bar, Matrix{H}(I, N, N))
     end
 
     # calculate scratch matrix
-    G′ = Matrix{T}(I, N, N)
+    G′ = Matrix{H}(I, N, N)
 
     # construct vector of LDR factorization to represent B(τ,0) and B(β,τ) matrices
     ldr_ws = ldr_workspace(G′)
@@ -84,7 +87,7 @@ function FermionGreensCalculator(
     forward = false
 
     # allocate FermionGreensCalculator struct
-    fgc = FermionGreensCalculator(forward, l, n_stab, N_stab, N, β, Δτ, Lτ, B_bar, F, G′, ldr_ws)
+    fgc = FermionGreensCalculator{H,R}(forward, l, n_stab, N_stab, N, β, Δτ, Lτ, B_bar, F, G′, ldr_ws)
 
     # initialize FermionGreensCalculator struct
     for l in fgc
@@ -297,9 +300,9 @@ end
 
 @doc raw"""
     update_factorizations!(
-        fgc::FermionGreensCalculator{T,E},
+        fgc::FermionGreensCalculator,
         B::AbstractVector{P}
-    ) where {T, E, P<:AbstractPropagator{T}}
+    ) where {P<:AbstractPropagator}
 
 If current imaginary time slice `fgc.l` corresponds to the boundary of a stabilization interval,
 calculate a LDR factorization to represent ``B(0, \tau)`` or ``B(\tau-\Delta\tau, \beta)``
@@ -310,9 +313,9 @@ This method should be called *after* all changes to the current time slice propa
 This method will also recompute ``\bar{B}_n`` as needed.
 """
 function update_factorizations!(
-    fgc::FermionGreensCalculator{T,E},
+    fgc::FermionGreensCalculator,
     B::AbstractVector{P}
-) where {T, E, P<:AbstractPropagator{T}}
+) where {P<:AbstractPropagator}
 
     # update B_bar matrix when necessary
     update_B̄!(fgc, B)
@@ -388,18 +391,18 @@ end
 
 @doc raw"""
     update_B̄!(
-        fgc::FermionGreensCalculator{T,E},
+        fgc::FermionGreensCalculator,
         B::AbstractVector{P}
-    ) where {T,E,P<:AbstractPropagator{T}}
+    ) where {P<:AbstractPropagator}
 
 Recalculate ``\bar{B}_n`` if the current timeslice `fgc.l` corresponds to the boundary of a stabilization interval,
 accounting for whether imaginary time is being iterated over in the forward (`fgc.forward = true`) or
 reverse (`fgc.forward = false`) direction.
 """
 function update_B̄!(
-    fgc::FermionGreensCalculator{T,E},
+    fgc::FermionGreensCalculator,
     B::AbstractVector{P}
-) where {T,E,P<:AbstractPropagator{T}}
+) where {P<:AbstractPropagator}
 
     (; forward, n_stab, l, Lτ) = fgc
 
@@ -428,9 +431,10 @@ end
 
 @doc raw"""
     calculate_B̄!(
-        fgc::FermionGreensCalculator{T,E},
-        B::AbstractVector{P}, n::Int
-    ) where {T,E,P<:AbstractPropagator{T}}
+        fgc::FermionGreensCalculator,
+        B::AbstractVector{P},
+        n::Int
+    ) where {P<:AbstractPropagator{T}}
 
 Given `B`, a vector of all the propagator matrices ``B_l``, calculate the matrix product
 ```math
@@ -439,9 +443,10 @@ Given `B`, a vector of all the propagator matrices ``B_l``, calculate the matrix
 with the result getting written to `fgc.B_bar[n]`.
 """
 function calculate_B̄!(
-    fgc::FermionGreensCalculator{T,E},
-    B::AbstractVector{P}, n::Int
-) where {T,E,P<:AbstractPropagator{T}}
+    fgc::FermionGreensCalculator,
+    B::AbstractVector{P},
+    n::Int
+) where {P<:AbstractPropagator}
 
     (; B_bar, n_stab, Lτ, N_stab, ldr_ws) = fgc
     @assert 1 <= n <= N_stab
