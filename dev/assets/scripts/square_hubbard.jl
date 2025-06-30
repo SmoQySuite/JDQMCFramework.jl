@@ -459,7 +459,7 @@ function make_measurements!(
     jdqmcf.initialize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, Gdn)
 
     # Calculate the current sign.
-    sgn = sign(sgndetGup * sgndetGdn)
+    sgn = sign(inv(sgndetGup) * inv(sgndetGdn))
 
     # Measure the average sign.
     avg_sign[bin] += sgn
