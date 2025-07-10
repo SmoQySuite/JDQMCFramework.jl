@@ -840,19 +840,22 @@ function local_update_greens!(
     G0i = @view G[:,i]
     copyto!(u, G0i)
 
-    # v = G[i,:] - I[i,:] <== row vector
-    @views @. v = conj(G[i,:]) # v = G[i,:]
-    v[i] = v[i] - 1.0 # v = G[i,:] - I[i,:]
+    # vᵀ = G[i,:] - I[i,:] <== row vector
+    vt = adjoint(v)
+    Gi0 = @view G[i,:]
+    copyto!(vt, Gi0)
+    v[i] = v[i] - 1.0
 
-    # G′ = G + (Δ/R)⋅[u⨂v] = G + (Δ/R)⋅G[:,i]⨂(G[i,:] - I[i,:])
+    # G′ = G + (Δ/R)⋅[u⨂vᵀ] = G + (Δ/R)⋅G[:,i]⨂(G[i,:] - I[i,:])
     # where ⨂ denotes an outer product
     BLAS.ger!(Δ/R, u, v, G)
 
-    # R = det(M′)/det(M) = det(G)/det(G′)
+    # R = det(M′)/det(M) = det(G)/det(G′) ==> R⁻¹ = det(G′)/det(G)
     # ==> log(|R|) = log(|det(M′)|) - log(|det(M)|) = log(|det(G)|) - log(|det(G′)|)
-    # ==> log(|det(G′)|) = log(|det(G)|) - log(|R|)
-    logdetG′ = logdetG - log(abs(R))
-    sgndetG′ = sign(R) * sgndetG
+    # ==> log(|det(G′)|) = log(|det(G)|) - log(|R|) = log(|det(G)|) + log(|R⁻¹|)
+    invR = inv(R)
+    logdetG′ = logdetG + log(abs(invR))
+    sgndetG′ = sign(invR) * sgndetG
 
     # update the diagonal exponentiated on-site energy matrix appearing in propagator
     # (1 + Δ[i,l]) × exp(-Δτ⋅V[i,l]) = (1 + [exp(-Δτ⋅V′[i,l])/exp(-Δτ⋅V[i,l])-1]) × exp(-Δτ⋅V[i,l])
