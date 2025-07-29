@@ -792,6 +792,36 @@ end
 
 
 @doc raw"""
+    local_update_det_ratio(
+        G::AbstractMatrix,
+        ΔV::T, i::Int, Δτ::E
+    ) where {T<:Number, E<:AbstractFloat}
+
+Calculate the determinant ratio ``R_{l,i}`` associated with a local update to the equal-time
+Green's function ``G(\tau,\tau).`` Also returns ``\Delta_{l,i},`` which is defined below.
+Specifically, this function returns the tuple ``(R_{l,i}, \Delta_{l,i})``.
+
+# Arguments
+
+- `G::AbstractMatrix`: Equal-time Green's function matrix ``G(\tau,\tau).``
+- `B::AbstractPropagator`: Represents the propagator matrix ``B_l,`` where ``\tau = \Delta\tau \cdot l.``
+- `ΔV::T`: The change in the ``V^{\prime}_{l,i,i}`` matrix element in the diagonal on-site energy matrix ``V_l.``
+- `i::Int`: Diagonal matrix element index in ``V_l`` being updated.
+- `Δτ::E`: Discretization in imaginary time ``\Delta\tau.``
+"""
+function local_update_det_ratio(
+    G::AbstractMatrix,
+    ΔV::T, i::Int, Δτ::E
+) where {T<:Number, E<:AbstractFloat}
+
+    Δ = expm1(-Δτ*ΔV)
+    R = 1.0 + Δ * (1.0 - G[i,i])
+
+    return (R, Δ)
+end
+
+
+@doc raw"""
     local_update_greens!(
         G::AbstractMatrix{T}, logdetG::E, sgndetG::T,
         B::AbstractPropagator,
