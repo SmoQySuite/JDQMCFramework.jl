@@ -9,4 +9,4 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 
 [compat]
-JDQMCMeasurements = "1.5"
+JDQMCMeasurements = "1.9.0"

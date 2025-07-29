@@ -552,14 +552,14 @@ function _local_update!(
     ## Iterate over sites in lattice.
     for i in perm
 
-        ## Calculate the new value of the diagonal potential energy matrix element
+        ## Calculate the change in the diagonal potential energy matrix element
         ## assuming the sign of the Ising HS field is changed.
-        Vup′ = -α/Δτ * (-s[i]) - μ
-        Vdn′ = +α/Δτ * (-s[i]) - μ
+        ΔVup = -α/Δτ * (-2*s[i])
+        ΔVdn = +α/Δτ * (-2*s[i])
 
         ## Calculate the determinant ratio associated with the proposed update.
-        Rup, Δup = jdqmcf.local_update_det_ratio(Gup, Bup, Vup′, i, Δτ)
-        Rdn, Δdn = jdqmcf.local_update_det_ratio(Gdn, Bdn, Vdn′, i, Δτ)
+        Rup, Δup = jdqmcf.local_update_det_ratio(Gup, ΔVup, i, Δτ)
+        Rdn, Δdn = jdqmcf.local_update_det_ratio(Gdn, ΔVdn, i, Δτ)
 
         ## Calculate the acceptance probability based on the Metropolis accept/reject criteria.
         P = min(1.0, abs(Rup * Rdn))
@@ -923,8 +923,8 @@ function correlation_stats(
     N_bins = length(avg_sign)
 
     ## Preallocate arrays to make the jackknife error analysis faster.
-    jackknife_samples = (zeros(Complex{T}, N_bins), zeros(E, N_bins))
-    jackknife_g       = zeros(Complex{T}, N_bins)
+    jackknife_sample_means = (zeros(Complex{T}, N_bins), zeros(E, N_bins))
+    jackknife_g = zeros(Complex{T}, N_bins)
 
     ## Iterate over correlation functions.
     for n in CartesianIndices(S_avg)
@@ -932,7 +932,7 @@ function correlation_stats(
         vals = @view S[:,n]
         S_avg[n], S_std[n] = jdqmcm.jackknife(
             /, vals, avg_sign,
-            jackknife_samples = jackknife_samples,
+            jackknife_sample_means = jackknife_sample_means,
             jackknife_g = jackknife_g
         )
     end
