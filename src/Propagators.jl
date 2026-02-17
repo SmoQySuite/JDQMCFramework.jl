@@ -3,7 +3,7 @@
 
 Abstract type to represent imaginary time propagator matrices ``B``. All specific propagators
 types inherit from this abstract type. In the above `T` is data type of the matrix elements
-of the exponentiated kintetic energy matrix ``e^{-\Delta\tau K_l}`` appearing in ``B_l``, and `E` is data type of the
+of the exponentiated kinetic energy matrix ``e^{-\Delta\tau K_l}`` appearing in ``B_l``, and `E` is data type of the
 matrix elements appearing in the diagonal exponentiated potential energy matrix ``e^{-\Delta\tau V_l}``.
 """
 abstract type AbstractPropagator{T<:Continuous, E<:Continuous} end
@@ -37,13 +37,13 @@ is the diagonal total on-site energy matrix.
 
 # Fields
 
-- `expmΔτV::Vector{E}`: A vector representing the diagonal exponeniated on-site energy matrix ``e^{-\Delta\tau V_l}.``
+- `expmΔτV::Vector{E}`: A vector representing the diagonal exponentiated on-site energy matrix ``e^{-\Delta\tau V_l}.``
 - `expmΔτKo2::Matrix{T}`: The exponentiated hopping matrix ``e^{-\Delta\tau K_l/2}.``
 - `exppΔτKo2::Matrix{T}`: Inverse of the exponentiated hopping matrix ``e^{+\Delta\tau K_l/2}.``
 """
 struct SymExactPropagator{T,E} <: AbstractExactPropagator{T,E}
     
-    "A vector representing the diagonal exponeniated on-site energy matrix `exp(-Δτ⋅Vₗ)`."
+    "A vector representing the diagonal exponentiated on-site energy matrix `exp(-Δτ⋅Vₗ)`."
     expmΔτV::Vector{E}
 
     "The exponentiated hopping matrix `exp(-Δτ⋅Kₗ/2)`."
@@ -66,13 +66,13 @@ is the diagonal total on-site energy matrix.
 
 # Fields
 
-- `expmΔτV::Vector{E}`: A vector representing the diagonal exponeniated on-site energy matrix ``e^{-\Delta\tau V_l}.``
+- `expmΔτV::Vector{E}`: A vector representing the diagonal exponentiated on-site energy matrix ``e^{-\Delta\tau V_l}.``
 - `expmΔτK::Matrix{T}`: The exponentiated hopping matrix ``e^{-\Delta\tau K_l}.``
 - `exppΔτK::Matrix{T}`: Inverse of the exponentiated hopping matrix ``e^{+\Delta\tau K_l}.``
 """
 struct AsymExactPropagator{T,E} <: AbstractExactPropagator{T,E}
     
-    "A vector representing the diagonal exponeniated on-site energy matrix `exp(-Δτ⋅Vₗ)`."
+    "A vector representing the diagonal exponentiated on-site energy matrix `exp(-Δτ⋅Vₗ)`."
     expmΔτV::Vector{E}
 
     "The exponentiated hopping matrix `exp(-Δτ⋅Kₗ)`"
@@ -96,12 +96,12 @@ matrix ``e^{-\Delta\tau K/2}`` is represented by the checkerboard approximation.
 
 # Fields
 
-- `expmΔτV::Vector{E}`: A vector representing the diagonal exponeniated on-site energy matrix ``e^{-\Delta\tau V_l}.``
+- `expmΔτV::Vector{E}`: A vector representing the diagonal exponentiated on-site energy matrix ``e^{-\Delta\tau V_l}.``
 - `expmΔτKo2::CheckerboardMatrix{T}`: The exponentiated hopping matrix ``e^{-\Delta\tau K_l/2}`` represented by the checkerboard approximation.
 """
 struct SymChkbrdPropagator{T, E} <: AbstractChkbrdPropagator{T,E}
     
-    "A vector representing the diagonal exponeniated on-site energy matrix `exp(-Δτ⋅Vₗ)`."
+    "A vector representing the diagonal exponentiated on-site energy matrix `exp(-Δτ⋅Vₗ)`."
     expmΔτV::Vector{E}
 
     "The exponentiated hopping matrix `exp(-Δτ⋅Kₗ/2)` represented by the checkerboard approximation."
@@ -122,12 +122,12 @@ matrix ``e^{-\Delta\tau K}`` is represented by the checkerboard approximation.
 
 # Fields
 
-- `expmΔτV::Vector{E}`: The vector representing the diagonal exponeniated on-site energy matrix ``e^{-\Delta\tau V_l}.``
+- `expmΔτV::Vector{E}`: The vector representing the diagonal exponentiated on-site energy matrix ``e^{-\Delta\tau V_l}.``
 - `expmΔτK::CheckerboardMatrix{T}`: The exponentiated hopping matrix ``e^{-\Delta\tau K_l}`` represented by the checkerboard approximation.
 """
 struct AsymChkbrdPropagator{T,E} <: AbstractChkbrdPropagator{T,E}
     
-    "The vector representing the diagonal exponeniated on-site energy matrix `exp(-Δτ⋅Vₗ)`."
+    "The vector representing the diagonal exponentiated on-site energy matrix `exp(-Δτ⋅Vₗ)`."
     expmΔτV::Vector{E}
 
     "The exponentiated hopping matrix `exp(-Δτ⋅Kₗ/2)` represented by the checkerboard approximation."
