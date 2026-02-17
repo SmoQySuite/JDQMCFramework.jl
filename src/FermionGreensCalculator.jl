@@ -63,10 +63,10 @@ function FermionGreensCalculator(
     # determine type of propagator matrix elements
     H = (T<:Complex || E<:Complex) ? Complex{R} : R
 
-    # calculate the number of numerical stabalization intervals
+    # calculate the number of numerical stabilization intervals
     N_stab = ceil(Int, Lτ/n_stab)
 
-    # allocate array to represent partical products of B matrices,
+    # allocate array to represent partial products of B matrices,
     # setting each equal to the identity matrix
     B_bar = Matrix{H}[]
     for n in 1:N_stab
@@ -143,7 +143,7 @@ end
         fgc::FermionGreensCalculator{T,E}, n_stab::Int
     ) where {T,E}
 
-Update `fgc` to reflect a new stabilizaiton frequency `n_stab`.
+Update `fgc` to reflect a new stabilization frequency `n_stab`.
 If `G`, `logdetG`, `sgndetG` and `B` are also passed then the equal-time Green's function `G` is re-calculated
 and the corresponding updated values for `(logdetG, sgndetG)` are returned.
 """
@@ -153,7 +153,7 @@ function resize!(
     B::Vector{P}, n_stab::Int
 ) where {T<:Number, E<:AbstractFloat, P<:AbstractPropagator{T}}
 
-    # check if stablization frequency is being updated
+    # check if stabilization frequency is being updated
     if fgc.n_stab != n_stab
 
         # resize fgc
@@ -174,13 +174,13 @@ function resize!(
     B_bar = fgc.B_bar::Vector{Matrix{T}}
     F = fgc.F::Vector{LDR{T,E}}
 
-    # check if stablization frequency is being updated
+    # check if stabilization frequency is being updated
     if fgc.n_stab != n_stab
 
         # calculate the new number of stabilization intervals
         N_stab = ceil(Int, Lτ/n_stab)
 
-        # calculate the change in stablization intervals
+        # calculate the change in stabilization intervals
         ΔN_stab = N_stab - fgc.N_stab
 
         # update stabilization interval and frequency
@@ -196,7 +196,7 @@ function resize!(
                 push!(B_bar, B_bar_new)
                 push!(F, F_new)
             end
-        # if number of stablization intervals decreased
+        # if number of stabilization intervals decreased
         else
             # shrink B_bar and F vectors
             for n in 1:abs(ΔN_stab)
@@ -269,7 +269,7 @@ function iterate(iter::FermionGreensCalculator, state::Bool)::Union{Tuple{Int,Bo
 
     if state # iterating from l=1 ==> l=Lτ
         iter.l += 1
-        # terminiation criteria
+        # termination criteria
         if iter.l == iter.Lτ+1
             iter.l = iter.Lτ
             iter.forward = false
@@ -348,7 +348,7 @@ function update_factorizations!(
     ldr_ws = fgc.ldr_ws::LDRWorkspace{T,E}
     B_bar = fgc.B_bar::Vector{Matrix{T}}
 
-    # get stabalizaiton interval
+    # get stabilization interval
     n, l′ = stabilization_interval(fgc)
 
     # if iterating from l=1 => l=Lτ
@@ -395,7 +395,7 @@ end
         B::AbstractVector{P}
     ) where {P<:AbstractPropagator}
 
-Recalculate ``\bar{B}_n`` if the current timeslice `fgc.l` corresponds to the boundary of a stabilization interval,
+Recalculate ``\bar{B}_n`` if the current imaginary time slice `fgc.l` corresponds to the boundary of a stabilization interval,
 accounting for whether imaginary time is being iterated over in the forward (`fgc.forward = true`) or
 reverse (`fgc.forward = false`) direction.
 """

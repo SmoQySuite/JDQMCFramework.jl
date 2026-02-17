@@ -55,7 +55,7 @@ function calculate_equaltime_greens!(
         update_factorizations!(fgc, B)
     end
     
-    # calculate equal-time Greens funciton matrix G(0,0) = G(β,β)
+    # calculate equal-time Greens function matrix G(0,0) = G(β,β)
     logdetG, sgndetG = calculate_equaltime_greens!(G, fgc)
     
     return logdetG, sgndetG
@@ -103,7 +103,7 @@ function propagate_equaltime_greens!(
         rdiv!(G, B_l, M = M)
     # if iterating from l=Lτ => l=1.
     # Note: if `fgc.l` corresponds to the "end" of a stabilization interval (l′=n_stab or l=Lτ), then
-    # when the equal-time Green's function was previously re-computed at `fgc.l+1` in the stabilize_equatime_greens!()
+    # when the equal-time Green's function was previously re-computed at `fgc.l+1` in the stabilize_equaltime_greens!()
     # routine, it already calculated G(l,l), so we don't need to propagate to G(l,l) here.
     elseif !(l′ == n_stab || l==Lτ)
         # G(l,l) = B⁻¹[l+1]⋅G(l+1,l+1)⋅B[l+1]
@@ -146,7 +146,7 @@ This method returns four values.
 The first two values returned are ``\log(\vert \det G(\tau,\tau) \vert)`` and ``\textrm{sign}(\det G(\tau,\tau))``.
 The latter two are the maximum error in a Green's function corrected by numerical stabilization ``\vert \delta G \vert``,
 and the error in the phase of the determinant corrected by numerical stabilization ``\delta\theta,``
-relative to naive propagation of the Green's function matrix in imaginary time occuring instead.
+relative to naive propagation of the Green's function matrix in imaginary time occurring instead.
 If no stabilization was performed, than ``\vert \delta G \vert = 0`` and ``\delta \theta = 0.``
 
 This method also computes the LDR matrix factorizations
@@ -202,7 +202,7 @@ function stabilize_equaltime_greens!(
             logdetG, sgndetG = inv_IpA!(G, B_β0, ldr_ws)
             # record that stabilization was performed
             stabilized = true
-        # if at boundary of stablization interval calculate G(τ,τ)
+        # if at boundary of stabilization interval calculate G(τ,τ)
         elseif l′ == n_stab && N_stab > 1
             # record initial G′(τ,τ) = G(τ,τ) before stabilization
             copyto!(G′, G)
@@ -232,7 +232,7 @@ function stabilize_equaltime_greens!(
             B_l = B[l]::P
             mul!(G′, G, B_l, M = ldr_ws.M) # G(τ,τ)⋅B[l]
             ldiv!(B_l, G′, M = ldr_ws.M) # B⁻¹[l]⋅G(τ,τ)⋅B[l]
-            # calucate G(τ-Δτ,τ-Δτ) = [I + B(τ-Δτ,0)⋅B(β,τ-Δτ)]⁻¹
+            # calculate G(τ-Δτ,τ-Δτ) = [I + B(τ-Δτ,0)⋅B(β,τ-Δτ)]⁻¹
             B_β_τmΔτ = F[n]::LDR{T,E}
             B_τmΔτ_0 = F[n-1]::LDR{T,E}
             logdetG, sgndetG = inv_IpUV!(G, B_τmΔτ_0, B_β_τmΔτ, ldr_ws)
@@ -345,7 +345,7 @@ function propagate_unequaltime_greens!(
         # G(0,l) = G(0,l-1)⋅B⁻¹[l]
         rdiv!(G0τ, B_l, M = M)
 
-    # if beginning iteration from l=Lτ => l=1, initialize uneqaul-time green's function matrices
+    # if beginning iteration from l=Lτ => l=1, initialize unequal-time green's function matrices
     elseif l == Lτ
 
         # G(τ=β,0) = (I - G(0,0))
@@ -357,7 +357,7 @@ function propagate_unequaltime_greens!(
 
     # if iterating from l=Lτ => l=1.
     # Note: if `fgc.l` corresponds to the "end" of a stabilization interval (l′=n_stab), then
-    # when the equal-time Green's function was previously re-computed at `fgc.l+1` in the stabilize_equatime_greens!()
+    # when the equal-time Green's function was previously re-computed at `fgc.l+1` in the stabilize_equaltime_greens!()
     # routine, it already calculated G(l,l), so we don't need to propagate to G(l,l) here.
     elseif !(l′ == n_stab)
 
@@ -389,7 +389,7 @@ end
         update_B̄::Bool=true
     )::Tuple{E,T,E,E} where {T<:Continuous, E<:AbstractFloat, P<:AbstractPropagator}
 
-Stabilize the Green's function matrice ``G(\tau,0)``, ``G(0,\tau)`` and ``G(\tau,\tau)``
+Stabilize the Green's function matrices ``G(\tau,0)``, ``G(0,\tau)`` and ``G(\tau,\tau)``
 as iterating through imaginary time ``\tau = \Delta\tau \cdot l.``
 For a given imaginary time slice `fgc.l`, this routine should be called *after* all changes to the ``B_l``
 propagator have been made.
@@ -418,7 +418,7 @@ This method returns four values.
 The first two values returned are ``\log(\vert \det G(\tau,\tau) \vert)`` and ``\textrm{sign}(\det G(\tau,\tau))``.
 The latter two are the maximum error in a Green's function corrected by numerical stabilization ``\vert \delta G \vert``,
 and the error in the phase of the determinant corrected by numerical stabilization ``\delta\theta,``
-relative to naive propagation of the Green's function matrix in imaginary time occuring instead.
+relative to naive propagation of the Green's function matrix in imaginary time occurring instead.
 If no stabilization was performed, than ``\vert \delta G \vert = 0`` and ``\delta \theta = 0.``
 
 This method also computes the LDR matrix factorizations
@@ -439,6 +439,7 @@ function stabilize_unequaltime_greens!(
 )::Tuple{E,T,E,E} where {T<:Continuous, E<:AbstractFloat, P<:AbstractPropagator}
 
     (; l, Lτ, forward, n_stab, N_stab, G′) = fgc
+    ΔG = G′
     F = fgc.F::Vector{LDR{T,E}}
     ldr_ws = fgc.ldr_ws::LDRWorkspace{T,E}
 
@@ -474,6 +475,9 @@ function stabilize_unequaltime_greens!(
             # G(0,0) = G(β,β) = [I + B(β,0)]⁻¹
             B_β0 = F[N_stab]::LDR{T,E}
             logdetG, sgndetG = inv_IpA!(Gττ, B_β0, ldr_ws)
+            # update numerical error
+            @. ΔG = G′ - Gττ
+            δG = max(δG, maximum(abs, ΔG))
             # G(β, 0) = I - G(0,0)
             copyto!(Gτ0, I)
             @. Gτ0 = Gτ0 - Gττ
@@ -481,7 +485,7 @@ function stabilize_unequaltime_greens!(
             @. G0τ = -Gττ
             # record that stabilization was performed
             stabilized = true
-        # if at boundary of stablization interval calculate G(τ,τ)
+        # if at boundary of stabilization interval calculate G(τ,τ)
         elseif l′ == n_stab && N_stab > 1
             # record initial G′(τ,τ) = G(τ,τ) before stabilization
             copyto!(G′, Gττ)
@@ -489,11 +493,22 @@ function stabilize_unequaltime_greens!(
             B_βτ = F[n+1]::LDR{T,E}
             B_τ0 = F[n]::LDR{T,E}
             logdetG, sgndetG = inv_IpUV!(Gττ, B_τ0, B_βτ, ldr_ws)
+            # update numerical error
+            @. ΔG = G′ - Gττ
+            δG = max(δG, maximum(abs, ΔG))
             # calculate G(τ,0) = [B⁻¹(τ,0) + B(β,τ)]⁻¹
+            copyto!(G′, Gτ0)
             inv_invUpV!(Gτ0, B_τ0, B_βτ, ldr_ws)
+            # update numerical error
+            @. ΔG = G′ - Gτ0
+            δG = max(δG, maximum(abs, ΔG))
             # calculate G(0,τ) = -[B⁻¹(β,τ) + B(τ,0)]⁻¹
+            copyto!(G′, G0τ)
             inv_invUpV!(G0τ, B_βτ, B_τ0, ldr_ws)
             @. G0τ = -G0τ
+            # update numerical error
+            @. ΔG = G′ - G0τ
+            δG = max(δG, maximum(abs, ΔG))
             # record that stabilization was performed
             stabilized = true
         end
@@ -508,6 +523,9 @@ function stabilize_unequaltime_greens!(
             # G(0,0) = [I + B(β,0)]⁻¹
             B_β0 = F[1]::LDR{T,E}
             logdetG, sgndetG = inv_IpA!(Gττ, B_β0, ldr_ws)
+            # update numerical error
+            @. ΔG = G′ - Gττ
+            δG = max(δG, maximum(abs, ΔG))
             # G(β, 0) = I - G(0,0)
             copyto!(Gτ0, I)
             @. Gτ0 = Gτ0 - Gττ
@@ -521,15 +539,28 @@ function stabilize_unequaltime_greens!(
             B_l = B[l]::P
             mul!(G′, Gττ, B_l, M = ldr_ws.M) # G(τ,τ)⋅B[l]
             ldiv!(B_l, G′, M = ldr_ws.M) # B⁻¹[l]⋅G(τ,τ)⋅B[l]
-            # calucate G(τ-Δτ,τ-Δτ) = [I + B(τ-Δτ,0)⋅B(β,τ-Δτ)]⁻¹
+            # calculate G(τ-Δτ,τ-Δτ) = [I + B(τ-Δτ,0)⋅B(β,τ-Δτ)]⁻¹
             B_β_τmΔτ = F[n]::LDR{T,E}
             B_τmΔτ_0 = F[n-1]::LDR{T,E}
             logdetG, sgndetG = inv_IpUV!(Gττ, B_τmΔτ_0, B_β_τmΔτ, ldr_ws)
+            # update numerical error
+            @. ΔG = G′ - Gττ
+            δG = max(δG, maximum(abs, ΔG))
+            # perform naive propagation G′(τ-Δτ,0) = B⁻¹[l]⋅G(τ,0)
+            ldiv!(G′, B_l, Gτ0, M = ldr_ws.M)
             # calculate G(τ-Δτ,0) = [B⁻¹(τ-Δτ,0) + B(β,τ-Δτ)]⁻¹
             inv_invUpV!(Gτ0, B_τmΔτ_0, B_β_τmΔτ, ldr_ws)
+            # update numerical error
+            @. ΔG = G′ - Gτ0
+            δG = max(δG, maximum(abs, ΔG))
+            # perform naive propagation G′(0,τ-Δτ) = G(0,τ)⋅B[l]
+            mul!(G′, G0τ, B_l, M = ldr_ws.M)
             # calculate G(0,τ-Δτ) = -[B⁻¹(β,τ-Δτ) + B(τ-Δτ,0)]⁻¹
             inv_invUpV!(G0τ, B_β_τmΔτ, B_τmΔτ_0, ldr_ws)
             @. G0τ = -G0τ
+            # update numerical error
+            @. ΔG = G′ - G0τ
+            δG = max(δG, maximum(abs, ΔG))
             # record that stabilization was performed
             stabilized = true
         end
@@ -537,9 +568,6 @@ function stabilize_unequaltime_greens!(
 
     # calculate error corrected by stabilization
     if stabilized
-        ΔG = G′
-        @. ΔG = abs(G′-Gττ)
-        δG = maximum(real, ΔG)
         δθ = angle(sgndetG′/sgndetG)
     end
     
@@ -591,7 +619,7 @@ This method returns four values.
 The first two values returned are ``\log(\vert \det G(\tau,\tau) \vert)`` and ``\textrm{sign}(\det G(\tau,\tau))``.
 The latter two are the maximum error in a Green's function corrected by numerical stabilization ``\vert \delta G \vert``,
 and the error in the phase of the determinant corrected by numerical stabilization ``\delta\theta,``
-relative to naive propagation of the Green's function matrix in imaginary time occuring instead.
+relative to naive propagation of the Green's function matrix in imaginary time occurring instead.
 If no stabilization was performed, than ``\vert \delta G \vert = 0`` and ``\delta \theta = 0.``
 
 This method also computes the LDR matrix factorizations
@@ -613,6 +641,7 @@ function stabilize_unequaltime_greens!(
 )::Tuple{E,T,E,E} where {T<:Continuous, E<:AbstractFloat, P<:AbstractPropagator}
 
     (; l, Lτ, forward, n_stab, N_stab, G′) = fgc
+    ΔG = G′
     F = fgc.F::Vector{LDR{T,E}}
     ldr_ws = fgc.ldr_ws::LDRWorkspace{T,E}
 
@@ -649,6 +678,9 @@ function stabilize_unequaltime_greens!(
             B_β0 = F[N_stab]::LDR{T,E}
             logdetG, sgndetG = inv_IpA!(Gττ, B_β0, ldr_ws)
             copyto!(G00, Gττ)
+            # update numerical error
+            @. ΔG = G′ - Gττ
+            δG = max(δG, maximum(abs, ΔG))
             # G(β, 0) = I - G(0,0)
             copyto!(Gτ0, I)
             @. Gτ0 = Gτ0 - Gττ
@@ -656,7 +688,7 @@ function stabilize_unequaltime_greens!(
             @. G0τ = -Gττ
             # record that stabilization was performed
             stabilized = true
-        # if at boundary of stablization interval calculate G(τ,τ)
+        # if at boundary of stabilization interval calculate G(τ,τ)
         elseif l′ == n_stab && N_stab > 1
             # record initial G′(τ,τ) = G(τ,τ) before stabilization
             copyto!(G′, Gττ)
@@ -664,13 +696,24 @@ function stabilize_unequaltime_greens!(
             B_βτ = F[n+1]::LDR{T,E}
             B_τ0 = F[n]::LDR{T,E}
             logdetG, sgndetG = inv_IpUV!(Gττ, B_τ0, B_βτ, ldr_ws)
+            # update numerical error
+            @. ΔG = G′ - Gττ
+            δG = max(δG, maximum(abs, ΔG))
             # calculate G(0,0) = [I + B(β,τ)⋅B(τ,0)]⁻¹
             logdetG00, sgndetG00 = inv_IpUV!(G00, B_βτ, B_τ0, ldr_ws)
             # calculate G(τ,0) = [B⁻¹(τ,0) + B(β,τ)]⁻¹
+            copyto!(G′, Gτ0)
             inv_invUpV!(Gτ0, B_τ0, B_βτ, ldr_ws)
+            # update numerical error
+            @. ΔG = G′ - Gτ0
+            δG = max(δG, maximum(abs, ΔG))
             # calculate G(0,τ) = -[B⁻¹(β,τ) + B(τ,0)]⁻¹
+            copyto!(G′, G0τ)
             inv_invUpV!(G0τ, B_βτ, B_τ0, ldr_ws)
             @. G0τ = -G0τ
+            # update numerical error
+            @. ΔG = G′ - G0τ
+            δG = max(δG, maximum(abs, ΔG))
             # record that stabilization was performed
             stabilized = true
         end
@@ -686,6 +729,9 @@ function stabilize_unequaltime_greens!(
             B_β0 = F[1]::LDR{T,E}
             logdetG, sgndetG = inv_IpA!(Gττ, B_β0, ldr_ws)
             copyto!(G00, Gττ)
+            # update numerical error
+            @. ΔG = G′ - Gττ
+            δG = max(δG, maximum(abs, ΔG))
             # G(β, 0) = I - G(0,0)
             copyto!(Gτ0, I)
             @. Gτ0 = Gτ0 - Gττ
@@ -703,13 +749,26 @@ function stabilize_unequaltime_greens!(
             B_β_τmΔτ = F[n]::LDR{T,E}
             B_τmΔτ_0 = F[n-1]::LDR{T,E}
             logdetG, sgndetG = inv_IpUV!(Gττ, B_τmΔτ_0, B_β_τmΔτ, ldr_ws)
+            # update numerical error
+            @. ΔG = G′ - Gττ
+            δG = max(δG, maximum(abs, ΔG))
             # calculate G(0,0) = [I + B(β,τ-Δτ)⋅B(τ-Δτ,0)]⁻¹
             logdetG00, sgndetG00 = inv_IpUV!(G00, B_β_τmΔτ, B_τmΔτ_0, ldr_ws)
+            # perform naive propagation G′(τ-Δτ,0) = B⁻¹[l]⋅G(τ,0)
+            ldiv!(G′, B_l, Gτ0, M = ldr_ws.M)
             # calculate G(τ-Δτ,0) = [B⁻¹(τ-Δτ,0) + B(β,τ-Δτ)]⁻¹
             inv_invUpV!(Gτ0, B_τmΔτ_0, B_β_τmΔτ, ldr_ws)
+            # update numerical error
+            @. ΔG = G′ - Gτ0
+            δG = max(δG, maximum(abs, ΔG))
+            # perform naive propagation G′(0,τ-Δτ) = G(0,τ)⋅B[l]
+            mul!(G′, G0τ, B_l, M = ldr_ws.M)
             # calculate G(0,τ-Δτ) = -[B⁻¹(β,τ-Δτ) + B(τ-Δτ,0)]⁻¹
             inv_invUpV!(G0τ, B_β_τmΔτ, B_τmΔτ_0, ldr_ws)
             @. G0τ = -G0τ
+            # update numerical error
+            @. ΔG = G′ - G0τ
+            δG = max(δG, maximum(abs, ΔG))
             # record that stabilization was performed
             stabilized = true
         end
@@ -717,9 +776,6 @@ function stabilize_unequaltime_greens!(
 
     # calculate error corrected by stabilization
     if stabilized
-        ΔG = G′
-        @. ΔG = abs(G′-Gττ)
-        δG = maximum(real, ΔG)
         δθ = angle(sgndetG′/sgndetG)
     end
     
@@ -758,7 +814,7 @@ the exponentiated diagonal on-site energy matrix ``V_l.``
 
 Given a proposed update to the ``(i,i)`` matrix element of the diagonal on-site energy matrix ``V_l``,
 (``V_{l,i,i} \rightarrow V^\prime_{l,i,i}),`` the corresponding determinant ratio associated
-with this proposed udpate is given by
+with this proposed update is given by
 ```math
 R_{l,i} = \frac{\det G(\tau,\tau)}{\det G^\prime(\tau,\tau)} = 1+\Delta_{i,i}(\tau,i)\left(1-G_{i,i}(\tau,\tau)\right),
 ```
@@ -805,7 +861,7 @@ Specifically, this function returns the tuple ``(R_{l,i}, \Delta_{l,i})``.
 
 - `G::AbstractMatrix`: Equal-time Green's function matrix ``G(\tau,\tau).``
 - `B::AbstractPropagator`: Represents the propagator matrix ``B_l,`` where ``\tau = \Delta\tau \cdot l.``
-- `ΔV::T`: The change in the ``V^{\prime}_{l,i,i}`` matrix element in the diagonal on-site energy matrix ``V_l.``
+- `ΔV::T`: The change `\Delta V_{l,i,i} = (V^{\prime}_{l,i,i}-V^{\phantom\prime}_{l,i,i}`)`` in the  matrix element in the diagonal on-site energy matrix ``V_l.``
 - `i::Int`: Diagonal matrix element index in ``V_l`` being updated.
 - `Δτ::E`: Discretization in imaginary time ``\Delta\tau.``
 """
@@ -849,11 +905,11 @@ The equal-time Green's function matrix is updated using the relationship
 ```math
 G_{j,k}^{\prime}\left(\tau,\tau\right)=G_{j,k}\left(\tau,\tau\right)-\frac{1}{R_{l,i}}G_{j,i}\left(\tau,\tau\right)\Delta_{l,i}\left(\delta_{i,k}-G_{i,k}\left(\tau,\tau\right)\right).
 ```
-The  ``B_l`` progpagator `B` is also udpated.
+The  ``B_l`` propagator `B` is also updated.
 Additionally, this method returns ``\log( \vert \det G^\prime(\tau,\tau) \vert )`` and ``\textrm{sign}( \det G^\prime(\tau,\tau) ).``
 
 An important note is that if the propagator matrices are represented in a symmetric form, then `G′` and `G` need to correspond
-to the transformed eqaul-time Green's function matrices ``\tilde{G}^\prime(\tau,\tau)`` and ``\tilde{G}(\tau,\tau).``
+to the transformed equal-time Green's function matrices ``\tilde{G}^\prime(\tau,\tau)`` and ``\tilde{G}(\tau,\tau).``
 Refer to the [`local_update_det_ratio`](@ref) docstring for more information.
 """
 function local_update_greens!(

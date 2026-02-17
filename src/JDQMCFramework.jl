@@ -32,7 +32,7 @@ export SymChkbrdPropagator, AsymChkbrdPropagator
 export SymPropagators
 
 # defines FermionGreensCalculator type to simplify the process of calculating
-# single-particle fermion green's funciton matrices
+# single-particle fermion green's function matrices
 include("FermionGreensCalculator.jl")
 export FermionGreensCalculator
 export resize!

@@ -128,7 +128,7 @@ checkerboard = false
 println("Whether the checkerboard approximation is used, checkerboard = ", checkerboard)
 
 ## Period with which numerical stabilization is performed i.e.
-## how many imaginary time slices separate more expensive recomputations
+## how many imaginary time slices separate more expensive recomputation
 ## of the Green's function matrix using numerically stable routines.
 n_stab = 10
 println("Numerical stabilization period, n_stab = ", n_stab)
@@ -144,7 +144,7 @@ println("Number of measurements, N_measurements = ", N_measurements)
 
 ## Number of local update sweeps separating sequential measurements.
 N_sweeps = 1
-println("Number of local update sweeps seperating measurements, n_sweeps = ", N_sweeps)
+println("Number of local update sweeps separating measurements, n_sweeps = ", N_sweeps)
 
 ## Number of bins used to performing a binning analysis when calculating final error bars
 ## for measured observables.
@@ -387,7 +387,7 @@ end
 # Now we instantiate two instances for the [`FermionGreensCalculator`](@ref) type, one for each spin
 # species, spin up and spin down. This object enables the efficient and numerically stable calculation
 # of the Green's functions behind-the-scenes, so that we do not need to concern ourselves with
-# implementing numerical stablization routines ourselves.
+# implementing numerical stabilization routines ourselves.
 
 ## Initialize a FermionGreensCalculator for both spin up and down electrons.
 fermion_greens_calc_up = jdqmcf.FermionGreensCalculator(Bup, β, Δτ, n_stab)
