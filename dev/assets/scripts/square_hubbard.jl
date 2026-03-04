@@ -46,7 +46,7 @@ println()
 
 # Discretization in imaginary time.
 Δτ = 0.05
-println("Disretization in imaginary time, dtau = ", Δτ)
+println("Discretization in imaginary time, dtau = ", Δτ)
 
 # Length of imaginary time axis.
 Lτ = round(Int, β/Δτ)
@@ -272,7 +272,7 @@ logdetGup, sgndetGup = jdqmcf.calculate_equaltime_greens!(Gup, fermion_greens_ca
 Gdn = zeros(typeof(t), N, N)
 logdetGdn, sgndetGdn = jdqmcf.calculate_equaltime_greens!(Gdn, fermion_greens_calc_dn);
 
-# Allcoate time-displaced Green's functions.
+# Allocate time-displaced Green's functions.
 Gup_τ0 = zero(Gup) # Gup(τ,0)
 Gup_0τ = zero(Gup) # Gup(0,τ)
 Gup_ττ = zero(Gup) # Gup(τ,τ)
@@ -382,7 +382,7 @@ function local_update!(
         δG = max(δG, δGup, δGdn)
 
         # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
-        iterate(fermion_greens_calc_dn, fermion_greens_calc_up.forward)
+        iterate(fermion_greens_calc_dn, fermion_greens_calc_up)
     end
 
     return logdetGup, sgndetGup, logdetGdn, sgndetGdn, δG, acceptance_rate
@@ -504,7 +504,7 @@ function make_measurements!(
         )
 
         # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
-        iterate(fermion_greens_calc_dn, fermion_greens_calc_up.forward)
+        iterate(fermion_greens_calc_dn, fermion_greens_calc_up)
     end
 
     return nothing
