@@ -245,7 +245,9 @@ end
 @doc raw"""
     iterate(iter::FermionGreensCalculator)
 
-    iterate(iter::FermionGreensCalculator, state)
+    iterate(iter::FermionGreensCalculator, state::FermionGreensCalculator)
+
+    iterate(iter::FermionGreensCalculator, state::Bool)
 
 Iterate over imaginary time slices, alternating between iterating in the forward direction from ``l=1`` to ``l=L_\tau``
 and in the reverse direction from ``l=L_\tau`` to ``l=1``. The `iter.forward` boolean field in the
@@ -290,6 +292,14 @@ function iterate(iter::FermionGreensCalculator, state::Bool)::Union{Tuple{Int,Bo
     end
 
     return next
+end
+
+function iterate(iter::FermionGreensCalculator, state::FermionGreensCalculator)::Union{Tuple{Int,Bool},Nothing}
+
+    @assert iter.forward == state.forward
+    @assert iter.l == state.l
+
+    return iterate(iter, state.forward)
 end
 
 

@@ -209,7 +209,7 @@ end
         logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_equaltime_greens!(Gdn, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=true)
 
         # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
-        iterate(fgc_dn, fgc_up.forward)
+        iterate(fgc_dn, fgc_up)
     end
 
     # Iterate over imaginary time τ=Δτ⋅l.
@@ -238,7 +238,7 @@ end
         logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_equaltime_greens!(Gdn, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=false)
 
         # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
-        iterate(fgc_dn, fgc_up.forward)
+        iterate(fgc_dn, fgc_up)
     end
 
     # initialize unequal-time Green's functions
@@ -277,7 +277,7 @@ end
         logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=false)
 
         # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
-        iterate(fgc_dn, fgc_up.forward)
+        iterate(fgc_dn, fgc_up)
     end
 
     # initialize unequal-time Green's functions
@@ -310,7 +310,7 @@ end
         logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=true)
 
         # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
-        iterate(fgc_dn, fgc_up.forward)
+        iterate(fgc_dn, fgc_up)
     end
 
 
@@ -348,7 +348,7 @@ end
         logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, Gdn_00, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=false)
 
         # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
-        iterate(fgc_dn, fgc_up.forward)
+        iterate(fgc_dn, fgc_up)
     end
 
     # initialize unequal-time Green's functions
@@ -383,6 +383,6 @@ end
         logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, Gdn_00, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=false)
 
         # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
-        iterate(fgc_dn, fgc_up.forward)
+        iterate(fgc_dn, fgc_up)
     end
 end

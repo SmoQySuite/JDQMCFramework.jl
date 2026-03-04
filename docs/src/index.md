@@ -55,7 +55,7 @@ JDQMCFramework package. The following discussion assumes an existing
 familiarity with the determinant quantum Monte Carlo (DQMC) algorithm,
 a method for simulating systems of itinerant fermions on a lattice
 at finite temperature in the grand canonical ensemble. The DQMC formalism
-starts by representing the partition funciton as a path integral
+starts by representing the partition function as a path integral
 ```math
 \begin{align*}
 Z= & \textrm{Tr}\,e^{-\beta\hat{H}}=\textrm{Tr}\left[\prod_{l=1}^{L_{\tau}}e^{-\Delta\tau\hat{H}}\right]
@@ -63,7 +63,7 @@ Z= & \textrm{Tr}\,e^{-\beta\hat{H}}=\textrm{Tr}\left[\prod_{l=1}^{L_{\tau}}e^{-\
 ```
 in imaginary time ``\tau=l\cdot\Delta\tau``, at inverse temperature
 ``\beta=L_{\tau}\cdot\Delta\tau``. Next, the Suzuki-Trotter approximation
-is applied, and Hubbard-Stratonivich transformations are used as needed
+is applied, and Hubbard-Stratonovich transformations are used as needed
 to render the Hamiltonian quadratic in fermion creation and annihilation
 operators. Lastly, the fermionic degrees of freedom are integrated
 out.
@@ -173,7 +173,7 @@ subject to the boundary condition ``G_{\sigma}(0,0)=G_{\sigma}(\beta,\beta)``.
 
 The DQMC method also requires periodic re-calculation of the fermion
 Green's function matrix as ``G_{\sigma}(\tau,\tau)`` is propagated
-to later or ealier imaginary times to maintain numerical stability.
+to later or earlier imaginary times to maintain numerical stability.
 Therefore, we introduce a parameter ``n_{s},`` which describes the
 frequency with which numerical stabilization needs to occur. The number
 of "stabilization intervals" in imaginary time is then given by
@@ -195,7 +195,7 @@ G_{\sigma}(0,0) = (I + B_{\sigma,L_\tau} B_{\sigma,L_\tau-1} \dots B_{\sigma, 2}
 In this section we introduce some of the basics of using this package by setting up the framework
 for a DQMC simulations in the case of a simple non-interacting square lattice tight binding model,
 assuming two electron spin species, spin up and spin down.
-While this is a "tivial" example, it is instructive.
+While this is a "trivial" example, it is instructive.
 
 ```@example square
 using LinearAlgebra
@@ -285,7 +285,7 @@ exppΔτK = exp(+Δτ*K)
 # null vector spin up propagators to fill
 Bup = AsymExactPropagator{eltype(expmΔτK),eltype(expmΔτV)}[]
 
-# null vecotr of spin down propagators to fill
+# null vector of spin down propagators to fill
 Bdn = AsymExactPropagator{eltype(expmΔτK),eltype(expmΔτV)}[]
 
 # construct propagator for each spin species and append to appropriate vector
@@ -338,12 +338,12 @@ for l in fgc_up
 
     # Periodically re-calculate the Green's function matrix for numerical stability.
     # Comment: if not performing updates, but just evaluating the derivative of the action, then
-    # set update_B̄=false to avoid wasting cpu time re-computing B_barₙ matrices.
+    # set update_B̄=false to avoid wasting cpu time re-computing B_bar matrices.
     logdetGup, sgndetGup, δGup, δθup = stabilize_equaltime_greens!(Gup, logdetGup, sgndetGup, fgc_up, Bup, update_B̄=true)
     logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_equaltime_greens!(Gdn, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=true)
 
     # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
-    iterate(fgc_dn, fgc_up.forward)
+    iterate(fgc_dn, fgc_up)
 end
 ```
 
@@ -385,6 +385,6 @@ for l in fgc_up
     logdetGdn, sgndetGdn, δGdn, δθdn = stabilize_unequaltime_greens!(Gdn_τ0, Gdn_0τ, Gdn_ττ, logdetGdn, sgndetGdn, fgc_dn, Bdn, update_B̄=false)
 
     # Keep up and down spin Green's functions synchronized as iterating over imaginary time.
-    iterate(fgc_dn, fgc_up.forward)
+    iterate(fgc_dn, fgc_up)
 end
 ```

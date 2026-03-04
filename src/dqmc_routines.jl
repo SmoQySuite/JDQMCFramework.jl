@@ -16,7 +16,7 @@ function calculate_equaltime_greens!(
     (; forward, l, Lτ, N_stab, ldr_ws) = fgc
     @assert l == 1 || l == Lτ
 
-    # get B(0,β)
+    # get B(β,0)
     if forward
         B_β0 = fgc.F[1]::LDR{T,E}
     else

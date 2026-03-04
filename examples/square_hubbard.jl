@@ -13,11 +13,11 @@
 # [`JDQMCFramework.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl.git) and other packages.
 # For instance, the [`JDQMCFramework.jl`](https://github.com/SmoQySuite/JDQMCFramework.jl.git) package takes care of all the
 # numerical stabilization nonsense that is one of the most challenging parts of writing a DQMC code.
-# Also, implementing various correlation measurements in a DQMC simulation is typically very time consuming and challening,
+# Also, implementing various correlation measurements in a DQMC simulation is typically very time consuming and challenging,
 # as it requires working through arduous Wick's contractions, and then implementing each term.
 # Once again, this hurdle is largely avoided by leveraging the functionality exported by the
 # [`JDQMCMeasurements.jl`](https://github.com/SmoQySuite/JDQMCMeasurements.jl.git) package,
-# which implements a variety of standard correlation function measurements for arbitary lattice geometries.
+# which implements a variety of standard correlation function measurements for arbitrary lattice geometries.
 #
 # The repulsive Hubbard model Hamiltonian on a square lattice considered in this tutorial is given by
 # ```math
@@ -112,7 +112,7 @@ println("Linear lattice size, L = ", L)
 
 ## Discretization in imaginary time.
 Δτ = 0.05
-println("Disretization in imaginary time, dtau = ", Δτ)
+println("Discretization in imaginary time, dtau = ", Δτ)
 
 ## Length of imaginary time axis.
 Lτ = round(Int, β/Δτ)
@@ -412,7 +412,7 @@ logdetGdn, sgndetGdn = jdqmcf.calculate_equaltime_greens!(Gdn, fermion_greens_ca
 # measurements we also need to initialize six more matrices, which correspond to ``G_\sigma(\tau,\tau),``
 # ``G_\sigma(\tau,0)`` and ``G_\sigma(0,\tau).``
 
-## Allcoate time-displaced Green's functions.
+## Allocate time-displaced Green's functions.
 Gup_τ0 = zero(Gup) # Gup(τ,0)
 Gup_0τ = zero(Gup) # Gup(0,τ)
 Gup_ττ = zero(Gup) # Gup(τ,τ)
@@ -530,7 +530,7 @@ function local_update!(
         δG = max(δG, δGup, δGdn)
 
         ## Keep up and down spin Green's functions synchronized as iterating over imaginary time.
-        iterate(fermion_greens_calc_dn, fermion_greens_calc_up.forward)
+        iterate(fermion_greens_calc_dn, fermion_greens_calc_up)
     end
 
     return logdetGup, sgndetGup, logdetGdn, sgndetGdn, δG, acceptance_rate
@@ -671,7 +671,7 @@ function make_measurements!(
         )
 
         ## Keep up and down spin Green's functions synchronized as iterating over imaginary time.
-        iterate(fermion_greens_calc_dn, fermion_greens_calc_up.forward)
+        iterate(fermion_greens_calc_dn, fermion_greens_calc_up)
     end
 
     return nothing
